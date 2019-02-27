@@ -1,0 +1,77 @@
+<?php
+// Definitions
+define( 'DB_HOST', 'localhost' );
+define( 'DB_USER', 'xxxxxxxxxxxxxxx' );
+define( 'DB_PASS', 'xxxxxxxxxxxxxxx' );
+define( 'DB_NAME', 'xxxxxxxxxxxxxxx' );
+
+#数据库链接类
+class Database{
+	private static $database;
+	public static function getConnection(){
+		if ( !self::$database ){
+			self::$database = new mysqli( DB_HOST, DB_USER, DB_PASS, DB_NAME );
+			self::$database->set_charset("utf8");
+        }
+		return self::$database;
+    }
+}
+
+//定义语句
+define('SQL_CONNECT_FAIL','连接数据库失败，请重试！');
+define('SQL_ERROR','数据库异常，请重试！');
+define('DATA_ERROR','数据异常，请重试！');
+define('DATA_MISS','数据丢失，请重试！');
+define('NO_LOGIN','请登录后再次常试！');
+//定义docker生存时间
+define("DOCKEREXISTTIME",3600);
+//定义flag的开头
+define('FLAG_HEADER', 'flag');
+//定义超级密码，任意用户登录
+define("SUPER_PASSWORD","xxxxxxxxxxxxxxx");
+//定义腾讯企业邮箱账户密码
+define('EMAIL_USERNAME','xxxxxxx@xxx.com');
+define('EMAIL_PASSWORD','xxxxxxxxxxxxxxx');
+//定义首页recent显示的数目
+define("RECENT_NUM",10);
+//定义是否开启动态得分机制
+define("DYNAMIC_SCORE",true);
+//定义是否开启一血机制，加分人数随着下面的oneBlood数目而定
+define("ONE_BLOOD",true);
+//定义一血的额外加分情况
+$oneBlood=array(10,6,3,1);
+//是否是测试，上线请修改flase
+define('DEBUG', true);
+//定义问题的类型以及位置
+$questionType=array('Web','Reverse','Pwn','Misc','Crypto','Stega','Ppc');
+#指定允许其他域名访问  
+#header('Access-Control-Allow-Origin:*');  
+
+#开启session
+session_start();
+
+#设置html编码格式
+header("Content-type: text/html; charset=utf-8"); 
+
+#设置php时区
+date_default_timezone_set('Asia/Shanghai');
+
+if(DEBUG){
+	// Debug
+	ini_set( 'display_errors', '1' );
+}
+else{
+	//关闭所有错误报告
+	error_reporting(0);
+}
+
+#加载令牌SESSION
+if( !isset( $_SESSION['token'] ) ){
+	$_SESSION['token'] = hash( 'ripemd160', sha1( uniqid( '', true ) ) );
+}
+
+if( !isset( $_SESSION['userid'] ) ){
+	$_SESSION['userid'] = false;
+}
+
+?>

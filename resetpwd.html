@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+	<title>Wpsec CTF</title>
+	<link href="//cdn.bootcss.com/materialize/0.98.2/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+	<script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+	<script src="//cdn.bootcss.com/highcharts/6.0.7/highcharts.js"></script>
+	<script src="//cdn.bootcss.com/highcharts/6.0.7/modules/sunburst.js"></script>
+	<script src="//cdn.bootcss.com/materialize/0.98.2/js/materialize.min.js"></script>
+	<link href="./favicon.ico" rel="shortcut icon"/>
+	<link href="./css/style.css" rel="stylesheet" type="text/css"/>
+	<script src="./js/ctf.js"></script>
+</head>
+<body>
+	<header style="padding-bottom: 3px;">
+		<nav class="blue" role="navigation">
+			<div class="container">
+				<div class="nav-wrapper">
+					<ul class="right hide-on-small-only">
+						<li><a href="./index.html">首页</a></li>
+						<li><a href="./scoreboard.html">排行</a></li>
+						<li><a href="./notice.html">公告</a></li>
+						<li><a href="./challenges.html">题目</a></li>
+						<li><a href="./about.html">关于</a></li>
+						<li><a href="./account.html">TEAM</a></li>
+					</ul>
+					<ul id="slide-out" class="side-nav">
+						<li class="logo"><a id="logo-container" href="/" class="brand-logo">
+							<object id="front-page-logo" type="image/png"></object></a></li>
+						<li><a href="./index.html">首页</a></li>
+						<li><a href="./scoreboard.html">排行</a></li>
+						<li><a href="./notice.html">公告</a></li>
+						<li><a href="./challenges.html">题目</a></li>
+						<li><a href="./about.html">关于</a></li>
+						<li><a href="./account.html">TEAM</a></li>
+					</ul>
+					<a href="#" data-activates="slide-out" class="button-collapse"><i class="large material-icons">reorder</i></a>
+					<a href="#" data-activates="slide-out" class="page-title" style="font-size: 30px;">WPSEC</a>
+				</div>
+			</div>
+		</nav>
+	</header>
+	<main>
+		<!-- 注册界面 -->
+		<div class="container">
+			<div class="section">
+				<div class="no-pad-bot section" id="index-banner">
+					<div class="container">
+						<h1 class="header center blue-text text-darken-2" id="header">Reset Password</h1>
+					</div>
+				</div>
+				<div class="row">
+					<div class="container">
+						<div class="col s12" id="resetone">
+							<div class="input-field col s10 offset-s1">
+								<i class="material-icons prefix">email</i>
+								<input id="email" type="email" class="validate">
+								<label for="email">*邮箱</label>
+							</div>
+							<div class="input-field col s7 offset-s1">
+								<i class="material-icons prefix">subject</i>
+								<input id="captcha" type="text" class="validate">
+								<label for="cap">*验证码</label>
+							</div>
+							<img id="capimg" class="col s3" onclick="getCaptcha()">
+							<button class="btn blue accent-2 col s4 offset-s4" id="sendmail">验证邮箱<i class="material-icons right">send</i></button>
+						</div>
+						<div id="resettwo" style="display: none">
+							<div class="input-field col s10 offset-s1">
+								<i class="material-icons prefix">lock_outline</i>
+								<input id="password" type="password" class="validate">
+								<label for="password">*请输入密码</label>
+							</div>
+							<div class="input-field col s10 offset-s1">
+								<i class="material-icons prefix">lock_open</i>
+								<input id="repeat" type="password" class="validate">
+								<label for="repeat">*请确认密码</label>
+							</div>
+							<div class="input-field col s10 offset-s1">
+								<i class="material-icons prefix">code</i>
+								<input id="resetkey" type="text" class="validate">
+								<label for="resetkey">*邮箱验证码</label>
+							</div>
+							<button class="btn blue accent-2 col s4 offset-s4" id="resetaccount">重置密码</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+	<script src="./js/resetpwd.js"></script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+	<title>Wpsec CTF</title>
+	<link href="//cdn.bootcss.com/materialize/0.98.2/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+	<script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+	<script src="//cdn.bootcss.com/highcharts/6.0.7/highcharts.js"></script>
+	<script src="//cdn.bootcss.com/highcharts/6.0.7/modules/sunburst.js"></script>
+	<script src="//cdn.bootcss.com/materialize/0.98.2/js/materialize.min.js"></script>
+	<link href="./favicon.ico" rel="shortcut icon"/>
+	<link href="./css/style.css" rel="stylesheet" type="text/css"/>
+	<script src="./js/ctf.js"></script>
+</head>
+<body>
+	<header style="padding-bottom: 3px;">
+		<nav class="blue" role="navigation">
+			<div class="container">
+				<div class="nav-wrapper">
+					<ul class="right hide-on-small-only">
+						<li><a href="./index.html">首页</a></li>
+						<li><a href="./scoreboard.html">排行</a></li>
+						<li><a href="./notice.html">公告</a></li>
+						<li><a href="./challenges.html">题目</a></li>
+						<li><a href="./about.html">关于</a></li>
+						<li><a href="./account.html">TEAM</a></li>
+					</ul>
+					<ul id="slide-out" class="side-nav">
+						<li class="logo"><a id="logo-container" href="/" class="brand-logo">
+							<object id="front-page-logo" type="image/png"></object></a></li>
+						<li><a href="./index.html">首页</a></li>
+						<li><a href="./scoreboard.html">排行</a></li>
+						<li><a href="./notice.html">公告</a></li>
+						<li><a href="./challenges.html">题目</a></li>
+						<li><a href="./about.html">关于</a></li>
+						<li><a href="./account.html">TEAM</a></li>
+					</ul>
+					<a href="#" data-activates="slide-out" class="button-collapse"><i class="large material-icons">reorder</i></a>
+					<a href="#" data-activates="slide-out" class="page-title" style="font-size: 30px;">WPSEC</a>
+				</div>
+			</div>
+		</nav>
+	</header>
+	<main>
+		<div class="no-pad-bot section" id="index-banner">
+			<div class="container">
+				<h1 class="header center blue-text text-darken-2">Questions</h1>
+			</div>
+		</div>
+
+		<!-- 题目板块 -->
+		<div class="container">
+			<div class="questions">
+			</div>
+		</div>
+	</main>
+	<!-- 模态框 -->
+	<div id="modal" class="modal row">
+		<ul class="tabs">
+			<li class="tab col s3"><a active href="#mod1">question</a></li>
+			<li class="tab col s3"><a href="#mod2" onclick="getQuestionSolves()">solves</a></li>
+		</ul>
+		<!-- 展示题目具体内容 -->
+		<div id="mod1" class="col s12">
+			<div class="modal-content" style="padding-top: 0">
+				<div class="">
+					<h4 class="center col s12" id="ques_tit"></h4>
+					<h5 class="center col s12" id="ques_score"></h5>
+				</div>
+				<div class="container">
+					<p id="ques_con"></p>
+				</div>
+			</div>
+			<form>
+				<div class="input-field col s12">
+					<div class="valign center">
+						<input type="text" placeholder="Input Your Flag" name="flag" style="width: 50%"/>
+					</div>
+				</div>
+				<div class="col s12">
+					<div class="valign center" style="padding-bottom: 20px">
+						<button class="btn waves-effect waves-light" type="submit" name="action">Submit<i class="material-icons right">send</i></button>
+					</div>
+				</div>
+			</form>
+		</div>
+		<!--此处用于显示solves-->
+		<div id="mod2" class="col s12">
+			<div class="modal-content">
+				<h5 class="center col s12" id="ques_solve"></h5>
+				<div class="container">
+					<table class="bordered highlight centered" id="solves"></table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="./js/challenges.js"></script> 
+</body>
+</html>

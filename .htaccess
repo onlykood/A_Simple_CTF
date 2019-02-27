@@ -1,0 +1,9 @@
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule ^QD-(.*)$ ./manage.php?check=$1 [L]
+ErrorDocument 404 /404.html
+</IfModule>
+<FilesMatch .wp$>
+Order allow,deny
+Deny from all
+</FilesMatch>

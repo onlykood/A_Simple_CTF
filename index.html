@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+	<title>Wpsec CTF</title>
+	<link href="//cdn.bootcss.com/materialize/0.98.2/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+	<script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+	<script src="//cdn.bootcss.com/highcharts/6.0.7/highcharts.js"></script>
+	<script src="//cdn.bootcss.com/highcharts/6.0.7/modules/sunburst.js"></script>
+	<script src="//cdn.bootcss.com/materialize/0.98.2/js/materialize.min.js"></script>
+	<link href="./favicon.ico" rel="shortcut icon"/>
+	<link href="./css/style.css" rel="stylesheet" type="text/css"/>
+	<script src="./js/ctf.js"></script>
+</head>
+<body>
+	<header style="padding-bottom: 3px;">
+		<nav class="blue" role="navigation">
+			<div class="container">
+				<div class="nav-wrapper">
+					<ul class="right hide-on-small-only">
+						<li><a href="./index.html">首页</a></li>
+						<li><a href="./scoreboard.html">排行</a></li>
+						<li><a href="./notice.html">公告</a></li>
+						<li><a href="./challenges.html">题目</a></li>
+						<li><a href="./about.html">关于</a></li>
+						<li><a href="./account.html">TEAM</a></li>
+					</ul>
+					<ul id="slide-out" class="side-nav">
+						<li class="logo"><a id="logo-container" href="/" class="brand-logo">
+							<object id="front-page-logo" type="image/png"></object></a></li>
+						<li><a href="./index.html">首页</a></li>
+						<li><a href="./scoreboard.html">排行</a></li>
+						<li><a href="./notice.html">公告</a></li>
+						<li><a href="./challenges.html">题目</a></li>
+						<li><a href="./about.html">关于</a></li>
+						<li><a href="./account.html">TEAM</a></li>
+					</ul>
+					<a href="#" data-activates="slide-out" class="button-collapse"><i class="large material-icons">reorder</i></a>
+					<a href="#" data-activates="slide-out" class="page-title" style="font-size: 30px;">WPSEC</a>
+				</div>
+			</div>
+		</nav>
+	</header>
+	<main>
+		<!--ul class="countdown">
+			<li>
+				<span class="days">0</span>
+				<p class="days_ref">days</p>
+			</li>
+			<li class="seperator">.</li>
+			<li>
+				<span class="hours">0</span>
+				<p class="hours_ref">hours</p>
+			</li>
+			<li class="seperator">:</li>
+			<li>
+				<span class="minutes">0</span>
+				<p class="minutes_ref">minutes</p>
+			</li>
+			<li class="seperator">:</li>
+			<li>
+				<span class="seconds">0</span>
+				<p class="seconds_ref">seconds</p>
+			</li>
+		</ul-->		
+		<div class="no-pad-bot section" id="index-banner">
+			<div class="container center">
+				<h1 class="header center" id="headline">A Simple CTF</h1>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col s"></div>
+		</div>
+		<div class="container">
+			<div class="section">
+				<div class="row center">
+					<h2 id="status"></h2>
+				</div>
+			</div>
+			<div class="section">
+				<div class="row">
+					<div class="col s12 m6 center">
+						<i class="material-icons medium blue-text text-darken-3">equalizer</i>
+						<h5 class="header center light">Top 3 Teams</h5>
+						<div id="scoreboard">
+							<table id="rank" class="bordered highlight center"></table>
+						</div>
+					</div>
+					<div class="col s12 m6 center">
+						<i class="material-icons medium blue-text text-darken-3">trending_down</i>
+						<h5 class="header center light">Recent Solves</h5>
+						<div id="solves" class="container">
+							<table id="recent_solves" class="center"></table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+	<script src="./js/index.js"></script>
+</body>
+</html>

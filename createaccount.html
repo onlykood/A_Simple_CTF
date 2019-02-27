@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+	<title>Wpsec CTF</title>
+	<link href="//cdn.bootcss.com/materialize/0.98.2/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+	<script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+	<script src="//cdn.bootcss.com/highcharts/6.0.7/highcharts.js"></script>
+	<script src="//cdn.bootcss.com/highcharts/6.0.7/modules/sunburst.js"></script>
+	<script src="//cdn.bootcss.com/materialize/0.98.2/js/materialize.min.js"></script>
+	<link href="./favicon.ico" rel="shortcut icon"/>
+	<link href="./css/style.css" rel="stylesheet" type="text/css"/>
+	<script src="./js/ctf.js"></script>
+</head>
+<body>
+	<header style="padding-bottom: 3px;">
+		<nav class="blue" role="navigation">
+			<div class="container">
+				<div class="nav-wrapper">
+					<ul class="right hide-on-small-only">
+						<li><a href="./index.html">首页</a></li>
+						<li><a href="./scoreboard.html">排行</a></li>
+						<li><a href="./notice.html">公告</a></li>
+						<li><a href="./challenges.html">题目</a></li>
+						<li><a href="./about.html">关于</a></li>
+						<li><a href="./account.html">TEAM</a></li>
+					</ul>
+					<ul id="slide-out" class="side-nav">
+						<li class="logo"><a id="logo-container" href="/" class="brand-logo">
+							<object id="front-page-logo" type="image/png"></object></a></li>
+						<li><a href="./index.html">首页</a></li>
+						<li><a href="./scoreboard.html">排行</a></li>
+						<li><a href="./notice.html">公告</a></li>
+						<li><a href="./challenges.html">题目</a></li>
+						<li><a href="./about.html">关于</a></li>
+						<li><a href="./account.html">TEAM</a></li>
+					</ul>
+					<a href="#" data-activates="slide-out" class="button-collapse"><i class="large material-icons">reorder</i></a>
+					<a href="#" data-activates="slide-out" class="page-title" style="font-size: 30px;">WPSEC</a>
+				</div>
+			</div>
+		</nav>
+	</header>
+	<main>
+		<!-- 注册界面 -->
+		<div class="container">
+			<div class="section">
+				<div class="no-pad-bot section" id="index-banner">
+					<div class="container">
+						<h1 class="header center blue-text text-darken-2" id="header">Register</h1>
+					</div>
+				</div>
+				<div class="row">
+					<div class="container">
+						<div class="col s12" id="regone">
+							<div class="input-field col s10 offset-s1">
+								<i class="material-icons prefix">account_circle</i>
+								<input id="username" type="text" class="validate">
+								<label for="username">*用户名</label>
+							</div>
+							<div class="input-field col s10 offset-s1">
+								<i class="material-icons prefix">email</i>
+								<input id="email" type="email" class="validate">
+								<label for="email">*邮箱</label>
+							</div>
+							<div class="input-field col s7 offset-s1">
+								<i class="material-icons prefix">subject</i>
+								<input id="captcha" type="text" class="validate">
+								<label for="cap">*验证码</label>
+							</div>
+							<img id="capimg" class="col s3" onclick="getCaptcha()">
+							<button class="btn blue accent-2 col s4 offset-s4" id="sendmail">发送邮件验证<i class="material-icons right">send</i></button>
+						</div>
+						<div id="regtwo" style="display: none">
+							<div class="input-field col s10 offset-s1">
+								<i class="material-icons prefix">lock_outline</i>
+								<input id="password" type="password" class="validate">
+								<label for="password">*请输入密码</label>
+							</div>
+							<div class="input-field col s10 offset-s1">
+								<i class="material-icons prefix">lock_open</i>
+								<input id="repeat" type="password" class="validate">
+								<label for="repeat">*请确认密码</label>
+							</div>
+							<div class="input-field col s10 offset-s1">
+								<i class="material-icons prefix">code</i>
+								<input id="regkey" type="text" class="validate">
+								<label for="regkey">*邮箱验证码</label>
+							</div>
+							<div class="col s12 hide">
+								<p class="center">
+									<input class="center" type="checkbox" id="agree" name="agree" checked/>
+									<label for="agree">我同意<a class="modal-trigger" href="#terms">注册协议</a></label>
+								</p>
+							</div>
+							<button class="btn blue accent-2 col s4 offset-s4" id="regaccount">注册</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="terms" class="modal">
+			<div class="modal-content" style="font-family: 微软雅黑">
+				<center><h4>注册协议</h4></center>
+				<p>本平台主要目的在于增强学生对网络及信息安全知识的兴趣，信息安全技术入门性引导，激励学生学习网络及信息安全技术的积极性；培养学生的创新意识、协作精神；提高学生利用信息安全知识解决实际问题的能力；吸引、鼓励广大学生踊跃参加课外科技活动，并从中发现人才。相关事宜通知如下：
+				<br />
+				<b>一．组织机构</b>
+				<br />
+				主办单位：啄木鸟网络安全小组
+				<br />
+				<b>二．比赛形式</b>
+				<br />
+				所有人均可参加比赛，单人制
+				<br />
+				<b>三．比赛方式及内容</b>
+				<br />
+				1.比赛方式
+				<br />
+				比赛采用在线注册答题形式：校内参赛队伍必须先在比赛平台上填写真实信息进行注册，然后在规定的时间内在比赛平台上进行相应的答题。
+				<br />
+				2.比赛时间 
+				<br />
+				平台开放时间：
+				<br />
+				3.比赛内容 
+				<br />
+				比赛知识点主要涉及: 
+				<br />
+				1).网络安全测试 
+				<br />
+				网络安全测试以整体网络环境安全测试为主。环境包括若干常见WEB网站系统，搭建的若干整站环境其中包含一个内网环境。测试过程中，需要记录在各整体网络环境测试中的思路，使用工具，测试的过程等以及针对测试中所发现的安全隐患提出的解决办法。平台答题结束之前，找到key，到平台提交key得分。 
+				<br />
+				可能还会单独考察一些知识点:Linux命令，工具；脚本等。
+				<br />
+				2).软件安全编程考察
+				<br />
+				考察反汇编基础和一些小工具的使用；
+				<br />
+				针对常用的缓冲区溢出利用(ExploitMe)技术分析；
+				<br />
+				恶意代码分析；
+				<br />
+				做题过程中，需要详细记录自己的做题过程。考察得到key时间，个别类型的题目需要将解题文档提交到指定QQ由组委会人工审核之后告知相应的key。
+				<br />
+				<b>四．报名方式</b>
+				<br />
+				根据答题平台，进行注册，登陆并在线答题。
+				<br />
+				<b>五．比赛其他注意事项</b>
+				<br />
+				1.参赛人员禁止抄袭，窃取别的参赛人员的文档或者Key。一旦发生，一经查实，立即取消参赛资格。
+				<br />
+				2.参赛人员禁止泄露或者散布Key或者文档。一旦发生，一经查实，立即取消参赛资格。
+				<br />
+				3.禁止攻击本平台服务器，一旦发生，一经查实，立即取消参赛资格。
+				<br />
+				4.在参赛期间，不能有违反国家有关法律法规的行为，如发生此类违法现象，个人承担相关责任，与主办和承办单位无关。
+				<br />
+				5.本次活动的最终解释权由啄木鸟网络安全小组所有。
+				<br />
+				</p>
+			</div>
+		</div>	
+	</main>
+	<script src="./js/createaccount.js"></script>
+</body>
+</html>

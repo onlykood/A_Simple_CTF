@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+	<title>Wpsec CTF</title>
+	<link href="//cdn.bootcss.com/materialize/0.98.2/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+	<script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+	<script src="//cdn.bootcss.com/highcharts/6.0.7/highcharts.js"></script>
+	<script src="//cdn.bootcss.com/highcharts/6.0.7/modules/sunburst.js"></script>
+	<script src="//cdn.bootcss.com/materialize/0.98.2/js/materialize.min.js"></script>
+	<!-- <script src="//cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js"></script> -->
+	<link href="./favicon.ico" rel="shortcut icon"/>
+	<link href="./css/style.css" rel="stylesheet" type="text/css"/>
+	<script src="./js/ctf.js"></script>
+</head>
+<body>
+	<header style="padding-bottom: 3px;">
+		<nav class="blue" role="navigation">
+			<div class="container">
+				<div class="nav-wrapper">
+					<ul class="right hide-on-small-only">
+						<li><a href="./index.html">首页</a></li>
+						<li><a href="./scoreboard.html">排行</a></li>
+						<li><a href="./notice.html">公告</a></li>
+						<li><a href="./challenges.html">题目</a></li>
+						<li><a href="./about.html">关于</a></li>
+						<li><a href="./account.html">TEAM</a></li>
+					</ul>
+					<ul id="slide-out" class="side-nav">
+						<li class="logo"><a id="logo-container" href="/" class="brand-logo">
+							<object id="front-page-logo" type="image/png"></object></a></li>
+						<li><a href="./index.html">首页</a></li>
+						<li><a href="./scoreboard.html">排行</a></li>
+						<li><a href="./notice.html">公告</a></li>
+						<li><a href="./challenges.html">题目</a></li>
+						<li><a href="./about.html">关于</a></li>
+						<li><a href="./account.html">TEAM</a></li>
+					</ul>
+					<a href="#" data-activates="slide-out" class="button-collapse"><i class="large material-icons">reorder</i></a>
+					<a href="#" data-activates="slide-out" class="page-title" style="font-size: 30px;">WPSEC</a>
+				</div>
+			</div>
+		</nav>
+	</header>
+	<main>
+		<!-- 未登录界面模块 -->
+		<div class="container">
+			<div class="section" id="lin" style="display: none;">
+				<div class="no-pad-bot section" id="index-banner">
+					<div class="container">
+						<h1 class="header center blue-text text-darken-2" id="header">Login</h1>
+					</div>
+				</div>
+				<div class="row">
+					<form class="col s12" id="login" method="post">
+						<div class="container">
+							<div class="input-field col s10 offset-s1">
+								<i class="material-icons prefix">account_circle</i>
+								<input name="name" id="name" type="text" class="validate">
+								<label for="name"><!-- Username --></label>
+							</div>
+							<div class="input-field col s10 offset-s1">
+								<i class="material-icons prefix">vpn_key</i>
+								<input name="password" id="password" type="password" class="validate">
+								<label for="password"><!-- Password --></label>
+							</div>
+							<div class="input-field col s7 offset-s1">
+								<i class="material-icons prefix">subject</i>
+								<input name="captcha" id="captcha" type="text" class="validate">
+								<label for="cap">*验证码</label>
+							</div>
+							<img id="capimg" class="col s3" onclick="getCaptcha()">
+							<button class="btn waves-effect waves-light blue accent-2 col s4 offset-s4" type="submit" name="action">登陆</button>
+						</div>
+					</form>
+					<div class="col s5 offset-s8">
+						<a href="createaccount.html">注册账户</a> / <a href="resetpwd.html">忘记密码</a>
+					</div>
+				</div>
+			</div>
+		</div>	
+		<!-- 登陆界面模块 -->
+		<div class="container center" id="info" style="display: none">
+			<div class="row">
+				<div class="col s12">
+					<ul class="tabs">
+						<li class="tab col s2"><a href="#quesinfo">答题信息</a></li>
+						<li class="tab col s2"><a href="#baseinfo">个人信息</a></li>
+						<li class="tab col s2"><a href="#changpass">修改密码</a></li>
+						<li class="tab col s2"><a href="#beta" onclick="loadVideo()">秘密通道</a></li>
+					</ul>
+				</div>
+				<div id="quesinfo" class="col s12">
+					<div class="col s12 center">
+						<div style="float:left;width:45%;">
+							<div id="pic1"></div>
+						</div>
+						<div style="float:right;width:45%;">
+							<div id="pic2"></div>
+						</div>
+					</div>
+					<table id="subinfo" class="striped bordered highlight centered"></table>
+				</div>
+				<!-- 修改基础信息板块，想要渗透测试一下么 -->
+				<div id="baseinfo" class="col s12 center">
+					<form id="userbaseinfo" method="post">
+						<div class="row">
+							<div class="input-field col s6 offset-s3">
+								<input type="file" class="imgInput" style="display: none;"/>
+								<img class="headImgShow" style="width:200px; height:200px; border-style:solid; border-color: #e1e1e1; border-width: 1px; border-radius:200px;" src="//upload.jianshu.io/users/upload_avatars/4525478/7332f531-3114-4c1a-a9b7-f9df29c79220.jpg"/>
+								<!-- 遮罩层，暂时取消-->
+								<!-- <div class="headImgs">
+									<a href="#" class="headImg">
+										<div class="mask" style="line-height: 150px;">
+											<font size="5px">点击上传头像</font>
+										</div>
+									</a>
+								</div> -->
+							</div>
+						</div>
+						<div class="row">
+							<div class="input-field col s6 offset-s3">
+								<i class="material-icons prefix">assignment_ind</i>
+								<input disabled placeholder="" id="username" type="text">
+								<label for="user">姓名</label>
+							</div>
+						</div>
+						<div class="row">							
+							<div class="input-field col s6 offset-s3">
+								<i class="material-icons prefix">email</i>
+								<input disabled placeholder="" id="email" type="text">
+								<label for="email">邮箱</label>
+							</div>
+						</div>
+						<div class="row">							
+							<div class="input-field col s6 offset-s3">
+								<i class="material-icons prefix">account_circle</i>
+								<input placeholder="" id="nickname" type="text" data-length="20" class="validate">
+								<label for="nickname">昵称</label>
+							</div>
+						</div>
+						<div class="row">
+							<div class="input-field col s6 offset-s3">
+								<i class="material-icons prefix">book</i>
+								<input placeholder="" id="said" type="text" data-length="50" class="validate">
+								<label for="name">个性签名</label>
+							</div>
+						</div>
+						<button class="btn blue" type="submit" >修改</button>
+					</form>
+				</div>
+				<!-- 修改密码板块，想要来一发么？ -->
+				<div id="changpass" class="col s12">
+					<form id="passinfo" method="post">
+				 		<div class="row">
+							<div class="input-field col s6 offset-s3">
+								<i class="material-icons prefix">lock_outline</i>
+								<input id="oldpassword" type="password" class="validate">
+								<label for="password">当前密码</label>
+							</div>
+						</div>
+						<div class="row">
+							<div class="input-field col s6 offset-s3">
+								<i class="material-icons prefix">vpn_key</i>
+								<input id="newpassword1" type="password" class="validate">
+								<label for="password">新密码</label>
+							</div>
+						</div>
+						<div class="row">
+							<div class="input-field col s6 offset-s3">
+								<i class="material-icons prefix">vpn_key</i>
+								<input id="newpassword2" type="password" class="validate">
+								<label for="password">确认密码</label>
+							</div>
+						</div>
+							<button class="btn blue" type="submit">修改</button>
+					</form>
+				</div>
+				<!-- 视频测试板块 -->
+				<div id="beta" class="col s12"></div>
+			</div>
+		</div>
+	</main>
+	<!-- 悬浮设置按钮 -->
+	<div id="setMenu" class="fixed-action-btn" style="display: none;">
+		<a class="btn-floating btn-large red" style="min-height: 0;border: none;">
+			<i class="large material-icons">settings</i>
+		</a>
+		<ul>
+			<li><a id="logout" class="btn-floating red tooltipped" data-position="left" data-delay="50" data-tooltip="退出"><i class="material-icons">input</i></a></li>
+			<li><a class="btn-floating yellow darken-1 tooltipped" data-position="left" data-delay="50" data-tooltip="暂定"><i class="material-icons">format_quote</i></a></li>
+			<li><a class="btn-floating green tooltipped" data-position="left" data-delay="50" data-tooltip="暂定"><i class="material-icons">publish</i></a></li>
+			<li><a id="share" class="btn-floating blue tooltipped" data-position="left" data-delay="50" data-tooltip="分享"><i class="material-icons">attach_file</i></a></li>
+		</ul>
+	</div>
+	<script src="./js/account.js"></script>
+</body>
+</html>
