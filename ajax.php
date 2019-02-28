@@ -9,9 +9,9 @@ if( !isset( $_GET['m'] ) || !is_string( $_GET['m'] ) )
 }
 
 //检测数据库连接情况
-$link=Database::getConnection();
+$link=@Database::getConnection();
 if (mysqli_connect_errno()){
-	returnInfo(SQL_CONNECT_FAIL);
+	returnInfo(MY_ERROR['SQL_CONNECT_FAIL']);
 }
 
 //检测token令牌是否存在/被改写
@@ -19,9 +19,9 @@ if(!isset($_POST['token'])||($_SESSION['token'] !== $_POST['token'])){
 	if($_GET['m']!='getSession'&&$_GET['m']!='getCaptcha'){
 		unset($_SESSION['token']);
 		if(!isset($_POST['token'])){
-			returnInfo(DATA_MISS);
+			returnInfo(MY_ERROR['DATA_MISS']);
 		}
-		returnInfo(DATA_ERROR);
+		returnInfo(MY_ERROR['DATA_ERROR']);
 	}
 }
 switch( $_GET['m'] )	{
@@ -91,6 +91,6 @@ switch( $_GET['m'] )	{
 	case 'getDockerUrl':
 		getDockerUrl();
 	default:
-		returnInfo(DATA_ERROR);
+		returnInfo(MY_ERROR['DATA_ERROR']);
 }
 ?>

@@ -24,8 +24,10 @@ function loadSession()
 		dataType: 'json',
 		async:false,/*这里必须要设置同步，不然会造成不必要的麻烦，例如本来登陆的，但是访问页面却出现登陆界面，jq有警告也没办法了╮(╯▽╰)╭*/
 		success:function(data){
+			debugLog('========');
 			debugLog(data);
 			if(errorCheck(data)){
+				debugLog("----");
 				logout();
 				return false;
 			}
@@ -51,7 +53,7 @@ function login(data){
 	loggedin = true;
 }
 
-function logout()	{
+function logout(){
 	name = 'unknow';
 	mail = 'unknow';
 	said = 'unknow';
@@ -93,11 +95,17 @@ function errorCheck(data){
 		Materialize.toast(data[0][1], 4000);
 		return 1;
 	}
+	if(data[0][0]=='-1'){
+		window.location.href='./easyInstall.php';
+		return 1;
+	}
 	return 0;
 }
 
-loadSession();
 $(document).ready(function(){
+	loadSession();
 	$(".button-collapse").sideNav();
 	$('.modal').modal();
-	console.log("██╗    ██╗███████╗██╗      ██████╗ ██████╗ ███╗   ███╗███████╗    ████████╗ ██████╗     ██╗    ██╗██████╗ ███████╗███████╗ ██████╗     ██████╗████████╗███████╗\n██║    ██║██╔════╝██║     ██╔════╝██╔═══██╗████╗ ████║██╔════╝    ╚══██╔══╝██╔═══██╗    ██║    ██║██╔══██╗██╔════╝██╔════╝██╔════╝    ██╔════╝╚══██╔══╝██╔════╝\n██║ █╗ ██║█████╗  ██║     ██║     ██║   ██║██╔████╔██║█████╗         ██║   ██║   ██║    ██║ █╗ ██║██████╔╝███████╗█████╗  ██║         ██║        ██║   █████╗  \n██║███╗██║██╔══╝  ██║     ██║     ██║   ██║██║╚██╔╝██║██╔══╝         ██║   ██║   ██║    ██║███╗██║██╔═══╝ ╚════██║██╔══╝  ██║         ██║        ██║   ██╔══╝  \n╚███╔███╔╝███████╗███████╗╚██████╗╚██████╔╝██║ ╚═╝ ██║███████╗       ██║   ╚██████╔╝    ╚███╔███╔╝██║     ███████║███████╗╚██████╗    ╚██████╗   ██║   ██║     \n ╚══╝╚══╝ ╚══════╝╚══════╝ ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚══════╝       ╚═╝    ╚═════╝      ╚══╝╚══╝ ╚═╝     ╚══════╝╚══════╝ ╚═════╝     ╚═════╝   ╚═╝   ╚═╝     \n                                                                                                                                                               \n");});
+	console.clear();
+	console.log("Welcome to my simple ctf, have a good time.");
+});

@@ -6,8 +6,16 @@ init.php
 # 测试文件
 # 
 test*.php
+flag.php
 
 # 短信测试文件
 /qcloudsms_php/
 短信发送.php
 
+# 数据库文件
+*.sql
+!1.sql
+
+
+# lock 文件
+*.lock

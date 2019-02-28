@@ -331,11 +331,11 @@ $(document).ready(function(){
 			processData: false,
 			contentType: false,
 			success: function(data){
+				debugLog(data);
 				if(errorCheck(data)){
 					getCaptcha();
 					return false;
 				}
-				debugLog("load function");
 				loadSession();
 				loadAccount();
 				//location.reload();

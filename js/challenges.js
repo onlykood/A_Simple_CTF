@@ -176,7 +176,7 @@ $(document).ready(function(){
 		}
 	});
 	getQuestions();
-	getQ(30);
+	//getQ(30);
 	$( 'form' ).submit(function(){
 		$.ajax({
 			type: 'POST',
