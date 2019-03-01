@@ -7,35 +7,6 @@
 */
 
 
-// 用于 Debug 模式，获取响应开始时间
-if(MY_SWITCH['DEBUG']){
-	$startTime = microtime(true);
-}
-
-/**
- * @description 用 json 格式返回信息
- * @Author      kood
- * @DateTime    2019-02-27
- * @param       string     $text      小提示框的显示文字
- * @param       string     $code      返回的状态码
- * @param       array      $data      返回的数据
- * @param       string     $debugInfo 如果开启 debug 模式，附加此项
- * @return      string                json 字符串
- */
-function returnInfo($text='NULL',$code='0',$datas=array(),$debugInfo=''){
-	$info=array(
-		array($code,$text),
-		$datas
-	);
-	if(MY_SWITCH['DEBUG']){
-		Global $startTime;
-		$endTime = microtime(true);
-		$info[0][2]=$endTime-$startTime;
-		$info[0][3]=$debugInfo;
-	}
-	exit(json_encode($info));
-}
-
 /**
  * @description 定义动态积分的得分函数模型
  * https://zh.numberempire.com/graphingcalculator.php 可绘制图形，1001-1000/(1.01+2.5^(12-x))
@@ -181,9 +152,6 @@ function getSession(){
 	);
 	loginCheck(true) or returnInfo("OK","1",array_values($data));
 
-	if(!file_exists('install.lock')){
-		returnInfo('No install','-1');
-	}
 	//returnInfo(MY_CONFIG['DATA_ERROR'],'-1');
 	$link =Database::getConnection();
 	$sql=$link->query(
@@ -703,9 +671,11 @@ function login( $name, $password ,$captcha) {
 		from users 
 		where BINARY name = '$name'"
 	);
-	$sql=$link->query("INSERT into ip_lists(`user_id`,`ip`,`time`,`status`) values('".$row['id']."','$ip','$time','10')");
+	
 	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+
 	$sql->num_rows or returnInfo('用户名或密码错误！',$debugInfo="1");
+
 	$row=$sql->fetch_assoc();
 
 	$password = md5($password.$row['user_key']);
@@ -1069,6 +1039,7 @@ function getDockerUrl(){
 	$sql->num_rows or returnInfo("No this docker");
 	$dockerID=$sql->fetch_assoc()['dockerid'];
 	if($dockerID=="0"){
+		//???
 		returnInfo("无docker，请重试！");
 	}
 
