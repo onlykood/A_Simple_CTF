@@ -3,7 +3,7 @@ function getQuestion(obj)
 {
 	debugLog(obj);
 	quesid=obj.id;
-	debugLog('click');
+	debugLog('click1');
 	$.ajax({
 		type: 'POST',
 		url: 'ajax.php?m=getQuestion',

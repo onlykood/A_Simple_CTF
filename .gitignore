@@ -19,3 +19,6 @@ flag.php
 
 # lock 文件
 *.lock
+
+# sql配置文件
+config.php

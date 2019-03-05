@@ -511,7 +511,6 @@ function getQuestion($id){
 	inputCheck('id',$id);
 	loginCheck();
 	$id=intval($id);
-
 	$link=Database::getConnection();
 	$sql=$link->query("SELECT id,`type`,typeid,title,content,score,rand_seed,rand_open,flag from questions where id='$id' and del=0");
 	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
@@ -828,15 +827,14 @@ function contentReplace($content){
 function dockerButtonReplace($quesid){
 	$userid=$_SESSION['userid'];
 	$link=Database::getConnection();
-
 	//更新 dockeruse 表中的 docker 使用状态，删除设定好的时间之前的数据
 	$time=time()-MY_CONFIG['DOCKER_EXIST_TIME'];
 	//$sql=$link->query("DELETE from dockeruse where `time` < '$time'");
 	//$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	returnInfo("Break!!");
 
-
-	$sql=$link->query("SELECT `url` from dockeruse where userid='$userid' and quesid='$quesid' and `time`> '$time'");
-	$sql or reutnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	$sql=$link->query("SELECT `url` from docker_uses where user_id='$userid' and ques_id='$quesid' and `time`> '$time'");
+	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
 
 	if(!$sql->num_rows){
 		return '<center><a class="waves-effect waves-light btn" id="dockerButton"><i class="material-icons right">cloud</i>下发docker</a></center>';
@@ -858,7 +856,10 @@ function questionContentReplace($questions){
 		$content=str_replace($matches[0],'<a class="btn grey" href="./QD-'.$check.'" target="_blank">'.$matches[1].'</a>', $content);
 	}
 	$content=str_ireplace('$Dlink','<a class="btn grey" href="./QD-'.$check.'" target="_blank">'.$questions['title'].'</a>', $content);
-	$content=str_replace('$dockerButton',dockerButtonReplace($questions['id']),$content);
+	if(strpos($content,'$dockerButton')){
+		$content=str_replace('$dockerButton',dockerButtonReplace($questions['id']),$content);
+	}
+
 	$content=str_ireplace('$rand', md5(time()),$content);
 	$_SESSION['check']=$check;
 	return $content;
@@ -867,6 +868,7 @@ function questionContentReplace($questions){
 #获取所有题目的名称(id,type,title,score,pass) sql need refactoring
 function getQuestions(){
 	loginCheck();
+
 	$userid=$_SESSION['userid'];
 	$link=Database::getConnection();
 	$sql=$link->query(
