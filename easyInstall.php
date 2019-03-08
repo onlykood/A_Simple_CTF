@@ -38,112 +38,112 @@ if(	isset($_POST['DB_HOST']) && isset($_POST['DB_USER']) && isset($_POST['DB_PAS
 // 导入数据表
 $link->query("DROP TABLE IF EXISTS `users_info`") or die('SQL error');
 $link->query("CREATE TABLE IF NOT EXISTS `users_info`(
-  `id`          int(11)          NOT NULL AUTO_INCREMENT                             COMMENT '用户id',
-  `name`        varchar(50)      NOT NULL DEFAULT 'unknown'                          COMMENT '姓名',
-  `password`    char(32)         NOT NULL DEFAULT ''                                 COMMENT '密码',
-  `email`       varchar(50)      NOT NULL DEFAULT 'unknow@unknown.com'               COMMENT '邮箱',
-  `team_id`     varchar(50)      NOT NULL DEFAULT '0'                                COMMENT '队伍id',
-  `key`         char(32)         NOT NULL DEFAULT '00000000000000000000000000000000' COMMENT '随机生成的 key ，用于随机 flag 生成以及密码的盐值',
-  `extra_score` int(11)          NOT NULL DEFAULT '0'                                COMMENT '额外得分',
-  `hint_score`  int(11)          NOT NULL DEFAULT '0'                                COMMENT '提示积分',
-  `nickname`    varchar(50)      NOT NULL DEFAULT 'unknown'                          COMMENT '昵称',
-  `said`        varchar(50)      NOT NULL DEFAULT ''                                 COMMENT '言论',
-  `reg_time`    int(11) UNSIGNED NOT NULL DEFAULT '0'                                COMMENT '注册时间',
-  `reg_ip`      int(11) UNSIGNED NOT NULL DEFAULT '0'                                COMMENT '注册ip',
-  `logged_time` int(11) UNSIGNED NOT NULL DEFAULT '0'                                COMMENT '最后登陆时间',
-  `logged_ip`   int(11) UNSIGNED NOT NULL DEFAULT '0'                                COMMENT '最后登陆ip',
-  `big_img`     mediumtext       NOT NULL                                            COMMENT '大图头像',
-  `tiny_img`    text             NOT NULL                                            COMMENT '小图头像',
-  `is_hide`     tinyint(1)       NOT NULL DEFAULT '0'                                COMMENT '是否隐藏',
-  `is_ban`      tinyint(1)       NOT NULL DEFAULT '0'                                COMMENT '是否禁止',
-  `is_admin`    tinyint(1)       NOT NULL DEFAULT '0'                                COMMENT '是否管理',
+  `id`          int(11)          NOT NULL AUTO_INCREMENT                             ,
+  `name`        varchar(50)      NOT NULL DEFAULT 'unknown'                          ,
+  `password`    char(32)         NOT NULL DEFAULT ''                                 ,
+  `email`       varchar(50)      NOT NULL DEFAULT 'unknow@unknown.com'               ,
+  `team_id`     varchar(50)      NOT NULL DEFAULT '0'                                ,
+  `key`         char(32)         NOT NULL DEFAULT '00000000000000000000000000000000' ,
+  `extra_score` int(11)          NOT NULL DEFAULT '0'                                ,
+  `hint_score`  int(11)          NOT NULL DEFAULT '0'                                ,
+  `nickname`    varchar(50)      NOT NULL DEFAULT 'unknown'                          ,
+  `said`        varchar(50)      NOT NULL DEFAULT ''                                 ,
+  `reg_time`    int(11) UNSIGNED NOT NULL DEFAULT '0'                                ,
+  `reg_ip`      int(11) UNSIGNED NOT NULL DEFAULT '0'                                ,
+  `logged_time` int(11) UNSIGNED NOT NULL DEFAULT '0'                                ,
+  `logged_ip`   int(11) UNSIGNED NOT NULL DEFAULT '0'                                ,
+  `big_img`     mediumtext       NOT NULL                                            ,
+  `tiny_img`    text             NOT NULL                                            ,
+  `is_hide`     tinyint(1)       NOT NULL DEFAULT '0'                                ,
+  `is_ban`      tinyint(1)       NOT NULL DEFAULT '0'                                ,
+  `is_admin`    tinyint(1)       NOT NULL DEFAULT '0'                                ,
   PRIMARY KEY(`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户信息表'") or die('SQL error1');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8") or die('SQL error1');
 
 $link->query("DROP TABLE IF EXISTS `users_team`") or die('SQL error');
 $link->query("CREATE TABLE IF NOT EXISTS `users_team`(
-  `id`          int(11)          NOT NULL AUTO_INCREMENT    COMMENT '队伍id',
-  `name`        varchar(50)      NOT NULL DEFAULT 'unknown' COMMENT '队伍名称',
-  `create_time` int(11) UNSIGNED NOT NULL DEFAULT '0'       COMMENT '创建时间',
-  `is_leader`   tinyint(1)       NOT NULL DEFAULT '0'       COMMENT '是否队长',
-  `is_hide`     tinyint(1)       NOT NULL DEFAULT '0'       COMMENT '是否隐藏',
+  `id`          int(11)          NOT NULL AUTO_INCREMENT    ,
+  `name`        varchar(50)      NOT NULL DEFAULT 'unknown' ,
+  `create_time` int(11) UNSIGNED NOT NULL DEFAULT '0'       ,
+  `is_leader`   tinyint(1)       NOT NULL DEFAULT '0'       ,
+  `is_hide`     tinyint(1)       NOT NULL DEFAULT '0'       ,
   PRIMARY KEY(`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='队伍表'") or die('SQL error2');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8") or die('SQL error2');
 
 $link->query("DROP TABLE IF EXISTS `ctf_challenges`") or die('SQL error');
 $link->query("CREATE TABLE IF NOT EXISTS `ctf_challenges` (
-  `id`          int(11)          NOT NULL AUTO_INCREMENT  COMMENT '题目id',
-  `hrad_level`  tinyint(1)       NOT NULL DEFAULT '0'     COMMENT '难度等级',
-  `create_time` int(11) UNSIGNED NOT NULL DEFAULT '0'     COMMENT '创建时间',
-  `edit_time`   int(11) UNSIGNED NOT NULL DEFAULT '0'     COMMENT '编辑时间',
-  `type`        tinyint(1)       NOT NULL DEFAULT '0'     COMMENT '类型',
-  `type_id`     int(1)       NOT NULL DEFAULT '0'     COMMENT '该类型中的id',
-  `docker_id`   int(11)          NOT NULL DEFAULT '0'     COMMENT '题目对应docker的id',
-  `score`       int(11)          NOT NULL DEFAULT '0'     COMMENT '静态分值',
-  `title`       varchar(100)     NOT NULL DEFAULT ''      COMMENT '题目名称',
-  `content`     text             NOT NULL                 COMMENT '题目描述',
-  `flag`        varchar(100)     NOT NULL DEFAULT ''      COMMENT 'flag内容',
-  `seed`        char(5)          NOT NULL DEFAULT 'ILWYE' COMMENT '随机种子',
-  `is_rand`     tinyint(1)       NOT NULL DEFAULT '0'     COMMENT '是否随机',
-  `is_hide`     tinyint(1)       NOT NULL DEFAULT '1'     COMMENT '是否隐藏',
+  `id`          int(11)          NOT NULL AUTO_INCREMENT  ,
+  `hard_level`  tinyint(1)       NOT NULL DEFAULT '0'     ,
+  `create_time` int(11) UNSIGNED NOT NULL DEFAULT '0'     ,
+  `edit_time`   int(11) UNSIGNED NOT NULL DEFAULT '0'     ,
+  `type`        tinyint(1)       NOT NULL DEFAULT '0'     ,
+  `type_id`     int(1)       NOT NULL DEFAULT '0'     ,
+  `docker_id`   int(11)          NOT NULL DEFAULT '0'     ,
+  `score`       int(11)          NOT NULL DEFAULT '0'     ,
+  `title`       varchar(100)     NOT NULL DEFAULT ''      ,
+  `content`     text             NOT NULL                 ,
+  `flag`        varchar(100)     NOT NULL DEFAULT ''      ,
+  `seed`        char(5)          NOT NULL DEFAULT 'ILWYE' ,
+  `is_rand`     tinyint(1)       NOT NULL DEFAULT '0'     ,
+  `is_hide`     tinyint(1)       NOT NULL DEFAULT '1'     ,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='CTF题表'") or die('SQL error3');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8") or die('SQL error3');
 
 $link->query("DROP TABLE IF EXISTS `ctf_submits`") or die('SQL error');
 $link->query("CREATE TABLE IF NOT EXISTS `ctf_submits` (
-  `id`       int(11)          NOT NULL AUTO_INCREMENT COMMENT '提交id',
-  `user_id`  int(11)          NOT NULL DEFAULT '0'    COMMENT '用户id',
-  `ques_id`  int(11)          NOT NULL DEFAULT '0'    COMMENT '题目id',
-  `sub_time` int(11) UNSIGNED NOT NULL DEFAULT '0'    COMMENT '提交时间',
-  `sub_ip`   int(11) UNSIGNED NOT NULL DEFAULT '0'    COMMENT '提交ip',
-  `sub_flag` varchar(100)     NOT NULL DEFAULT ''     COMMENT '提交flag',
-  `is_pass`  tinyint(1)       NOT NULL DEFAULT '0'    COMMENT '是否通过',
-  `is_hide`  tinyint(1)       NOT NULL DEFAULT '0'    COMMENT '是否隐藏',
+  `id`       int(11)          NOT NULL AUTO_INCREMENT ,
+  `user_id`  int(11)          NOT NULL DEFAULT '0'    ,
+  `ques_id`  int(11)          NOT NULL DEFAULT '0'    ,
+  `sub_time` int(11) UNSIGNED NOT NULL DEFAULT '0'    ,
+  `sub_ip`   int(11) UNSIGNED NOT NULL DEFAULT '0'    ,
+  `sub_flag` varchar(100)     NOT NULL DEFAULT ''     ,
+  `is_pass`  tinyint(1)       NOT NULL DEFAULT '0'    ,
+  `is_hide`  tinyint(1)       NOT NULL DEFAULT '0'    ,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='CTF提交表'") or die('SQL error4');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8") or die('SQL error4');
 
 $link->query("DROP TABLE IF EXISTS `notices`") or die('SQL error');
 $link->query("CREATE TABLE IF NOT EXISTS `notices` (
-  `id`          int(11)          NOT NULL AUTO_INCREMENT COMMENT '公告id',
-  `create_time` int(11) UNSIGNED NOT NULL DEFAULT '0'    COMMENT '创建时间',
-  `create_user` int(11)          NOT NULL DEFAULT '0'    COMMENT '创建用户id',
-  `edit_time`   int(11) UNSIGNED NOT NULL DEFAULT '0'    COMMENT '编辑时间',
-  `edit_user`   int(11)          NOT NULL DEFAULT '0'    COMMENT '编辑用户',
-  `content`     text             NOT NULL                COMMENT '公告内容',
-  `is_hide`     tinyint(1)       NOT NULL DEFAULT '1'    COMMENT '是否隐藏',
-  `is_delete`   tinyint(1)       NOT NULL DEFAULT '0'    COMMENT '是否删除',
+  `id`          int(11)          NOT NULL AUTO_INCREMENT ,
+  `create_time` int(11) UNSIGNED NOT NULL DEFAULT '0'    ,
+  `create_user_id` int(11)       NOT NULL DEFAULT '0'    ,
+  `edit_time`   int(11) UNSIGNED NOT NULL DEFAULT '0'    ,
+  `edit_user_id`   int(11)       NOT NULL DEFAULT '0'    ,
+  `content`     text             NOT NULL                ,
+  `is_hide`     tinyint(1)       NOT NULL DEFAULT '1'    ,
+  `is_delete`   tinyint(1)       NOT NULL DEFAULT '0'    ,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='公告表'") or die('SQL error5');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8") or die('SQL error5');
 
 $link->query("DROP TABLE IF EXISTS `docker_use_lists`") or die('SQL error');
 $link->query("CREATE TABLE IF NOT EXISTS `docker_use_lists` (
-  `id`          int(11)      	 NOT NULL AUTO_INCREMENT COMMENT '下发id',
-  `user_id`     int(11)      	 NOT NULL DEFAULT '0'    COMMENT '用户id',
-  `ques_id`     int(11)      	 NOT NULL DEFAULT '0'    COMMENT '题目id',
-  `docker_id`   int(11)      	 NOT NULL DEFAULT '0'    COMMENT '容器id',
-  `ret_url`     varchar(100) 	 NOT NULL DEFAULT '#'    COMMENT '返回网址',
-  `create_time` int(11) UNSIGNED NOT NULL DEFAULT '0'    COMMENT '创建时间',
+  `id`          int(11)      	 NOT NULL AUTO_INCREMENT ,
+  `user_id`     int(11)      	 NOT NULL DEFAULT '0'    ,
+  `ques_id`     int(11)      	 NOT NULL DEFAULT '0'    ,
+  `docker_id`   int(11)      	 NOT NULL DEFAULT '0'    ,
+  `ret_url`     varchar(100) 	 NOT NULL DEFAULT '#'    ,
+  `create_time` int(11) UNSIGNED NOT NULL DEFAULT '0'    ,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='docker下发记录'") or die('SQL error6');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8") or die('SQL error6');
 
 
 $link->query("DROP TABLE IF EXISTS `users_action`") or die('SQL error');
 $link->query("CREATE TABLE IF NOT EXISTS `users_action`(
-  `id`      int(11)          NOT NULL AUTO_INCREMENT COMMENT '自增主键',
-  `user_id` int(11)          NOT NULL DEFAULT '0'    COMMENT '用户id',
-  `ip`      int(11) UNSIGNED NOT NULL DEFAULT '0'    COMMENT '操作ip',
-  `time`    int(11) UNSIGNED NOT NULL DEFAULT '0'    COMMENT '操作时间',
-  `states`  int(11)          NOT NULL DEFAULT '0'    COMMENT '状态',
+  `id`      int(11)          NOT NULL AUTO_INCREMENT ,
+  `user_id` int(11)          NOT NULL DEFAULT '0'    ,
+  `ip`      int(11) UNSIGNED NOT NULL DEFAULT '0'    ,
+  `time`    int(11) UNSIGNED NOT NULL DEFAULT '0'    ,
+  `states`  int(11)          NOT NULL DEFAULT '0'    ,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户行为记录'") or die('SQL error7');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8") or die('SQL error7');
 
 $link->query("DROP TABLE IF EXISTS `configs`") or die('SQL error');
 $link->query("CREATE TABLE IF NOT EXISTS `configs`(
-  `id`    int(11)     NOT NULL AUTO_INCREMENT COMMENT '自增主键',
-  `name`  varchar(50) NOT NULL DEFAULT ''     COMMENT '配置名称',
-  `value` varchar(100)  NOT NULL DEFAULT ''     COMMENT '配置值',
+  `id`    int(11)     NOT NULL AUTO_INCREMENT ,
+  `name`  varchar(50) NOT NULL DEFAULT ''     ,
+  `value` varchar(100)  NOT NULL DEFAULT ''   ,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8 COMMENT '配置信息'") or die('SQL error8');
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8") or die('SQL error8');
 
 
 // 写入初始数据
@@ -167,7 +167,7 @@ $link->query("INSERT INTO `configs`(`id`,`name`,`value`) VALUES
 $link->query("INSERT INTO `users_info` (`name`,`password`,`email`,`key`,`reg_time`,`reg_ip`,`big_img`,`tiny_img`,`is_hide`,`is_admin`) 
 VALUES('$username','$password','$email','$key','$time','$ip','','','1','1')") or die('SQL error');
 
-echo "写入初始数据成功！";
+echo "写入初始数据成功！<a href='./index.html'>手动跳转</a>";
 
 	// 写入 config.php 文件
 	if(!file_put_contents('config.php',$content)){

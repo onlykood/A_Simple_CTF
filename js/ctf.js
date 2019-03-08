@@ -106,6 +106,6 @@ $(document).ready(function(){
 	loadSession();
 	$(".button-collapse").sideNav();
 	$('.modal').modal();
-	console.clear();
+	// console.clear();
 	console.log("Welcome to my simple ctf, have a good time.");
 });

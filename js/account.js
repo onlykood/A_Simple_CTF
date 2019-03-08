@@ -272,7 +272,7 @@ function getUserAvator(){
 
 function imgCheck(imgInfo){
 	if(imgInfo===undefined){
-		return 'NULL';
+		return true;
 	}
 
 	if(imgInfo.size > 204800){
@@ -385,7 +385,7 @@ $(document).ready(function(){
 			return false;
 		}
 		var imgInfo=$(".imgInput")[0].files[0];
-		var imgBase64Data="NULL";
+		var imgBase64Data="";
 		debugLog(imgInfo);
 		if(!imgCheck(imgInfo)){
 			return false;
@@ -415,7 +415,7 @@ $(document).ready(function(){
 		}
 
 		if(imgInfo===undefined){
-			baseAjax('NULL');
+			baseAjax('');
 			return false;
 		}
 

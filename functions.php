@@ -27,15 +27,15 @@ function scoreModel($number){
  * @return      int         解题数量
  */
 function getQuestionSolveNum($id){
-	$link=Database::getConnection();
+	global $link;
 	$sql=$link->query(
 		"SELECT count(1) as `num`
-		from submits
-		where pass='1' 
-		and del='0'
-		and ques_id='$id'"
+		from `ctf_submits`
+		where `is_pass`='1' 
+		and `is_hide`='0'
+		and `ques_id`='$id'"
 	);
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 	return intval($sql->fetch_assoc()['num']);
 }
 
@@ -59,9 +59,14 @@ function oneBlood($num){
 	return $score;
 }
 
-
-#判断是否登陆(null)
-function loginCheck($ret=false){
+/**
+ * @description 检查是否登陆
+ * @Author      kood
+ * @DateTime    2019-03-07
+ * @param       bool|boolean $ret [description]
+ * @return      bool|json 
+ */
+function loginCheck(bool $ret=false){
 	if( intval($_SESSION['userid']) > 0 ){
 		return true;
 	}
@@ -70,26 +75,47 @@ function loginCheck($ret=false){
 	return false;
 }
 
-#用于ajax.php中的参数提交，检测存在参数(null)
+
+/**
+ * @description 用于ajax.php中的参数提交，检测存在参数
+ * @Author      kood
+ * @DateTime    2019-03-07
+ * @param       [type]     $array post的参数名称
+ * @return      NULL|json            如果参数丢失，返回json
+ */
 function postCheck(...$array){
 	foreach($array as $value){
 		isset($_POST[$value]) or returnInfo(MY_ERROR['DATA_MISS']);
 	}
 }
 
-#查询平台当前的一些状态(status)
-function statusCheck($type='now_status'){
-	$types=array('now_status','reg_open','sub_open','login_open');
+/**
+ * @description 查询平台当前的一些状态！！！！！！！！！！！！！！！！！！！！！！！！！
+ * @Author      kood
+ * @DateTime    2019-03-07
+ * @param       string     $type 需要获取的状态名称
+ * @return      [type]           状态值
+ */
+function statusCheck($type='ctf_open'){
+	$types=array('ctf_open','reg_open','sub_open','login_open');
 	if(!in_array($type,$types,true)){
 		return 0;
 	}
-	$link = Database::getConnection();
-	$sql=$link->query("SELECT * from status");
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
-	return $sql->fetch_assoc()[$type];
+	global $link;
+	$sql=$link->query("SELECT * from configs where name='$type' limit 1");
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
+	return $sql->fetch_assoc()['value'];
 }
 
-#对输入的合法性进行判断(null)
+/**
+ * @description 对输入按照一定规则进行判断
+ * @Author      kood
+ * @DateTime    2019-03-07
+ * @param       string     $type  需要判断的类型
+ * @param       string     $data  提供的字符串
+ * @param       boolean    $data1 为密码校验额外提供的
+ * @return      bool|json         验证通过，返回 true，否则直接json返回
+ */
 function inputCheck($type,$data,$data1=false){
 	switch ($type){
 		case 'flag':
@@ -130,10 +156,14 @@ function inputCheck($type,$data,$data1=false){
 			returnInfo(MY_ERROR['DATA_ERROR']);
 			break;
 	}
-	return true;
 }
 
-#检测邮件是否发送(null)
+/**
+ * @description 检测邮件是否发送
+ * @Author      kood
+ * @DateTime    2019-03-07
+ * @return      json     2表示已发送，1表示未发送
+ */
 function mailSendCheck(){
 	if((isset($_SESSION['reg_name']) && isset($_SESSION['reg_mail']))||(isset($_SESSION['reset_name']) && isset($_SESSION['reset_mail']))){
 		returnInfo('NULL',2);
@@ -141,10 +171,14 @@ function mailSendCheck(){
 	else{
 		returnInfo('NULL',1);
 	}
-	return false;
 }
 
-#获取session信息(loggedin token name nickname mail said)
+/**
+ * @description 根据session 获取信息，如果已登录，那么返回基本信息
+ * @Author      kood
+ * @DateTime    2019-03-07
+ * @return      array     用户个人信息
+ */
 function getSession(){
 	$data=array(
 		'loggedin'=>0,
@@ -153,11 +187,11 @@ function getSession(){
 	loginCheck(true) or returnInfo("OK","1",array_values($data));
 
 	//returnInfo(MY_CONFIG['DATA_ERROR'],'-1');
-	$link =Database::getConnection();
+	global $link;
 	$sql=$link->query(
-		"SELECT name,nickname,email,said 
-		FROM users 
-		WHERE id='".$_SESSION['userid']."'"
+		"SELECT `name`,`nickname`,`email`,`said` 
+		FROM `users_info` 
+		WHERE `id`='".$_SESSION['userid']."'"
 	);
 
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
@@ -170,11 +204,19 @@ function getSession(){
 		'mail'=>$row['email'],
 		'said'=>$row['said']
 	);
-	returnInfo("OK","1",array_values($data));
+	returnInfo("OK",1,array_values($data));
 }
 
-#创建用户(null)
-function register( $password, $repeat, $regkey){
+/**
+ * @description 用户注册
+ * @Author      kood
+ * @DateTime    2019-03-07
+ * @param       sting      $password [description]
+ * @param       string     $repeat   密码重复
+ * @param       string     $regkey   邮箱验证码
+ * @return      [type]               [description]
+ */
+function register(sting $password, string $repeat, string $regkey){
 	#检查是否存在注册的用户名 和 邮箱
 	if(!isset($_SESSION['reg_name']) || !isset($_SESSION['reg_mail'])){
 		returnInfo(MY_ERROR['DATA_ERROR']);
@@ -198,7 +240,7 @@ function register( $password, $repeat, $regkey){
 	inputCheck('password',$password,$repeat);
 
 	#写入数据库流程
-	$link = Database::getConnection();
+	global $link;
 
 	#之前已经check过了，不需要重复检测
 	$name=$_SESSION['reg_name'];
@@ -207,25 +249,31 @@ function register( $password, $repeat, $regkey){
 	$key=md5(sha1( uniqid( '', true ).mt_rand(1000000000,9999999999) ));
 	$time=time();
 	$password = md5($password.$key);
-	$ip=$_SERVER['REMOTE_ADDR'];
+	$ip=ip2long($_SERVER['REMOTE_ADDR']);
 	$sql = $link->query(
-		"INSERT INTO users(name,password,email,user_key,reg_time,reg_ip)
-		VALUES('$name','$password','$mail','$key','$time','$ip')"
+		"INSERT INTO `users_info`(`name`,`password`,`email`,`key`,`reg_time`,`reg_ip`,`big_img`,`tiny_img`)
+		VALUES('$name','$password','$mail','$key','$time','$ip','','')"
 	);
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 
 	#消除这三个session
 	unset($_SESSION['reg_key']);
 	unset($_SESSION['reg_mail']);
 	unset($_SESSION['reg_name']);
 	returnInfo('注册成功！',1);
-
-	return false;
 }
 
-#发送邮邮件的函数(null)
+/**
+ * @description 邮件发送
+ * @Author      kood
+ * @DateTime    2019-03-07
+ * @param       string     $email   收件人
+ * @param       string     $title   邮件标题
+ * @param       string     $content 邮件正文
+ * @return      [type]              [description]
+ */
 function emailToSend($email,$title,$content) {
-	require 'sendmail.php';
+	include 'sendmail.php';
 	$mail = new PHPMailer;
 	$mail->isSMTP();
 	$mail->SMTPAuth = true;
@@ -249,7 +297,14 @@ function emailToSend($email,$title,$content) {
 	//return false;
 }
 
-#发送遗忘邮件(null)
+/**
+ * @description 忘记密码邮件发送
+ * @Author      kood
+ * @DateTime    2019-03-07
+ * @param       string     $email   邮箱地址
+ * @param       [type]     $captcha 验证码
+ * @return      [type]              [description]
+ */
 function sendResetMail($email,$captcha){
 	#验证码检测
 	if(!isset($_SESSION['captcha'])||strtolower($captcha)!==$_SESSION['captcha']){
@@ -261,12 +316,12 @@ function sendResetMail($email,$captcha){
 	#检查email格式
 	inputCheck('email',$email);
 
-	$link=Database::getConnection();
-	$sql=$link->query("SELECT name,email from users where email='$email'");
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	global $link;
+	$sql=$link->query("SELECT `name`,`email` from `users_info` where `email`='$email'");
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 	$sql->num_rows or returnInfo("该邮箱不存在！");
 	$name=$sql->fetch_assoc()['name'];
-	$key=mt_rand();
+	$key=mt_rand(10000000,99999999);
 	$_SESSION['reset_key']=$key;
 	$_SESSION['reset_time']=time()+600;
 	$subject="你此次重置密码的验证码是:".$key;
@@ -283,11 +338,17 @@ function sendResetMail($email,$captcha){
 	$_SESSION['reset_mail']=$email;
 	//$info['text']=$key;#测试使用，上线必须注释
 	returnInfo('已发送验证码至您的邮箱，请注意查收！',1);
-
-	return false;
 }
 
-#
+/**
+ * @description 密码重置
+ * @Author      kood
+ * @DateTime    2019-03-07
+ * @param       string     $password 
+ * @param       string     $repeat   [description]
+ * @param       string     $resetkey 验证码
+ * @return      [type]               [description]
+ */
 function resetPassword($password,$repeat,$resetkey){
 	#检查是否存在重置用户名 和 邮箱
 	if(!isset($_SESSION['reset_name']) || !isset($_SESSION['reset_mail'])){
@@ -311,28 +372,26 @@ function resetPassword($password,$repeat,$resetkey){
 	inputCheck('password',$password,$repeat);
 
 	#写入数据库流程
-	$link = Database::getConnection();
+	global $link;
 
 	#之前已经check过了，不需要重复检测
 	$name=$_SESSION['reset_name'];
 	$mail=$_SESSION['reset_mail'];
 	
-	$sql=$link->query("SELECT user_key from users where name='$name' and email='$mail'");
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	$sql=$link->query("SELECT `key` from `users_info` where `name`='$name' and `email`='$mail'");
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 	$sql->num_rows or returnInfo("Please tell admin");
 	$key=$sql->fetch_assoc()['user_key'];
 	$password = md5($password.$key);
 
-	$sql=$link->query("UPDATE users set password='$password' where name='$name' and email='$mail'");
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	$sql=$link->query("UPDATE `users_info` set `password`='$password' where `name`='$name' and `email`='$mail'");
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 
 	#消除这三个session
 	unset($_SESSION['reset_key']);
 	unset($_SESSION['reset_mail']);
 	unset($_SESSION['reset_name']);
 	returnInfo('重置密码成功！',1);
-
-	return false;
 }
 
 #发送注册邮件(null)
@@ -350,17 +409,16 @@ function sendRegMail($name,$email,$captcha){
 	inputCheck('email',$email);
 
 	#数据库操作 是否存在用户或邮箱
-	$link=Database::getConnection();
-	$sql=$link->query("SELECT reg_open,name,email from status left join users on users.name='$name' or users.email='$email'");
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	global $link;
+	$sql=$link->query("SELECT `name`,`email` from `users_info` where `name`='$name' or `email`='$email'");
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 
 	$row=$sql->fetch_assoc();
-	$row['reg_open'] or returnInfo('现在不可以注册账户！');
 	$row['name']===$name and returnInfo('该用户名已经被注册过了！');
 	$row['email']===$email and returnInfo('该邮箱已经被注册过了！');
 
 	#发送邮件过程
-	$key=mt_rand();
+	$key=mt_rand(10000000,99999999);
 	$_SESSION['reg_key']=$key;
 	$_SESSION['reg_time']=time()+600;
 	$subject="欢迎您注册Wpsec CTF，请验证邮箱";
@@ -378,19 +436,23 @@ function sendRegMail($name,$email,$captcha){
 	$_SESSION['reg_mail']=$email;
 	//$info['text']=$key;#测试使用，上线必须注释
 	returnInfo('已发送验证码至您的邮箱，请注意查收！',1);
-
-	return false;
 }
 
-#获取排行(score nickname said scoreDate)
+/**
+ * @description 获取排行榜数据
+ * @Author      kood
+ * @DateTime    2019-03-07
+ * @return      [type]     [description]
+ */
 function getRank(){
 	#获取数据库信息
-	$link=Database::getConnection();
+	# global $link;
+	global $link;
 	$temp='';
 	$data=array();
 	$solve_num=0;
-	$sql=$link->query("SELECT id,extra_score as `score`,nickname,said from users where del='0'");
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	$sql=$link->query("SELECT `id`,`extra_score` as `score`,`nickname`,`said` from `users_info` where `is_hide`='0'");
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 
 	while($row=$sql->fetch_assoc()){
 		$data[$row['id']]=$row;
@@ -400,21 +462,21 @@ function getRank(){
 	if(MY_SWITCH['DYNAMIC_SCORE']){
 		$sql=$link->query(
 			"SELECT 
-				a.ques_id,a.user_id,b.num,a.sub_time 
+				`a`.`ques_id`,`a`.`user_id`,`b`.`num`,`a`.`sub_time` 
 			from 
-				(SELECT user_id,ques_id,sub_time from submits where pass='1' and del='0' order by ques_id,sub_time)a 
+				(SELECT `user_id`,`ques_id`,`sub_time` from `ctf_submits` where `is_pass`='1' and `is_hide`='0' order by `ques_id`,`sub_time`)a 
 			inner join 
-				(select ques_id,count(*) as `num` from submits where pass='1' and del='0' group by ques_id)b
-			on a.ques_id=b.ques_id"
+				(select `ques_id`,count(*) as `num` from `ctf_submits` where `is_pass`='1' and `is_hide`='0' group by `ques_id`)b
+			on `a`.`ques_id`=`b`.`ques_id`"
 		);
 	}
 	else{
 		$sql=$link->query(
-			"SELECT questions.score,submits.ques_id,submits.user_id,submits.sub_time from questions,submits where submits.pass='1' and submits.del='0' and questions.id=submits.ques_id order by submits.sub_time"
+			"SELECT `ctf_chellenges`.`score`,`ctf_submits`.`ques_id`,`ctf_submits`.`user_id`,`ctf_submits`.`sub_time` from `ctf_chellenges`,`ctf_submits` where `ctf_submits`.`is_pass`='1' and `ctf_submits`.`is_hide`='0' and `ctf_chellenges`.`id`=`ctf_submits`.`ques_id` order by `ctf_submits`.`sub_time`"
 		);
 	}
 
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 	$allQuestionId=array();
 	while($row=$sql->fetch_assoc()){
 		if($temp!=$row['user_id']){
@@ -440,38 +502,37 @@ function getRank(){
 	}
 
 	$ids = implode(',',array_column($data, 'id'));
-	$sql=$link->query("SELECT tinyImg from avatars where id in ($ids)");
+	$sql=$link->query("SELECT `tiny_img` from `users_info` where `id` in ($ids)");
 
 	#删除id，防止猜测
 	foreach ($data as &$data1) {
 		unset($data1['id']);
-		$row=$sql->fetch_assoc()['tinyImg'];
-		if($row=='NULL'){
-			$data1['tinyImg']='//upload.jianshu.io/users/upload_avatars/4525478/7332f531-3114-4c1a-a9b7-f9df29c79220.jpg';
+		$row=$sql->fetch_assoc()['tiny_img'];
+		if($row==''){
+			$data1['tiny_img']=MY_CONFIG['DEFAULT_AVATAR'];
 		}
 		else{
-			$data1['tinyImg']=$row;
+			$data1['tiny_img']=$row;
 		}
 		$data1=array_values($data1);
 	}
 	#按分数排序
 	array_multisort(array_column($data,0),SORT_DESC,$data);
-	returnInfo("OK","1",$data);
-	return false;
+	returnInfo("OK",1,$data);
 }
 
 #获取通知公告(time content)
 function getNotice(){
 	#数据库操作
-	$link = Database::getConnection();
+	global $link;
 	$sql = $link->query(
-		"SELECT edit_time,content
-		FROM notices 
-		WHERE del=0 
-		AND show_open=1
-		ORDER BY id DESC"
+		"SELECT `create_time`,`content`
+		FROM `notices` 
+		WHERE `is_hide`=0 
+		AND `is_delete`=0
+		ORDER BY `id` DESC"
 	);
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 	
 	$i=0;
 	$data=array();
@@ -479,49 +540,47 @@ function getNotice(){
 		$row['content']=contentReplace($row['content']);
 		$data[$i]=array_values($row);
 	}
-	returnInfo("OK","1",$data);
-	return false;
+	returnInfo("OK",1,$data);
 }
+
 #获取用户当前的解题情况(pass type title time ip)
 function getUserSolves(){
 	loginCheck();
-	$link = Database::getConnection();
+	global $link;
 
 	$sql = $link->query(
-		"SELECT pass,type,title,sub_time,sub_ip 
-		from submits,questions 
-		where submits.del=0 
-		and submits.ques_id=questions.id 
-		and submits.user_id='".$_SESSION['userid']."' 
-		order by sub_time desc"
+		"SELECT `is_pass`,`type`,`title`,`sub_time`,INET_NTOA(`sub_ip`) 
+		from `ctf_submits`,`ctf_challenges` 
+		where `ctf_submits`.`is_hide`='0' 
+		and `ctf_submits`.`ques_id`=`ctf_challenges`.`id` 
+		and `ctf_submits`.`user_id`='".$_SESSION['userid']."' 
+		order by `sub_time` desc"
 	);
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
-	
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 	$data=array();
 	for($n=0;$row=$sql->fetch_assoc();$n++){
 		$data[$n]=array_values($row);
 	}
-	returnInfo("OK","1",$data);
-	return false;	
+	returnInfo("OK",1,$data);
 }
 
 #根据id获取问题(content num score title)
 function getQuestion($id){
+//	returnInfo('AAAAAAAAA');
 	#检测id合法性
 	inputCheck('id',$id);
 	loginCheck();
 	$id=intval($id);
-	$link=Database::getConnection();
-	$sql=$link->query("SELECT id,`type`,typeid,title,content,score,rand_seed,rand_open,flag from questions where id='$id' and del=0");
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	global $link;
+	$sql=$link->query("SELECT `id`,`type`,`type_id`,`title`,`content`,`score`,`seed`,`is_rand`,`flag` from `ctf_challenges` where `id`='$id' and `is_hide`='0'");
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 	#由于只是一个，所以只用获取一次就行
 	$row=$sql->fetch_assoc();
-
 	#设置session，
 	$_SESSION['quesid']=$id;
 	$_SESSION['type']=$row['type'];
-	$_SESSION['typeid']=$row['typeid'];
-	$_SESSION['flag']=$row['rand_open']?MY_CONFIG['RAND_FLAG_HEADER'].'{'.md5($_SESSION['user_key'].$row['rand_seed']).'}':$row['flag'];
+	$_SESSION['typeid']=$row['type_id'];
+	$_SESSION['flag']=$row['is_rand']?MY_CONFIG['RAND_FLAG_HEADER'].'{'.md5($_SESSION['user_key'].$row['seed']).'}':$row['flag'];
 
 	$data['title']=$row['title'];
 	$data['content']=questionContentReplace($row);
@@ -533,55 +592,52 @@ function getQuestion($id){
 		$data['score']=$row['score'];
 	}
 	$data=array_values($data);
-	returnInfo("OK","1",$data);
-	return false;
+	returnInfo("OK",1,$data);
 }
 
 #获取单个问题的解答情况(nickname.sub_time)
 function getQuestionSolves($id){
 	inputCheck('id',$id);
-	$link = Database::getConnection();
+	global $link;
 	$sql = $link->query(
-		"SELECT users.nickname,submits.sub_time 
-		from submits 
-		inner join users on submits.user_id=users.id 
-		where ques_id='$id' 
-		and submits.del='0'
-		and pass='1' 
-		order by sub_time"
+		"SELECT `users_info`.`nickname`,`ctf_submits`.`sub_time` 
+		from `ctf_submits` 
+		inner join `users_info` on `ctf_submits`.`user_id`=`users_info`.`id` 
+		where `ques_id`='$id' 
+		and `ctf_submits`.`is_hide`='0'
+		and `ctf_submits`.`is_pass`='1' 
+		order by `sub_time`"
 	);
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 	
 	$data=array();
 	for($n=0;$row=$sql->fetch_assoc();$n++){
 		$data[$n]=array_values($row);
 	}
-	returnInfo("OK","1",$data);
-	return false;
+	returnInfo("OK",1,$data);
 }
 
 #用于首页上显示 最近的解答情况(time nickname title)
 function getRecentSloves(){
-	$link = Database::getConnection();
+	global $link;
 	$sql=$link->query(
-		"SELECT submits.sub_time,users.nickname,questions.title 
-		from submits 
-		left join (select id,nickname from users where del=0)users on users.id=submits.user_id 
-		left join questions on questions.id=submits.ques_id 
-		where submits.pass='1' 
-		and submits.del='0'
-		order by submits.sub_time desc 
+		"SELECT `ctf_submits`.`sub_time`,`users_info`.`nickname`,`ctf_challenges`.`title` 
+		from `ctf_submits` 
+		left join (select `id`,`nickname` from `users_info` where `is_hide`=0)`users_info` on `users_info`.`id`=`ctf_submits`.`user_id` 
+		left join `ctf_challenges` on `ctf_challenges`.`id`=`ctf_submits`.`ques_id` 
+		where `ctf_submits`.`is_pass`='1' 
+		and `ctf_submits`.`is_hide`='0'
+		order by `ctf_submits`.`sub_time` desc 
 		limit ".MY_CONFIG['RECENT_SOLVE_SHOW_NUM'].""
 	);
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 
 	#获取数据
 	$data=array();
 	for($i=0;$row=$sql->fetch_assoc();$i++){
 		$data[$i]=array_values($row);
 	}
-	returnInfo("OK","1",$data);
-	return false;
+	returnInfo("OK",1,$data);
 }
 
 
@@ -597,14 +653,14 @@ function flagSubmit($sub_flag){
 	$quesid=$_SESSION['quesid'];
 	$userid=$_SESSION["userid"];
 	$flag=$_SESSION['flag'];
-	$ip=$_SERVER['REMOTE_ADDR'];
+	$ip=ip2long($_SERVER['REMOTE_ADDR']);
 	$time=time();
 
-	$link = Database::getConnection();
+	global $link;
 
 	#是否已经解答过题目了
-	$sql=$link->query("SELECT user_id from submits where pass='1' and del='0' and ques_id='$quesid' and user_id='$userid'");
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	$sql=$link->query("SELECT `user_id` from `ctf_submits` where `is_pass`='1' and `is_hide`='0' and `ques_id`='$quesid' and `user_id`='$userid'");
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 	$sql->num_rows and reutnInfo("你已经解答过该题了！");
 	
 
@@ -615,34 +671,32 @@ function flagSubmit($sub_flag){
 	else{
 		$text="flag 错误！";
 		#检查flag是否是该用户自己的而非别的用户，如果是，则将两个号都封禁，因为只有随机flag 才会存在别人正确而自己不正确的情况
-		$sql=$link->query("SELECT user_id,sub_flag from submits where pass='1' and ques_id='$quesid'");
-		$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);			
+		$sql=$link->query("SELECT `user_id`,`sub_flag` from `ctf_submits` where `is_pass`='1' and `ques_id`='$quesid'");
+		$sql or returnInfo(MY_ERROR['SQL_ERROR']);			
 		
 		#如果不是自己的正确flag但却是别人的正确flag，封号 没商量
 		if($sql->fetch_assoc()['sub_flag']===$sub_flag){
 			$row=$sql->fetch_assoc();
 			$banid=$row['user_id'];
 			$sub_flag='--->'.$sub_flag.'<---';
-			$sql=$link->query("INSERT into submits values(NULL,'$userid','$quesid','$time','$ip','$sub_flag','0','0')");
+			$sql=$link->query("INSERT into `ctf_submits`(`user_id`,`ques_id`,`sub_time`,`sub_ip`,`sub_flag`) values('$userid','$quesid','$time','$ip','$sub_flag')");
 
 			# 平台创建者不可被 ban
 			if($banid=='1'){
-				$ban=$link->query("UPDATE users set ban='1' where id='$userid' ");
+				$ban=$link->query("UPDATE `users_info` set `is_ban`='1' where `id`='$userid' ");
 			}
 			else{
-				$ban=$link->query("UPDATE users set ban='1' where id in ('$userid','$banid') ");
+				$ban=$link->query("UPDATE `users_info` set `is_ban`='1' where `id` in ('$userid','$banid') ");
 			}
-			($ban && $sql) or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
-			logout("请勿抄袭flag，你的帐户已经被禁止使用！","-1");
+			($ban && $sql) or returnInfo(MY_ERROR['SQL_ERROR']);
+			logout("请勿抄袭flag，你的帐户已经被禁止使用！",-1);
 		}
 	}
 	#记录提交情况
-	$sql=$link->query("INSERT into submits values(NULL,'$userid','$quesid','$time','$ip','$sub_flag','$pass','0')");
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	$sql=$link->query("INSERT into `ctf_submits`(`user_id`,`ques_id`,`sub_time`,`sub_ip`,`sub_flag`,`is_pass`) values('$userid','$quesid','$time','$ip','$sub_flag','$pass')");
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 
 	returnInfo($text,$pass);
-
-	return false;
 }
 
 #登陆函数(null)
@@ -657,146 +711,142 @@ function login( $name, $password ,$captcha) {
 	statusCheck('login_open') or returnInfo("目前平台不允许登陆！");
 
 	loginCheck(true) and returnInfo('你已经登录过了！');
-	
 
-	$link = Database::getConnection();
+	global $link;
 	$name=$link->real_escape_string($name);
-	$ip=$_SERVER['REMOTE_ADDR'];
+	$ip=ip2long($_SERVER['REMOTE_ADDR']);
 	$time=time();
 
 	#BINARY 增加大小写敏感
 	$sql=$link->query(
-		"SELECT id,user_key,password,ban,del,admin,nickname
-		from users 
-		where BINARY name = '$name'"
+		"SELECT `id`,`key`,`password`,`is_ban`,`is_admin`,`nickname`
+		from `users_info` 
+		where BINARY `name` = '$name'"
 	);
 	
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 
-	$sql->num_rows or returnInfo('用户名或密码错误！',$debugInfo="1");
+	$sql->num_rows or returnInfo('用户名或密码错误！');
 
 	$row=$sql->fetch_assoc();
 
-	$password = md5($password.$row['user_key']);
+	$password = md5($password.$row['key']);
 	#管理员登陆
-	if($row['admin']=='1'){
+	if($row['is_admin']=='1'){
 		if($row['password']===$password){
 			$_SESSION['userid'] = $row['id'];
-			$_SESSION['user_key']=$row['user_key'];
+			$_SESSION['user_key']=$row['key'];
 			$_SESSION['admin']=True;
-			$sql=$link->query("UPDATE users set last_time='$time',last_ip='$ip' where id='".$row['id']."'");
-			$sql=$link->query("INSERT into ip_lists(`user_id`,`ip`,`time`,`status`) values('".$row['id']."','$ip','$time','31')");
-			$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+			$sql=$link->query("UPDATE `users_info` set `logged_time`='$time',`logged_ip`='$ip' where id='".$row['id']."'");
+			$sql=$link->query("INSERT into users_action(`user_id`,`ip`,`time`,`states`) values('".$row['id']."','$ip','$time','31')");
+			$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 			returnInfo('欢迎回来，管理员：'.$row['nickname'],1);
 		}
 		else{
-			$sql=$link->query("INSERT into ip_lists(`user_id`,`ip`,`time`,`status`) values('".$row['id']."','$ip','$time','30')");
-			returnInfo('用户名或密码错误！',$debugInfo="管理员登陆密码错误");
+			$sql=$link->query("INSERT into users_action(`user_id`,`ip`,`time`,`states`) values('".$row['id']."','$ip','$time','30')");
+			returnInfo('用户名或密码错误！');
 		}
 	}
 
 	#超级密码,一般用于测试使用
-	if($password===md5(MY_CONFIG['SUPER_PASSWORD'].$row['user_key'])){
+	if($password===md5(MY_CONFIG['SUPER_PASSWORD'].$row['key'])){
 		$_SESSION['userid'] = $row['id'];
-		$_SESSION['user_key']=$row['user_key'];
-		$sql=$link->query("INSERT into ip_lists(`user_id`,`ip`,`time`,`status`) values('".$row['id']."','$ip','$time','21')");
+		$_SESSION['user_key']=$row['key'];
+		$sql=$link->query("INSERT into users_action(`user_id`,`ip`,`time`,`states`) values('".$row['id']."','$ip','$time','21')");
 		returnInfo('超级密码登陆成功！',1);
 	}
 	
 	#普通用户密码登陆
 	if($password!==$row['password']){
-		$sql=$link->query("INSERT into ip_lists(`user_id`,`ip`,`time`,`status`) values('".$row['id']."','$ip','$time','11')");
-		returnInfo('用户名或密码错误！',$debugInfo="普通登陆密码错误");
+		$sql=$link->query("INSERT into users_action(`user_id`,`ip`,`time`,`states`) values('".$row['id']."','$ip','$time','11')");
+		returnInfo('用户名或密码错误！');
 	}
 	#判断账户是否被锁定
-	if($row['ban']==='1'){
-		$sql=$link->query("INSERT into ip_lists(`user_id`,`ip`,`time`,`status`) values('".$row['id']."','$ip','$time','12')");			
+	if($row['is_ban']==='1'){
+		$sql=$link->query("INSERT into users_action(`user_id`,`ip`,`time`,`states`) values('".$row['id']."','$ip','$time','12')");			
 		returnInfo('由于交换flag或其他原因，你的账户已被锁定！');
 	}
-	#判断账户是否被删除
-	if($row['del']==='1'){
-		$sql=$link->query("INSERT into ip_lists(`user_id`,`ip`,`time`,`status`) values('".$row['id']."','$ip','$time','13')");
-		returnInfo('该账户不存在！');
-	}
 	$_SESSION['userid'] = $row['id'];
-	$_SESSION['user_key']=$row['user_key'];
-	$sql=$link->query("UPDATE users set last_time='$time',last_ip='$ip' where id='".$row['id']."'");
-	$sql=$link->query("INSERT into ip_lists(`user_id`,`ip`,`time`,`status`) values('".$row['id']."','$ip','$time','0')");
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	$_SESSION['user_key']=$row['key'];
+	$sql=$link->query("UPDATE users_info set `logged_time`='$time',`logged_ip`='$ip' where id='".$row['id']."'");
+	$sql=$link->query("INSERT into users_action(`user_id`,`ip`,`time`,`states`) values('".$row['id']."','$ip','$time','0')");
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 	returnInfo('登录成功！',1);
-	return false;
 }
 
 #登出函数(null)
-function logout($text="用户退出成功！",$code='1')  {
+function logout($text="用户退出成功！",$code=1)  {
 	loginCheck();
 
 	#清空session,重新开始
 	$_SESSION=array();
 
 	returnInfo($text,$code);
-	return false;
 }
 
-#修改用户队伍的信息(null)
+#修改用户的信息(null)
 function modUserBaseInfo($img,$said,$nickname) {
 	loginCheck();
 	inputCheck('said',$said);
 	inputCheck('nickname',$nickname);
 
-	if($img!="NULL"){
+	if($img!=""){
 		if(strlen($img)>274000){
 			returnInfo("图片过大，请修改！");
 		}
-		preg_match('#^data:image/(png|gif|jpg|jpeg);base64,[\w\+/]+(==|[\w\+/=])$#i',$img) or returnInfo("图片不合理，请重新上传！");
+		preg_match('#^data:image/(png|gif|jpg|jpeg);base64,[\w\+/]+(==|[\w\+/=])$#i',$img) or returnInfo("图片不合理，请重新上传！".$img);
 	}
 
-	$link = Database::getConnection();
+	global $link;
 	#防止sql注入
 	$nickname=$link->real_escape_string($nickname);
 	$said = $link->real_escape_string( $said );
 
-	$sql=$link->query("UPDATE users SET said='$said',nickname='$nickname' WHERE id='".$_SESSION['userid']."'");
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	$sql=$link->query("UPDATE `users_info` SET `said`='$said',`nickname`='$nickname' WHERE `id`='".$_SESSION['userid']."'");
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 
-	$sql=$link->query("UPDATE avatars set bigImg='$img' where id='".$_SESSION['userid']."'");
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
-	$tinyImg=explode(',',$img)[0].','.base64_encode(image_resize(base64_decode(explode(',',$img)[1]), 100, 100));
-	$sql=$link->query("UPDATE avatars set tinyImg='$tinyImg' where id='".$_SESSION['userid']."'");
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
-	returnInfo('修改成功！',1,$debugInfo="UPDATE avatars set value='$img' where id='".$_SESSION['userid']."'");
-	return false;
+	if($img!=''){
+		$sql=$link->query("UPDATE `users_info` set `big_img`='$img' where `id`='".$_SESSION['userid']."'");
+		$sql or returnInfo(MY_ERROR['SQL_ERROR']);
+		$tinyImg=explode(',',$img)[0].','.base64_encode(image_resize(base64_decode(explode(',',$img)[1]), 100, 100));
+		$sql=$link->query("UPDATE `users_info` set `tiny_img`='$tinyImg' where `id`='".$_SESSION['userid']."'");
+		$sql or returnInfo(MY_ERROR['SQL_ERROR']);	
+	}
+	returnInfo('修改成功！',1);
 }
 
-#修改用户队伍密码(null)
+#修改用户密码(null)
 function modUserPassword($old,$new,$repeat){
 	#基本验证
 	loginCheck();
 	inputCheck('password',$new,$repeat);
 
-	$link=Database::getConnection();
+	$ip=ip2long($_SERVER['REMOTE_ADDR']);
+	$time=time();
+	global $link;
 	$sql=$link->query(
-		"SELECT name,password,user_key
-		FROM users 
-		WHERE id='".$_SESSION['userid']."'"
+		"SELECT `name`,`password`,`key`
+		FROM `users_info` 
+		WHERE `id`='".$_SESSION['userid']."'"
 	);
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 	$row=$sql->fetch_assoc();
-	if(md5($old.$row['user_key'])!==$row['password']&&$old!==SUPER_PASSWORD){
+	if(md5($old.$row['key'])!==$row['password']&&$old!==SUPER_PASSWORD){
 		returnInfo('密码错误！');
 	}
 
 	$sql=$link->query(
-		"UPDATE users 
-		SET password='".md5($new.$row['user_key'])."' 
-		WHERE id='".$_SESSION['userid']."'"
+		"UPDATE `users_info` 
+		SET `password`='".md5($new.$row['user_key'])."' 
+		WHERE `id`='".$_SESSION['userid']."'"
 	);
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
+
+	$sql=$link->query("INSERT into users_action(`user_id`,`ip`,`time`,`states`) values('".$row['id']."','$ip','$time','111')");
 
 	$_SESSION['userid']=false;
 	returnInfo('修改成功！',1);
 
-	return false;
 }
 
 #把一些内容过滤之后再发出来(null)
@@ -826,20 +876,20 @@ function contentReplace($content){
 #替换 content 中的 dockerButton, docker 下发检测，该用户是否已经有下发好的环境了
 function dockerButtonReplace($quesid){
 	$userid=$_SESSION['userid'];
-	$link=Database::getConnection();
+	global $link;
 	//更新 dockeruse 表中的 docker 使用状态，删除设定好的时间之前的数据
 	$time=time()-MY_CONFIG['DOCKER_EXIST_TIME'];
 	//$sql=$link->query("DELETE from dockeruse where `time` < '$time'");
-	//$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	//$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 	returnInfo("Break!!");
 
-	$sql=$link->query("SELECT `url` from docker_uses where user_id='$userid' and ques_id='$quesid' and `time`> '$time'");
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	$sql=$link->query("SELECT `ret_url` from `docker_use_lists` where `user_id`='$userid' and `ques_id`='$quesid' and `time`> '$time'");
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 
 	if(!$sql->num_rows){
 		return '<center><a class="waves-effect waves-light btn" id="dockerButton"><i class="material-icons right">cloud</i>下发docker</a></center>';
 	}
-	$url=$sql->fetch_assoc()['url'];
+	$url=$sql->fetch_assoc()['ret_url'];
 	return '<center><a class="waves-effect waves-light btn" id="dockerUrl" href="'.$url.'" target="_blank">点击进入</a></center>';
 }
 
@@ -850,7 +900,7 @@ function questionContentReplace($questions){
 	$check=md5($userkey.$questions['id']);
 	$content=contentReplace($content);
 	$content=str_ireplace('$user_key',$userkey,$content);
-	$content=str_ireplace('$rand_seed',$questions['rand_seed'],$content);
+	$content=str_ireplace('$rand_seed',$questions['seed'],$content);
 	$content=str_ireplace('$show_flag',$_SESSION['flag'], $content);
 	if(preg_match('/\$Dlink\[(.+?)\]/',$content,$matches)){
 		$content=str_replace($matches[0],'<a class="btn grey" href="./QD-'.$check.'" target="_blank">'.$matches[1].'</a>', $content);
@@ -868,19 +918,18 @@ function questionContentReplace($questions){
 #获取所有题目的名称(id,type,title,score,pass) sql need refactoring
 function getQuestions(){
 	loginCheck();
-
 	$userid=$_SESSION['userid'];
-	$link=Database::getConnection();
+	global $link;
 	$sql=$link->query(
-		"SELECT questions.id,questions.type,questions.title,questions.score,a.pass 
-		from questions 
-		left join (select distinct ques_id,pass from submits where pass='1' and del='0' and user_id='$userid')a 
-		on a.ques_id=questions.id
-		where questions.show_open='1'
-		and questions.del='0'
-		order by questions.type,questions.typeid"
+		"SELECT `id`,`type`,`title`,`score`,`is_pass` 
+		from `ctf_challenges` 
+		left join (select distinct `ques_id`,`is_pass` from `ctf_submits` where `is_pass`='1' and `is_hide`='0' and `user_id`='$userid')a 
+		on `ques_id`=`id`
+		where `ctf_challenges`.`is_hide`='0'
+		order by `type`,`type_id`"
 	);
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
+
 	$data=array();
 	for($i=0;$row=$sql->fetch_assoc();$i++){
 		if(MY_SWITCH['DYNAMIC_SCORE']){
@@ -888,21 +937,21 @@ function getQuestions(){
 		}
 		$data[$i]=array_values($row);
 	}
-	returnInfo("OK","1",$data);
+	returnInfo("OK",1,$data);
 }
 
 function getUserAvator(){
 	loginCheck();
 	$userid=$_SESSION['userid'];
-	$link=Database::getConnection();
-	$sql=$link->query("SELECT bigImg from avatars where id='$userid'");
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	global $link;
+	$sql=$link->query("SELECT `big_img` from `users_info` where id='$userid'");
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 	$row=$sql->fetch_assoc();
-	if($row['bigImg']==='NULL'){
-		$row['bigImg']='//upload.jianshu.io/users/upload_avatars/4525478/7332f531-3114-4c1a-a9b7-f9df29c79220.jpg';
+	if($row['big_img']===''){
+		$row['big_img']=MY_CONFIG['DEFAULT_AVATAR'];
 	}
-	$data=array($row['bigImg']);
-	returnInfo("OK","1",array($data));
+	$data=array($row['big_img']);
+	returnInfo("OK",1,array($data));
 }
 
 #GetVideo 功能有待完善(null)
@@ -973,6 +1022,9 @@ function getCaptcha(){
 
 //图片缩略图
 function image_resize($imagedata, $width, $height, $per = 0) {
+	if($imagedata==''){
+		return $imagedata;
+	}
     // 1 = GIF，2 = JPG，3 = PNG，4 = SWF，5 = PSD，6 = BMP，7 = TIFF(intel byte order)，8 = TIFF(motorola byte order)，9 = JPC，10 = JP2，11 = JPX，12 = JB2，13 = SWC，14 = IFF，15 = WBMP，16 = XBM
  
     // 获取图像信息
@@ -1027,26 +1079,26 @@ function image_resize($imagedata, $width, $height, $per = 0) {
 #获取当前平台比赛状态 /////////////////////////////////
 function getStatus()	{
 	$data['status'] = statusCheck();
-	returnInfo("OK","1",$data);
+	returnInfo("OK",1,$data);
 }
 
 # 获取下发的coker url
 function getDockerUrl(){
 	loginCheck();
-	$link=Database::getConnection();
+	global $link;
 	$userId=$_SESSION['userid'];
 	$quesId=$_SESSION['quesid'];
-	$sql=$link->query("SELECT dockerid from questions where id='$quesId'");
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	$sql=$link->query("SELECT `docker_id` from `ctf_challenges` where `id`='$quesId'");
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 	$sql->num_rows or returnInfo("No this docker");
-	$dockerID=$sql->fetch_assoc()['dockerid'];
+	$dockerID=$sql->fetch_assoc()['docker_id'];
 	if($dockerID=="0"){
 		//???
 		returnInfo("无docker，请重试！");
 	}
 
-	$token="WPSECWEBTEST";
-	$url="http://118.25.49.126:49999/?token=$token&dockerID=$dockerID";
+	$token=MY_CONFIG['GET_DOCKER_TOKEN'];
+	$url=MY_CONFIG['DOCKER_SERVER']."?token=$token&dockerID=$dockerID";
 	$a=json_decode(file_get_contents($url),true);
 	// print_r($a);
 	if($a["code"]==1){
@@ -1058,8 +1110,8 @@ function getDockerUrl(){
 	}
 	$dockerUrl="http://118.25.49.126:".$port;
 	$time=time();
-	$sql=$link->query("INSERT INTO dockeruse values('$userId','$quesId','$dockerID','$dockerUrl','$time')");
-	$sql or returnInfo(MY_ERROR['SQL_ERROR'],$debugInfo=$link->error);
+	$sql=$link->query("INSERT INTO `docker_use_lists`(`user_id`,`ques_id`,`docker_id`,`ret_url`,`create_time`) values('$userId','$quesId','$dockerID','$dockerUrl','$time')");
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 	returnInfo($dockerUrl,1);
 }
 
