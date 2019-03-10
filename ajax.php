@@ -8,15 +8,9 @@ if( !isset( $_GET['m'] ) || !is_string( $_GET['m'] ) )
 	die();
 }
 
-//检测数据库连接情况
-$link=@Database::getConnection();
-if (mysqli_connect_errno()){
-	returnInfo(MY_ERROR['SQL_CONNECT_FAIL']);
-}
-
 //检测token令牌是否存在/被改写
 if(!isset($_POST['token'])||($_SESSION['token'] !== $_POST['token'])){
-	if($_GET['m']!='getSession'&&$_GET['m']!='getCaptcha'){
+	if($_GET['m']!='getSession' && $_GET['m']!='getCaptcha' && $_GET['m']!='getConfig'){
 		unset($_SESSION['token']);
 		if(!isset($_POST['token'])){
 			returnInfo(MY_ERROR['DATA_MISS']);
@@ -25,6 +19,9 @@ if(!isset($_POST['token'])||($_SESSION['token'] !== $_POST['token'])){
 	}
 }
 switch( $_GET['m'] )	{
+	case 'getConfig':
+		postCheck('type');
+		getConfig($_POST['type']);
 
 	case 'getNotice':
 		getNotice();

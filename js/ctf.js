@@ -101,7 +101,26 @@ function errorCheck(data){
 	}
 	return 0;
 }
-
+function loadTitle(){
+	$.ajax({
+		type:'post',
+		url: 'ajax.php?m=getConfig',
+		dataType: 'json',
+		data:{'type':'ctf_name'},
+		success:function(data){
+			debugLog(data);
+			if(errorCheck(data)){
+				return false;
+			}
+			document.title = data[1][0];
+			$('.page-title').text(data[1][1]);
+		},
+		error:function(data){
+			debugLog(data);
+		}
+	});
+}
+loadTitle();
 $(document).ready(function(){
 	loadSession();
 	$(".button-collapse").sideNav();

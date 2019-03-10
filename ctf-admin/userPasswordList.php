@@ -52,7 +52,7 @@
 	</body>
 </html>
 <script>
-var type="user";
+var type="users_info";
 function getPasswordList(){
 	$.ajax({
 		url: './ajax.php?m=getInfoList',
@@ -77,7 +77,7 @@ function getPasswordList(){
 					$( '<td>' ).text( content.said ).appendTo( trow );
 					$( '<td>' ).text( content.password ).appendTo( trow );
 					//$( '<td>' ).text( content.score ).appendTo( trow );
-					if(content.ban=='0'){
+					if(content.is_ban=='0'){
 						$('<td class="td-status" style="color:#2196F3">').text('正常').appendTo( trow );
 					}
 					else{

@@ -27,8 +27,8 @@
 		</div>
 		<div class="x-body">
 			<xblock>
-				<button class="layui-btn layui-btn-danger" onclick="allClicked(this,'show_open')" name="批量隐藏/显示">批量隐藏/显示</button>
-				<button class="layui-btn layui-btn-danger" onclick="allClicked(this,'del')" name="批量删除">批量删除</button>
+				<button class="layui-btn layui-btn-danger" onclick="allClicked(this,'is_hide')" name="批量隐藏/显示">批量隐藏/显示</button>
+				<button class="layui-btn layui-btn-danger" onclick="allClicked(this,'is_delete')" name="批量删除">批量删除</button>
 				<button class="layui-btn" onclick="x_admin_show('添加公告','./noticeManage.php?operate=add',600,500)">添加公告</button>
 			</xblock>
 	  		<table class="layui-table">
@@ -50,7 +50,7 @@
 	</body>
 </html>
 <script>
-var type='notice';
+var type='notices';
 
 	/*获取用户基础信息*/
 	function getNoticeList(){
@@ -74,7 +74,7 @@ var type='notice';
 						$( '<td>' ).text( num+1 ).appendTo( trow );
 						$( '<td>' ).text( new Date(content.edit_time*1000).toLocaleDateString() ).appendTo( trow );
 						$( '<td>' ).text( content.content ).appendTo( trow );
-						if(content.show_open=='0'){
+						if(content.is_hide=='1'){
 							$('<td class="td-status" style="color:red">').text('隐藏').appendTo( trow );
 						}
 						else{

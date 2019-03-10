@@ -47,7 +47,7 @@ function inputCheck($data,$type)
 			if(!preg_match('/^[a-zA-Z0-9_{}\=\+\*\@\-]+$/', $data)){
 				returnInfo('Flag不符合格式！');
 			}
-			if(strlen($data)>50){
+			if(strlen($data)>100){
 				returnInfo('Flag过长！');
 			}
 			break;
@@ -177,13 +177,13 @@ function get_captcha()
 function getUsersList($type)
 {
 	if($type==='Base'){
-		$s='SELECT id,name,email,last_time,reg_time,ban,last_ip from users where `del`=0';
+		$s='SELECT `id`,`name`,`email`,`logged_time`,`reg_time`,`is_ban`,`logged_ip` from users_info where `is_hide`=0';
 	}
 	elseif($type==='Password'){
-		$s='SELECT id,nickname,name,said,password,ban from users where `del`=0';
+		$s='SELECT id,nickname,name,said,password,`is_ban` from `users_info` where `is_hide`=0';
 	}
 	elseif($type==='Delete'){
-		$s='SELECT id,name,last_time,email,last_ip from users where `del`=1';
+		$s='SELECT id,name,logged_time,email,logged_ip from `users_info` where `is_delete`=1';
 	}
 	else{
 		returnInfo(DATA_ERROR);
@@ -205,17 +205,16 @@ function getUsersList($type)
 #修改状态
 function modStatus($type,$operate,$ids)
 {
-	$types=array("user","question","notice","submit");
-	$operates=array("ban","del","rand_open","show_open");
+	$types=array("users_info","ctf_challenges","notices","ctf_submits");
+	$operates=array("is_ban","is_delete","is_hide","is_rand");
 	if(!in_array($type, $types)||!in_array($operate, $operates)){
-		returnInfo(DATA_ERROR);
+		returnInfo(DATA_ERROR.$type.$operate);
 	}
 	$link=Database::getConnection();
-	if($type==='user'&&in_array("1",$ids)){
-		returnInfo("修改Kood用户状态？不好意思，你没权限！");
+	if($type==='users_info'&&in_array("1",$ids)){
+		returnInfo("禁止修改第一用户！");
 	}
 	$ids=$link->real_escape_string(implode(",", $ids));
-	$type.='s';
 	$sql=$link->query("UPDATE $type set $operate=1-$operate where id in ($ids)");
 	if(!$sql){
 		returnInfo(SQL_ERROR."UPDATE $type set $operate=1-$operate where id in ($ids)");
@@ -227,27 +226,24 @@ function modStatus($type,$operate,$ids)
 #获取信息
 function getInfoList($type,$del=0)
 {
-	$types=array("user","question","notice");
+	$types=array("users_info","ctf_challenges","notices");
 	if(!in_array($type, $types)){
 		returnInfo(DATA_ERROR);
 	}
 	$link=Database::getConnection();
-	$type.='s';
 	$del=intval($del);
-	$sql=$link->query("SELECT * from $type where del='$del'");
-	if(!$sql){
-		returnInfo(SQL_ERROR);
-	}
+	$sql=$link->query("SELECT * from $type where `is_delete`='$del'");
+	$sql or returnInfo(SQL_ERROR);
 	$data=array();
 	$i=0;
 	while($row=$sql->fetch_assoc()){
 		$data[$i++]=$row;
 	}
 	//arrayRemove($data,$i,"");
-	if($type==='questions'){
+	if($type==='ctf_challenges'){
 		Global $questionType;
 		for($j=0;$j<$i;$j++){
-			$data[$j]['type']=$questionType[$data[$j]['type']].$data[$j]['typeid'];
+			$data[$j]['type']=$questionType[$data[$j]['type']].$data[$j]['type_id'];
 		}
 		array_multisort(array_column($data,'id'),SORT_DESC,$data);
 	}
@@ -259,7 +255,7 @@ function modUserInfo($id,$key,$name,$nickname,$email,$said,$password)
 {
 	$id=intval($id);
 	if($id===1){
-		returnInfo("修改Kood用户状态？不好意思，你没权限！");
+		returnInfo("第一用户无权限操作");
 	}
 	$link=Database::getConnection();
 	$name=$link->real_escape_string($name);
@@ -267,11 +263,11 @@ function modUserInfo($id,$key,$name,$nickname,$email,$said,$password)
 	$email=$link->real_escape_string($email);
 	$said=$link->real_escape_string($said);
 	if($password==''){
-		$s="UPDATE users set name='$name',nickname='$nickname',email='$email',said='$said' where id='$id'";
+		$s="UPDATE users_info set name='$name',nickname='$nickname',email='$email',said='$said' where id='$id'";
 	}
 	else{
 		$password=md5($password.$key);
-		$s="UPDATE users set name='$name',nickname='$nickname',email='$email',said='$said',password='$password' where id='$id'";
+		$s="UPDATE users_info set name='$name',nickname='$nickname',email='$email',said='$said',password='$password' where id='$id'";
 	}
 	$sql=$link->query($s);
 	if(!$sql){
@@ -298,7 +294,7 @@ function modQuesInfo($id,$title,$score,$content,$flag,$dockerid)
 		inputCheck($flag,'flag');
 		$flag=$link->real_escape_string($flag);
 	}
-	$sql=$link->query("UPDATE questions set title='$title',score='$score',content='$content',flag='$flag',rand_open='$rand',dockerid='$dockerid' where id='$id'");
+	$sql=$link->query("UPDATE ctf_challenges set title='$title',score='$score',content='$content',flag='$flag',is_rand='$rand',docker_id='$dockerid' where id='$id'");
 	if(!$sql){
 		returnInfo(SQL_ERROR);
 	}
@@ -319,7 +315,7 @@ function userAdd($name,$email,$password)
 
 	#数据库操作 是否存在用户或邮箱
 	$link=Database::getConnection();
-	$sql=$link->query("SELECT `name`,`email` from users where `name`='$name' or `email`='$email'");
+	$sql=$link->query("SELECT `name`,`email` from users_info where `name`='$name' or `email`='$email'");
 	if(!$sql){
 		returnInfo(SQL_ERROR);
 	}
@@ -331,7 +327,7 @@ function userAdd($name,$email,$password)
 		returnInfo('该邮箱已经被注册过了！');
 	}
 
-	$sql=$link->query("INSERT into users(`name`,`password`,`email`,`user_key`,`reg_time`) values('$name','$password','$email','$key','$time')");
+	$sql=$link->query("INSERT into users_info(`name`,`password`,`email`,`key`,`reg_time`,`big_img`,`tiny_img`) values('$name','$password','$email','$key','$time','','')");
 	if(!$sql){
 		returnInfo(SQL_ERROR);
 	}
@@ -361,17 +357,17 @@ function quesAdd($title,$type,$score,$content,$flag,$dockerid)
 	}
 	$seed=substr(md5(sha1( uniqid( '', true ) ) ),0,5);
 	$time=time();
-	$sql=$link->query("SELECT * from questions where type='$type'");
+	$sql=$link->query("SELECT type_id from ctf_challenges where `type`='$type' order by type_id desc limit 1");
 	if(!$sql){
-		returnInfo(SQL_ERROR);
+		returnInfo(SQL_ERROR.'1');
 	}
-	$typeid=$sql->num_rows+1;
+	$typeid=$sql->fetch_assoc()['type_id']+1;
 	$sql=$link->query(
-		"INSERT into questions(`edit_time`,`type`,`typeid`,`dockerid`,`title`,`score`,`content`,`flag`,`rand_seed`,`rand_open`) 
+		"INSERT into ctf_challenges(`create_time`,`type`,`type_id`,`docker_id`,`title`,`score`,`content`,`flag`,`seed`,`is_rand`) 
 		values('$time','$type','$typeid','$dockerid','$title','$score','$content','$flag','$seed','$rand')"
 	);
 	if(!$sql){
-		returnInfo(SQL_ERROR);
+		returnInfo(SQL_ERROR.$typeid);
 	}
 	returnInfo("OK","1");
 
@@ -382,12 +378,12 @@ function getSubmitsList()
 {
 	$link=Database::getConnection();
 	$sql=$link->query(
-		"SELECT * from submits 
-		inner join (select id as ques_id,title from questions)a 
-		on a.ques_id=submits.ques_id 
-		inner join (select id as user_id,name from users)b 
-		on b.user_id=submits.user_id 
-		where del=0
+		"SELECT * from ctf_submits 
+		inner join (select id as ques_id,title from ctf_challenges)a 
+		on a.ques_id=ctf_submits.ques_id 
+		inner join (select id as user_id,name from users_info)b 
+		on b.user_id=ctf_submits.user_id 
+		where `is_delete`=0
 		order by id desc"
 	);
 	if(!$sql){
@@ -402,7 +398,7 @@ function getSubmitsList()
 		$data[$i]['time']=$row['sub_time'];
 		$data[$i]['ip']=$row['sub_ip'];
 		$data[$i]['flag']=$row['sub_flag'];
-		$data[$i++]['pass']=$row['pass'];
+		$data[$i++]['pass']=$row['is_pass'];
 	}
 	returnInfo("OK","1",$data);
 }
@@ -414,11 +410,12 @@ function noticeManage($operate,$id,$content)
 	$time=time();
 	$content=$link->real_escape_string($content);
 	$id=intval($id);
+	$userID=$_SESSION['userid'];
 	if($operate==='add'){
-		$sql=$link->query("INSERT into notices(`edit_time`,`content`) values('$time','$content')");
+		$sql=$link->query("INSERT into notices(`create_time`,`create_user_id`,`content`) values('$time','$userID','$content')");
 	}
 	elseif($operate==='edit'){
-		$sql=$link->query("UPDATE notices set `content`='$content' where id='$id'");
+		$sql=$link->query("UPDATE notices set `content`='$content',`edit_time`='$time',`edit_user_id`='$userID' where id='$id'");
 	}
 	else{
 		returnInfo(DATA_ERROR);

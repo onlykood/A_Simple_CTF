@@ -6,7 +6,7 @@ if(!isset($_GET['id'])){
 }
 $id=intval($_GET['id']);
 $link=Database::getConnection();
-$sql=$link->query("SELECT * from users where id='$id'");
+$sql=$link->query("SELECT * from users_info where id='$id'");
 if(!$sql){
 	returnInfo(SQL_ERROR);
 }
@@ -35,7 +35,7 @@ $row=$sql->fetch_assoc();
 	<div class="x-body">
 		<form class="layui-form">
 			<input type="hidden" id="userid" name="userid" value="<?php echo $row['id'];?>">
-			<input type="hidden" id="userkey" name="usrekey" value="<?php echo $row['user_key'];?>">
+			<input type="hidden" id="userkey" name="usrekey" value="<?php echo $row['key'];?>">
 			<div class="layui-form-item">
 				<label for="L_username" class="layui-form-label">
 					<span class="x-red">*</span>用户名
@@ -46,7 +46,7 @@ $row=$sql->fetch_assoc();
 			</div>
 			<div class="layui-form-item">
 				<label for="L_nickname" class="layui-form-label">
-					<span class="x-red">*</span>昵称
+					昵称
 				</label>
 				<div class="layui-input-inline">
 					<input type="text" id="L_nickname" name="nickname" required="" lay-verify="nikename" autocomplete="off" class="layui-input" value="<?php echo htmlspecialchars($row['nickname']);?>">
@@ -54,7 +54,7 @@ $row=$sql->fetch_assoc();
 			</div>
 			<div class="layui-form-item">
 				<label for="L_password" class="layui-form-label">
-					<span class="x-red">*</span>密码
+					密码
 				</label>
 				<div class="layui-input-inline">
 					<input type="text" id="L_password" name="password" required="" lay-verify="password" autocomplete="off" class="layui-input" value="">
@@ -62,7 +62,7 @@ $row=$sql->fetch_assoc();
 			</div>
 			<div class="layui-form-item">
 				<label for="L_email" class="layui-form-label">
-					<span class="x-red">*</span>邮箱
+					邮箱
 				</label>
 				<div class="layui-input-inline">
 					<input type="text" id="L_email" name="email" required="" lay-verify="email" autocomplete="off" class="layui-input" value="<?php echo htmlspecialchars($row['email']);?>">
@@ -70,7 +70,7 @@ $row=$sql->fetch_assoc();
 			</div>
 			<div class="layui-form-item">
 				<label for="L_said" class="layui-form-label">
-					<span class="x-red">*</span>Said
+					Said
 				</label>
 				<div class="layui-input-inline">
 					<input type="text" id="L_said" name="said" required="" lay-verify="said" autocomplete="off" class="layui-input" value="<?php echo htmlspecialchars($row['said']);?>">

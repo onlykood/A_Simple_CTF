@@ -27,8 +27,8 @@
 		</div>
 		<div class="x-body">
 			<xblock>
-				<button class="layui-btn layui-btn-danger" onclick="allClicked(this,'show_open')" name="批量隐藏/显示">批量隐藏/显示</button>
-				<button class="layui-btn layui-btn-danger" onclick="allClicked(this,'del')" name="批量删除">批量删除</button>
+				<button class="layui-btn layui-btn-danger" onclick="allClicked(this,'is_hide')" name="批量隐藏/显示">批量隐藏/显示</button>
+				<button class="layui-btn layui-btn-danger" onclick="allClicked(this,'is_delete')" name="批量删除">批量删除</button>
 				<button class="layui-btn" onclick="x_admin_show('添加问题','./quesAdd.php',600,500)"><i class="layui-icon"></i>添加问题</button>			
 			</xblock>
 	  		<table class="layui-table">
@@ -66,7 +66,7 @@
 	</body>
 </html>
 <script>
-var type="question";
+var type="ctf_challenges";
 
 	function getQuestionList(){
 		$.ajax({
@@ -100,7 +100,7 @@ var type="question";
 						if(content.flag=='')
 							content.flag='随机';
 						$('<td>').html('<input type="text" disabled="disabled" class="layui-input" value="'+content.flag+'">').appendTo(trow);
-						if(content.show_open=='1'){
+						if(content.is_hide=='0'){
 							$('<td class="td-status" style="color:green">').text('显示').appendTo( trow );
 						}
 						else{

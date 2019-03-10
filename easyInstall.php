@@ -57,6 +57,7 @@ $link->query("CREATE TABLE IF NOT EXISTS `users_info`(
   `is_hide`     tinyint(1)       NOT NULL DEFAULT '0'                                ,
   `is_ban`      tinyint(1)       NOT NULL DEFAULT '0'                                ,
   `is_admin`    tinyint(1)       NOT NULL DEFAULT '0'                                ,
+  `is_delete`   tinyint(1)       NOT NULL DEFAULT '0'                                ,
   PRIMARY KEY(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8") or die('SQL error1');
 
@@ -86,6 +87,7 @@ $link->query("CREATE TABLE IF NOT EXISTS `ctf_challenges` (
   `seed`        char(5)          NOT NULL DEFAULT 'ILWYE' ,
   `is_rand`     tinyint(1)       NOT NULL DEFAULT '0'     ,
   `is_hide`     tinyint(1)       NOT NULL DEFAULT '1'     ,
+  `is_delete`   tinyint(1)       NOT NULL DEFAULT '0'     ,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8") or die('SQL error3');
 
@@ -99,6 +101,7 @@ $link->query("CREATE TABLE IF NOT EXISTS `ctf_submits` (
   `sub_flag` varchar(100)     NOT NULL DEFAULT ''     ,
   `is_pass`  tinyint(1)       NOT NULL DEFAULT '0'    ,
   `is_hide`  tinyint(1)       NOT NULL DEFAULT '0'    ,
+  `is_delete` tinyint(1)       NOT NULL DEFAULT '0'    ,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8") or die('SQL error4');
 
@@ -134,6 +137,7 @@ $link->query("CREATE TABLE IF NOT EXISTS `users_action`(
   `ip`      int(11) UNSIGNED NOT NULL DEFAULT '0'    ,
   `time`    int(11) UNSIGNED NOT NULL DEFAULT '0'    ,
   `states`  int(11)          NOT NULL DEFAULT '0'    ,
+  `is_delete`   tinyint(1)       NOT NULL DEFAULT '0'    ,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8") or die('SQL error7');
 
@@ -162,7 +166,9 @@ $link->query("INSERT INTO `configs`(`id`,`name`,`value`) VALUES
 (11,'email_username',''),
 (12,'email_password',''),
 (13,'super_password','!@#RTRGFEW'),
-(14,'random_flag_head_fmt','flag')") or die('SQL error');
+(14,'random_flag_head_fmt','flag'),
+(15,'ctf_name','Simple CTF'),
+(16,'ctf_organizer','Simple')") or die('SQL error');
 
 $link->query("INSERT INTO `users_info` (`name`,`password`,`email`,`key`,`reg_time`,`reg_ip`,`big_img`,`tiny_img`,`is_hide`,`is_admin`) 
 VALUES('$username','$password','$email','$key','$time','$ip','','','1','1')") or die('SQL error');

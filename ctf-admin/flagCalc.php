@@ -42,7 +42,7 @@
 <?php
   $quesid=intval($_GET['id']);
   $link=Database::getConnection();
-  $sql=$link->query("SELECT users.id,name,email,user_key,rand_seed from users,questions where questions.id='$quesid'");
+  $sql=$link->query("SELECT `users_info`.`id`,`users_info`.`name`,`users_info`.`email`,`users_info`.`key`,`ctf_challenges`.`seed` from `users_info`,`ctf_challenges` where `ctf_challenges`.`id`='$quesid'");
   if(!$sql){
     returnInfo(SQL_ERROR);
   }

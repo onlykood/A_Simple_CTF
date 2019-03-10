@@ -29,7 +29,7 @@
     </div>
     <div class="x-body">
       <xblock>
-        <button class="layui-btn layui-btn-danger" onclick="allClicked(this,'del')" name="批量恢复">批量恢复</button>
+        <button class="layui-btn layui-btn-danger" onclick="allClicked(this,'is_delete')" name="批量恢复">批量恢复</button>
       </xblock>
       <table class="layui-table">
         <thead>

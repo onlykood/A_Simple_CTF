@@ -27,8 +27,8 @@
 		</div>
 		<div class="x-body">
 			<xblock>
-				<button class="layui-btn layui-btn-danger" onclick="allClicked(this,'ban')" name="批量禁止/放行">批量禁止/放行</button>
-				<button class="layui-btn layui-btn-danger" onclick="allClicked(this,'del')" name="批量删除">批量删除</button>
+				<button class="layui-btn layui-btn-danger" onclick="allClicked(this,'is_ban')" name="批量禁止/放行">批量禁止/放行</button>
+				<button class="layui-btn layui-btn-danger" onclick="allClicked(this,'is_delete')" name="批量删除">批量删除</button>
 				<button class="layui-btn" onclick="x_admin_show('添加用户','./userAdd.php',600,400)"><i class="layui-icon"></i>添加</button>
 			</xblock>
 	  		<table class="layui-table">
@@ -66,7 +66,7 @@
 	</body>
 </html>
 <script>
-var type="user";
+var type="users_info";
 
 	/*获取用户基础信息*/
 	function getBaseList(){
@@ -76,7 +76,7 @@ var type="user";
 			dataType: 'json',
 			data:{'type':type},
 			success:function(data){
-				//console.log(data);
+				console.log(data);
 				if(errorCheck(data)){
 					return false;
 				}
@@ -91,9 +91,9 @@ var type="user";
 						$( '<td>' ).text( content.name ).appendTo( trow );
 						$( '<td>' ).text( content.email ).appendTo( trow );
 						$( '<td>' ).text( new Date(content.reg_time*1000).toLocaleDateString() ).appendTo( trow );
-						$( '<td>' ).text( new Date(content.last_time*1000).toLocaleDateString() ).appendTo( trow );
-						$( '<td>' ).text( content.last_ip ).appendTo( trow );
-						if(content.ban=='0'){
+						$( '<td>' ).text( new Date(content.logged_time*1000).toLocaleDateString() ).appendTo( trow );
+						$( '<td>' ).text( int2ip(content.logged_ip) ).appendTo( trow );
+						if(content.is_ban=='0'){
 							$('<td class="td-status" style="color:#2196F3">').text('正常').appendTo( trow );
 						}
 						else{

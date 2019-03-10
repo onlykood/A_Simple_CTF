@@ -6,7 +6,7 @@ if(!isset($_GET['id'])){
 }
 $id=intval($_GET['id']);
 $link=Database::getConnection();
-$sql=$link->query("SELECT * from questions where id='$id'");
+$sql=$link->query("SELECT * from ctf_challenges where id='$id'");
 if(!$sql){
 	returnInfo(SQL_ERROR);
 }
@@ -56,7 +56,7 @@ $row=$sql->fetch_assoc();
 				    Dockerid
 				</label>
 				<div class="layui-input-inline">
-				    <input type="text" id="L_dockerid" name="dockerid" lay-verify="dockerid" class="layui-input" value="<?php echo $row['dockerid'];?>">
+				    <input type="text" id="L_dockerid" name="dockerid" lay-verify="dockerid" class="layui-input" value="<?php echo $row['docker_id'];?>">
 				</div>
 				<div class="layui-form-mid layui-word-aux">
 				    <span class="x-red">*</span>无docker id，则不填或填0

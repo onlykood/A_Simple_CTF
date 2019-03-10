@@ -27,7 +27,7 @@
     </div>
 		<div class="x-body">
 			<xblock>
-				<button class="layui-btn layui-btn-danger" onclick="allClicked(this,'del')" name="批量删除">批量删除</button>
+				<button class="layui-btn layui-btn-danger" onclick="allClicked(this,'is_delete')" name="批量删除">批量删除</button>
 			</xblock>
 	  		<table class="layui-table">
 				<thead>
@@ -87,7 +87,7 @@ var type="submit";
 						$( '<td>' ).text( content.username ).appendTo( trow );
 						$( '<td>' ).text( content.quesname ).appendTo( trow );
 						$( '<td>' ).text( new Date(content.time*1000).toLocaleDateString() ).appendTo( trow );
-						$( '<td>' ).text( content.ip ).appendTo( trow );
+						$( '<td>' ).text( int2ip(content.ip) ).appendTo( trow );
 						$( '<td>' ).text( content.flag ).appendTo( trow );
 						if(content.pass=='0'){
 							$('<td class="td-status" style="color:red">').text('错误').appendTo( trow );
