@@ -13,7 +13,7 @@ function getRankList(data)	{
 			var trow = $( '<tr>' );
 			$( '<td>' ).text( num+1 ).appendTo( trow );
 
-			$('<td><img class="tinyImg" src="'+content[4]+'" />').appendTo( trow );
+			$('<td><img class="tinyImg" src="'+content[3]+'" />').appendTo( trow );
 			//$( '<td>' ).text( content[3])
 			$( '<td>' ).text( content[1]).appendTo( trow );
 			$( '<td>' ).text( content[2]).appendTo( trow );
@@ -31,10 +31,10 @@ function getRankPic(data) {
 		return false;
 	}
 	$.each(data,function(n,content){
-		if(n>9){
+		if(n>19){
 			return false;
 		}
-		info[n]={name:content[1],data:content[3]};
+		info[n]={name:content[1],data:content[4]};
 	})
 	debugLog("info:");
 	debugLog(info);

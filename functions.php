@@ -471,13 +471,11 @@ function sendRegMail($name,$email,$captcha){
  * @return      [type]     [description]
  */
 function getRank(){
-	#获取数据库信息
-	# global $link;
 	global $link;
 	$temp='';
 	$data=array();
 	$solve_num=0;
-	$sql=$link->query("SELECT `id`,`extra_score` as `score`,`nickname`,`said` from `users_info` where `is_hide`='0'");
+	$sql=$link->query("SELECT a.`id`,`extra_score` as `score`,`nickname`,`said`,a.`tiny_img` from `users_info` as a , ctf_submits as b where a.`is_hide`='0' and a.`is_delete`='0' and b.`is_pass`='1' and b.`is_delete`='0' group by a.`id`");
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 
 	while($row=$sql->fetch_assoc()){
@@ -488,17 +486,20 @@ function getRank(){
 	if(MY_SWITCH['DYNAMIC_SCORE']){
 		$sql=$link->query(
 			"SELECT 
-				`a`.`ques_id`,`a`.`user_id`,`b`.`num`,`a`.`sub_time` 
+				a.`ques_id`,a.`user_id`,b.`num`,a.`sub_time` 
 			from 
-				(SELECT `user_id`,`ques_id`,`sub_time` from `ctf_submits` where `is_pass`='1' and `is_hide`='0' order by `ques_id`,`sub_time`)a 
+				(SELECT `user_id`,`ques_id`,`sub_time` from `ctf_submits` where `is_pass`='1' and `is_hide`='0' and `is_delete`='0' order by `ques_id`,`sub_time`)a 
 			inner join 
-				(select `ques_id`,count(*) as `num` from `ctf_submits` where `is_pass`='1' and `is_hide`='0' group by `ques_id`)b
-			on `a`.`ques_id`=`b`.`ques_id`"
+				(select `ques_id`,count(*) as `num` from `ctf_submits` where `is_pass`='1' and `is_hide`='0' and `is_delete`='0' group by `ques_id`)b
+			on a.`ques_id`=b.`ques_id`"
 		);
 	}
 	else{
 		$sql=$link->query(
-			"SELECT `ctf_chellenges`.`score`,`ctf_submits`.`ques_id`,`ctf_submits`.`user_id`,`ctf_submits`.`sub_time` from `ctf_chellenges`,`ctf_submits` where `ctf_submits`.`is_pass`='1' and `ctf_submits`.`is_hide`='0' and `ctf_chellenges`.`id`=`ctf_submits`.`ques_id` order by `ctf_submits`.`sub_time`"
+			"SELECT b.`score`,a.`ques_id`,a.`user_id`,a.`sub_time` 
+			FROM `ctf_challenges` as b,`ctf_submits` as a 
+			WHERE a.`is_pass`='1' and a.`is_hide`='0' and a.`is_delete`='0' and b.`id`=a.`ques_id`
+			ORDER BY a.`sub_time`"
 		);
 	}
 
@@ -527,24 +528,20 @@ function getRank(){
 		$data[$row['user_id']]['scoreDate'][$ttt++]=array($row['sub_time']*1000+28800000,$data[$row['user_id']]['score']);
 	}
 
-	$ids = implode(',',array_column($data, 'id'));
-	$sql=$link->query("SELECT `tiny_img` from `users_info` where `id` in ($ids)");
-
-	#删除id，防止猜测
-	foreach ($data as &$data1) {
-		unset($data1['id']);
-		$row=$sql->fetch_assoc()['tiny_img'];
-		if($row==''){
-			$data1['tiny_img']=MY_CONFIG['DEFAULT_AVATAR'];
+	#删除 id，防止猜测
+	foreach ($data as $key => $value) {
+		unset($value['id']);
+		if($value['score']==0){
+			unset($data[$key]);
+			continue;
 		}
-		else{
-			$data1['tiny_img']=$row;
-		}
-		$data1=array_values($data1);
+		if($value['tiny_img']=='')
+			$value['tiny_img']=MY_CONFIG['DEFAULT_AVATAR'];
+		$data[$key]=array_values($value);
 	}
+
 	#按分数排序
 	array_multisort(array_column($data,0),SORT_DESC,$data);
-	//returnInfo("OK",0,$GLOBALS);
 	returnInfo("OK",1,$data);
 }
 
@@ -599,7 +596,7 @@ function getQuestion($id){
 	loginCheck();
 	$id=intval($id);
 	global $link;
-	$sql=$link->query("SELECT `id`,`type`,`type_id`,`title`,`content`,`score`,`seed`,`is_rand`,`flag` from `ctf_challenges` where `id`='$id' and `is_hide`='0'");
+	$sql=$link->query("SELECT `id`,`type`,`type_id`,`title`,`content`,`score`,`seed`,`is_rand`,`flag` from `ctf_challenges` where `id`='$id' and `is_hide`='0' and `is_delete`='0'");
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 	#由于只是一个，所以只用获取一次就行
 	$row=$sql->fetch_assoc();
@@ -998,7 +995,7 @@ function getVideo(){
 		$data.='<a href="./ctf-admin" target="_blank">管理入口</a><br>';
 	}
 	else{
-		$data.="不存在阿";
+		# data.="不存在阿";
 	}
 	returnInfo("OK",1,$data);
 }
@@ -1095,11 +1092,8 @@ function image_resize($imagedata, $width, $height, $per = 0) {
  
     // 销毁
     imagedestroy($block);
- 
     $image = file_get_contents($tmpFilename);
- 
     unlink($tmpFilename);
- 
     return $image;
 }
 ######################################################################################################################
