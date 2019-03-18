@@ -80,7 +80,7 @@ $(document).ready(function(){
 				}
 				if(data[0][0]=='2'){
 					setTimeout(function(){
-						window.location.href="./createaccount.html";
+						window.location.href="./register.html";
 					},2000);
 				}
 				$('#resetaccount').html('重置密码');

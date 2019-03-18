@@ -17,7 +17,7 @@ function getNotice()
 				function(num,content)
 				{
 					var trow = $( '<tr>' );
-					//$( '<td>' ).text().appendTo( trow );
+					/*$( '<td>' ).text().appendTo( trow );*/
 					$( '<td>' ).html('['+ getMyDate(content[0]) +'] '+content[1]).appendTo( trow );
 					trow.appendTo( table );
 				}

@@ -25,6 +25,11 @@ if(	isset($_POST['DB_HOST']) && isset($_POST['DB_USER']) && isset($_POST['DB_PAS
 	$ip=ip2long($_SERVER['REMOTE_ADDR']);
 	$username=$_POST['USER_NAME'];
 	$password=$_POST['USER_PASSWD'];
+	if($password==''){
+		$a='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~';
+		$password=substr(str_shuffle($a),mt_rand(0,strlen($a)-11),10);
+		echo '您的密码为:',$password,'<br/>';
+	}
 	$email=$_POST['USER_MAIL'];
 	$key=md5(sha1( uniqid( '', true ).mt_rand(1000000000,9999999999) ));
 	$time=time();
@@ -46,7 +51,7 @@ $link->query("CREATE TABLE IF NOT EXISTS `users_info`(
   `key`         char(32)         NOT NULL DEFAULT '00000000000000000000000000000000' ,
   `extra_score` int(11)          NOT NULL DEFAULT '0'                                ,
   `hint_score`  int(11)          NOT NULL DEFAULT '0'                                ,
-  `nickname`    varchar(50)      NOT NULL DEFAULT 'unknown'                          ,
+  `nickname`    varchar(50)      NOT NULL DEFAULT '匿名'                             ,
   `said`        varchar(50)      NOT NULL DEFAULT ''                                 ,
   `reg_time`    int(11) UNSIGNED NOT NULL DEFAULT '0'                                ,
   `reg_ip`      int(11) UNSIGNED NOT NULL DEFAULT '0'                                ,
@@ -54,6 +59,7 @@ $link->query("CREATE TABLE IF NOT EXISTS `users_info`(
   `logged_ip`   int(11) UNSIGNED NOT NULL DEFAULT '0'                                ,
   `big_img`     mediumtext       NOT NULL                                            ,
   `tiny_img`    text             NOT NULL                                            ,
+  `is_verify`	tinyint(1)		 NOT NULL DEFAULT '0'                                ,
   `is_hide`     tinyint(1)       NOT NULL DEFAULT '0'                                ,
   `is_ban`      tinyint(1)       NOT NULL DEFAULT '0'                                ,
   `is_admin`    tinyint(1)       NOT NULL DEFAULT '0'                                ,
@@ -168,18 +174,18 @@ $link->query("INSERT INTO `configs`(`id`,`name`,`value`) VALUES
 (13,'super_password','!@#RTRGFEW'),
 (14,'random_flag_head_fmt','flag'),
 (15,'ctf_name','Simple CTF'),
-(16,'ctf_organizer','Simple')") or die('SQL error');
+(16,'ctf_organizer','Simple'),
+(17,'email_verify_open','0')") or die('SQL error');
 
-$link->query("INSERT INTO `users_info` (`name`,`password`,`email`,`key`,`reg_time`,`reg_ip`,`big_img`,`tiny_img`,`is_hide`,`is_admin`) 
-VALUES('$username','$password','$email','$key','$time','$ip','','','1','1')") or die('SQL error');
-
-echo "写入初始数据成功！<a href='./index.html'>手动跳转</a>";
+$link->query("INSERT INTO `users_info` (`name`,`password`,`email`,`key`,`reg_time`,`reg_ip`,`big_img`,`tiny_img`,`is_verify`,`is_hide`,`is_admin`) 
+VALUES('$username','$password','$email','$key','$time','$ip','','','1','1','1')") or die('SQL error');
 
 	// 写入 config.php 文件
 	if(!file_put_contents('config.php',$content)){
 		highlight_string($content);
-		die("# 请确认当前目录下是否有文件写权限？或手动将本页面数据保存为 config.php");
+		die("<br/># 请确认当前目录下是否有文件写权限？或手动将本页面数据保存为 config.php");
 	}
+	echo "写入初始数据成功！<a href='./index.html'>手动跳转</a><br/>";
 }
 
 $html=<<<'HTML'
@@ -199,7 +205,7 @@ $html=<<<'HTML'
 </head>
 <body>
 	<header style="padding-bottom: 3px;">
-		<nav class="blue" role="navigation">
+		<nav class="black" role="navigation">
 			<div class="container">
 				<div class="nav-wrapper">
 					<a href="#" data-activates="slide-out" class="page-title" style="font-size: 30px;">A Simple CTF</a>

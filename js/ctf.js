@@ -45,12 +45,28 @@ function loadSession()
 	});
 }
 
+function getThemeColor(){
+	var color=localStorage.getItem('themeColor');
+	if(color==null){
+		localStorage.setItem('themeColor', 'grey darken-4');
+		color='grey darken-4';
+	}
+	$('nav').attr('class',color);
+	return false;
+}
+
+function setThemeColor(color){
+	localStorage.setItem('themeColor',color);
+	getThemeColor();
+	return false;
+}
 function login(data){
 	name = data[2];
 	mail = data[4];
 	said = data[5];
 	nickname=data[3];
 	loggedin = true;
+	$('.head-menu').append('<li><a href="#" id="logout">退出</a></li>')
 }
 
 function logout(){
@@ -63,12 +79,13 @@ function logout(){
 
 function getCaptcha()
 {
-	$("#capimg").attr('src','ajax.php?m=getCaptcha'); 
+	//.attr('src','ajax.php?m=getCaptcha'+String(Math.random()).slice(2));
+	$("#capimg").attr('src','ajax.php?m=getCaptcha&'+String(Math.random()).slice(2));
 	return false;
 }
 
 function getMyDate(str){
-	//补上3个0 转换为数字
+	/*补上3个0 转换为数字*/
 	str+='000';
 	str-=0;
 	var oDate = new Date(str),  
@@ -82,7 +99,7 @@ function getMyDate(str){
 	return oTime;  
 }
 
-//补0操作
+/*补0操作*/
 function getzf(num){  
 	if(parseInt(num) < 10){  
 		num = '0'+num;  
@@ -101,30 +118,86 @@ function errorCheck(data){
 	}
 	return 0;
 }
+
 function loadTitle(){
-	$.ajax({
-		type:'post',
-		url: 'ajax.php?m=getConfig',
-		dataType: 'json',
-		data:{'type':'ctf_name'},
-		success:function(data){
-			debugLog(data);
-			if(errorCheck(data)){
-				return false;
+	title=sessionStorage.getItem('title');
+	pageTitle=sessionStorage.getItem('pageTitle');
+	if(title==null || pageTitle==null){
+		$.ajax({
+			type:'post',
+			url: 'ajax.php?m=getConfig',
+			dataType: 'json',
+			data:{'type':'ctf_name'},
+			success:function(data){
+				debugLog(data);
+				if(errorCheck(data)){
+					return false;
+				}
+				document.title = data[1][0];
+				$('.page-title').text(data[1][1]);
+				sessionStorage.setItem('title',data[1][0]);
+				sessionStorage.setItem('pageTitle',data[1][1]);
+			},
+			error:function(data){
+				debugLog(data);
 			}
-			document.title = data[1][0];
-			$('.page-title').text(data[1][1]);
-		},
-		error:function(data){
-			debugLog(data);
-		}
-	});
+		});
+	}
+	else{
+		document.title = title;
+		$('.page-title').text(pageTitle);
+	}
+	return false;
 }
+
+function textToImg(img,uname) {
+	if(img!=''){
+		return img;
+	}
+	var name = uname.charAt(0);
+	var fontSize = 60;
+	var fontWeight = 'bold';
+	var canvas = document.getElementById('headImg');
+	var img1 = document.getElementById('headImg');
+	canvas.width = 120;
+	canvas.height = 120;
+	var context = canvas.getContext('2d');
+	context.fillStyle = '#F7F7F9';
+	context.fillRect(0, 0, canvas.width, canvas.height);
+	context.fillStyle = '#605CA8';
+	context.font = fontWeight + ' ' + fontSize + 'px sans-serif';
+	context.textAlign = 'center';
+	context.textBaseline = "middle";
+	context.fillText(name, fontSize, fontSize);
+	return canvas.toDataURL('image/png');
+};
+
 loadTitle();
 $(document).ready(function(){
+	getThemeColor();
 	loadSession();
 	$(".button-collapse").sideNav();
 	$('.modal').modal();
-	// console.clear();
+	DEBUG ? null : console.clear();
 	console.log("Welcome to my simple ctf, have a good time.");
+	$('#logout').click(function(){
+		if(!loggedin){
+			Materialize.toast("你还没有登录!", 4000);
+			loadAccount();
+			return false;
+		}
+		$.ajax({
+			type: 'POST',
+			url: 'ajax.php?m=logout',
+			data:{'token':token},
+			dataType: 'json',
+			success: function(data) {
+				Materialize.toast(data[0][1], 1000,'',function(){location.reload();});
+			},
+			error:function(data){
+				debugLog(data);
+			}
+		});
+		return false;
+	});
 });

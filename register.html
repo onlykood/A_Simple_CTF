@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+	<title>  </title>
+	<link href="//cdn.bootcss.com/materialize/0.98.2/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+	<script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+	<script src="//cdn.bootcss.com/highcharts/6.0.7/highcharts.js"></script>
+	<script src="//cdn.bootcss.com/highcharts/6.0.7/modules/sunburst.js"></script>
+	<script src="//cdn.bootcss.com/materialize/0.98.2/js/materialize.min.js"></script>
+	<link href="./favicon.ico" rel="shortcut icon"/>
+	<link href="./css/style.css" rel="stylesheet" type="text/css"/>
+	<script src="./js/ctf.js"></script>
+</head>
+<body>
+	<header style="padding-bottom: 3px;">
+		<nav class="white" role="navigation">
+			<div class="container">
+				<div class="nav-wrapper">
+					<ul class="right hide-on-small-only head-menu">
+						<li><a href="./index.html">首页</a></li>
+						<li><a href="./scoreboard.html">排行</a></li>
+						<li><a href="./notice.html">公告</a></li>
+						<li><a href="./challenges.html">题目</a></li>
+						<li><a href="./about.html">关于</a></li>
+						<li><a href="./account.html">TEAM</a></li>
+					</ul>
+					<ul id="slide-out" class="side-nav">
+						<li class="logo"><a id="logo-container" href="/" class="brand-logo">
+							<object id="front-page-logo" type="image/png"></object></a></li>
+						<li><a href="./index.html">首页</a></li>
+						<li><a href="./scoreboard.html">排行</a></li>
+						<li><a href="./notice.html">公告</a></li>
+						<li><a href="./challenges.html">题目</a></li>
+						<li><a href="./about.html">关于</a></li>
+						<li><a href="./account.html">TEAM</a></li>
+					</ul>
+					<a href="#" data-activates="slide-out" class="button-collapse"><i class="large material-icons">reorder</i></a>
+					<a href="#" data-activates="slide-out" class="page-title" style="font-size: 30px;">  </a>
+				</div>
+			</div>
+		</nav>
+	</header>
+	<main>
+		
+		<div class="container">
+			<div class="section">
+				<div class="no-pad-bot section" id="index-banner">
+					<div class="container">
+						<h1 class="header center" id="header">Register</h1>
+					</div>
+				</div>
+
+				<!-- 邮箱验证 注册界面 -->
+				<div class="row on-verify" style="display: none;">
+					<div class="container">
+						<div class="col s12" id="verify_regone">
+							<div class="input-field col s10 offset-s1">
+								<i class="material-icons prefix">account_circle</i>
+								<input id="verify_username" type="text" class="validate">
+								<label for="verify_username">*用户名</label>
+							</div>
+							<div class="input-field col s10 offset-s1">
+								<i class="material-icons prefix">email</i>
+								<input id="verify_email" type="email" class="validate">
+								<label for="verify_email">*邮箱</label>
+							</div>
+							<div class="input-field col s7 offset-s1">
+								<i class="material-icons prefix">subject</i>
+								<input id="verify_captcha" type="text" class="validate">
+								<label for="verify_captcha">*验证码</label>
+							</div>
+							<img id="on-captcha" class="col s3" onclick="this.src=this.src" src="/ajax.php?m=getCaptcha">
+							<button class="btn blue accent-2 col s4 offset-s4" id="sendmail">发送邮件验证<i class="material-icons right">send</i></button>
+						</div>
+						<div id="verify_regtwo" style="display: none">
+							<div class="input-field col s10 offset-s1">
+								<i class="material-icons prefix">lock_outline</i>
+								<input id="verify_password" type="password" class="validate">
+								<label for="verify_password">*请输入密码</label>
+							</div>
+							<div class="input-field col s10 offset-s1">
+								<i class="material-icons prefix">lock_open</i>
+								<input id="verify_repeat" type="password" class="validate">
+								<label for="verify_repeat">*请确认密码</label>
+							</div>
+							<div class="input-field col s10 offset-s1">
+								<i class="material-icons prefix">code</i>
+								<input id="verify_regkey" type="text" class="validate">
+								<label for="verify_regkey">*邮箱验证码</label>
+							</div>
+							<div class="col s12 hide">
+								<p class="center">
+									<input class="center" type="checkbox" id="verify_agree" name="verify_agree" checked/>
+									<label for="verify_agree">我同意<a class="modal-trigger" href="#terms">注册协议</a></label>
+								</p>
+							</div>
+							<button class="btn blue accent-2 col s4 offset-s4" id="regaccount">注册</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- 无验证 注册界面 -->
+				<form class="no-verify container" style="display: none">
+					<div class="row">
+						<div class="input-field col s10 offset-s1">
+							<i class="material-icons prefix">account_circle</i>
+							<input id="username" type="text" class="validate" name="username" required>
+							<label for="username">*用户名</label>
+						</div>
+						<div class="input-field col s10 offset-s1">
+							<i class="material-icons prefix">email</i>
+							<input id="email" type="email" class="validate" name="email" required>
+							<label for="email">*邮箱</label>
+						</div>
+						<div class="input-field col s10 offset-s1">
+							<i class="material-icons prefix">lock_outline</i>
+							<input id="password" type="password" class="validate" name="password" required>
+							<label for="password">*请输入密码</label>
+						</div>
+						<div class="input-field col s7 offset-s1">
+							<i class="material-icons prefix">subject</i>
+							<input id="captcha" type="text" class="validate" name="captcha" required>
+							<label for="cap">*验证码</label>
+						</div>
+						<img id="no-captcha" class="col s3" onclick="this.src=this.src" src="/ajax.php?m=getCaptcha">
+						<div class="col s12">
+							<p class="center">
+								<input class="center" type="checkbox" id="agree" name="agree" checked/>
+								<label for="agree">我同意<a class="modal-trigger" href="#terms">注册协议</a></label>
+							</p>
+						</div>
+						<button class="submit btn blue accent-2 col s4 offset-s4" id="regaccount">注册</button>
+					</div>
+				</form>
+
+			</div>
+		</div>
+		
+		<div id="terms" class="modal">
+			<div class="modal-content" style="font-family: 微软雅黑">
+				<center><h4>注册协议</h4></center>
+				<p>1. 禁止攻击服务器，搭建的平台是给大家玩的，不是给你破坏的。</p>
+				<p>2. 禁止抄袭他人flag，一经发现，给与封号惩罚。</p>
+				<p>3. 最终解释权归本站所有</p>
+			</div>
+		</div>	
+	</main>
+	<script src="./js/register.js"></script>
+</body>
+</html>

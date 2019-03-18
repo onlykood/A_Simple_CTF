@@ -2,7 +2,7 @@ function getTop3Rank()	{
 	$.ajax({
 		type: 'post',
 		url: 'ajax.php?m=getRank',
-		data:"token="+token,
+		data:{'token':token,'is_img':0},
 		dataType:'json',
 		success: function(data) {
 			debugLog(data);
@@ -68,38 +68,9 @@ function getRecentSloves()	{
 	return false;
 }
 
-function getStatus()	{
-	$.ajax({
-		type:'post',
-		url:'ajax.php?m=getStatus',
-		data:"token="+token,
-		dataType:'json',
-		success: function(data) {
-			if(errorCheck(data)){
-				return false;
-			}
-			debugLog(data);
-			var s = '';
-			switch(data[1]['status']){
-				case '5':s='比赛还没有开始！';break;
-				case '4':s='热身赛开始！';break;
-				case '3':s='休息中，稍后进行正式赛！';break;
-				case '2':s='正式赛开始！';break;
-				case '1':s='比赛已经结束了！';break;
-			}
-			//$( '#status' ).text( 'Season 1' );
-		},
-		error: function(data){
-			debugLog(data);
-		}
-	});
-	return false;
-}
-
 $(document).ready(function(){
 	getTop3Rank()
 	getRecentSloves();
-	//getStatus();
 	$.fn.downCount = function (options, callback) {
 		var settings = $.extend({date: null,offset: null}, options);
 		if (!settings.date||!Date.parse(settings.date)) 

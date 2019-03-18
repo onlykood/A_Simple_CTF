@@ -23,7 +23,9 @@ ul.side-nav li.logo:hover {
 main {
     flex: 1 0 auto;
 }
-
+nav {
+  background-color:#e0e0e0;
+}
 body {
     display: flex;
     min-height: 100vh;
@@ -62,7 +64,7 @@ footer {
   padding:0;
 }
 .btn-large{
-  background-color: #448aff;
+  background-color: #40506a;
   width: 24%;
   min-height: 100px;
   line-height: 1;
@@ -70,7 +72,7 @@ footer {
   box-shadow: none;
 }
 .btn-large:hover{
-  background-color: #2979ff;
+  background-color: #3a4860;
   box-shadow: none;
 }  
 .tabs .tab a{
@@ -137,6 +139,9 @@ ul.countdown li p {
   height: 50px;
   border-radius: 50px;
 }
+.tmp1{
+  text-transform: capitalize;
+}
 /* account base-info img遮罩层*************/
 /*
 .headImgs {
@@ -159,3 +164,21 @@ ul.countdown li p {
 .headImgs a:hover .mask {
     opacity: 1;           
 }*/
+
+
+/*************/
+/* challengs 滚动条部分*/
+.scroll-bar1::-webkit-scrollbar {/*滚动条整体样式*/
+  width: 10px;     /*高宽分别对应横竖滚动条的尺寸*/
+  height: 1px;
+}
+.scroll-bar1::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+  background: #535353;
+}
+.scroll-bar1::-webkit-scrollbar-track {/*滚动条里面轨道*/
+  -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+  border-radius: 10px;
+  background: #EDEDED;
+}

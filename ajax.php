@@ -22,14 +22,17 @@ switch( $_GET['m'] )	{
 	case 'getConfig':
 		postCheck('type');
 		getConfig($_POST['type']);
-
+	case 'noVerifyRegister':
+		postCheck('username','password','email','captcha');
+		noVerifyRegister($_POST['username'],$_POST['password'],$_POST['email'],$_POST['captcha']);
 	case 'getNotice':
 		getNotice();
 	case 'getQuestion':
 		postCheck('id');
 		getQuestion($_POST['id']);
 	case 'getRank':
-		getRank();
+		postCheck('is_img');
+		getRank($_POST['is_img']);
 
 	case 'getRecentSloves':
 			getRecentSloves();
@@ -41,6 +44,7 @@ switch( $_GET['m'] )	{
 		getQuestionSolves($_POST['id']);
 
 	case 'register':
+		// returnInfo(serialize($_POST));
 		postCheck('password','repeat','regkey');
 		register($_POST['password'],$_POST['repeat'],$_POST['regkey']);
 
@@ -57,11 +61,8 @@ switch( $_GET['m'] )	{
 	case 'getSession':
 		getSession();
 
-	case 'getStatus':
-		getStatus();
 	case 'modUserBaseInfo':
 		postCheck('img','said','nickname');
-		//returnInfo($_POST['img']);
 		modUserBaseInfo($_POST['img'],$_POST['said'],$_POST['nickname']);
 	case 'modUserPassword':
 		postCheck('old','new','repeat');
@@ -87,6 +88,8 @@ switch( $_GET['m'] )	{
 		getUserAvator();
 	case 'getDockerUrl':
 		getDockerUrl();
+	case 'getEmailVerify':
+		getEmailVerify();
 	default:
 		returnInfo(MY_ERROR['DATA_ERROR']);
 }

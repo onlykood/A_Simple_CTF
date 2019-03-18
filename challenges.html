@@ -15,10 +15,10 @@
 </head>
 <body>
 	<header style="padding-bottom: 3px;">
-		<nav class="blue" role="navigation">
+		<nav class="white" role="navigation">
 			<div class="container">
 				<div class="nav-wrapper">
-					<ul class="right hide-on-small-only">
+					<ul class="right hide-on-small-only head-menu">
 						<li><a href="./index.html">首页</a></li>
 						<li><a href="./scoreboard.html">排行</a></li>
 						<li><a href="./notice.html">公告</a></li>
@@ -45,7 +45,7 @@
 	<main>
 		<div class="no-pad-bot section" id="index-banner">
 			<div class="container">
-				<h1 class="header center blue-text text-darken-2">Questions</h1>
+				<h1 class="header center">Questions</h1>
 			</div>
 		</div>
 
@@ -56,14 +56,14 @@
 		</div>
 	</main>
 	<!-- 模态框 -->
-	<div id="modal" class="modal row">
+	<div id="modal" class="modal row scroll-bar1">
 		<ul class="tabs">
-			<li class="tab col s3"><a active href="#mod1">question</a></li>
-			<li class="tab col s3"><a href="#mod2" onclick="getQuestionSolves()">solves</a></li>
+			<li class="tab col s3"><a href="#mod1" class="active tmp1">Challenge</a></li>
+			<li class="tab col s3"><a href="#mod2" class="tmp1" onclick="getQuestionSolves()">Solves</a></li>
 		</ul>
 		<!-- 展示题目具体内容 -->
 		<div id="mod1" class="col s12">
-			<div class="modal-content" style="padding-top: 0">
+			<div class="modal-content" style="padding: 0">
 				<div class="">
 					<h4 class="center col s12" id="ques_tit"></h4>
 					<h5 class="center col s12" id="ques_score"></h5>
@@ -71,19 +71,15 @@
 				<div class="container">
 					<p id="ques_con"></p>
 				</div>
-			</div>
-			<form>
-				<div class="input-field col s12">
-					<div class="valign center">
-						<input type="text" placeholder="Input Your Flag" name="flag" style="width: 50%"/>
-					</div>
+			<form class="">
+				<div class="col s8 offset-s1 center">
+					<input type="text" placeholder="Flag" name="flag"/>
 				</div>
-				<div class="col s12">
-					<div class="valign center" style="padding-bottom: 20px">
-						<button class="btn waves-effect waves-light" type="submit" name="action">Submit<i class="material-icons right">send</i></button>
-					</div>
+				<div class="col s3">
+					<button class="btn waves-effect waves-light tmp1" style="height: 51px" type="submit" name="action">Submit</button>
 				</div>
 			</form>
+			</div>
 		</div>
 		<!--此处用于显示solves-->
 		<div id="mod2" class="col s12">

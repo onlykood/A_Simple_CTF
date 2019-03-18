@@ -12,9 +12,7 @@ function getRankList(data)	{
 		function(num,content){
 			var trow = $( '<tr>' );
 			$( '<td>' ).text( num+1 ).appendTo( trow );
-
-			$('<td><img class="tinyImg" src="'+content[3]+'" />').appendTo( trow );
-			//$( '<td>' ).text( content[3])
+			$('<td><img class="tinyImg" src="'+textToImg(content[3] ,content[1])+'" />').appendTo( trow );
 			$( '<td>' ).text( content[1]).appendTo( trow );
 			$( '<td>' ).text( content[2]).appendTo( trow );
 			$( '<td>' ).text( content[0]).appendTo( trow );
@@ -31,7 +29,7 @@ function getRankPic(data) {
 		return false;
 	}
 	$.each(data,function(n,content){
-		if(n>19){
+		if(n>14){
 			return false;
 		}
 		info[n]={name:content[1],data:content[4]};
@@ -75,7 +73,7 @@ function getRanks(){
 		type: 'post',
 		url: 'ajax.php?m=getRank',
 		dataType:'json',
-		data:{"token":token},
+		data:{'token':token,'is_img':1},
 		success: function(data) {
 			debugLog(data);
 			if(errorCheck(data)){

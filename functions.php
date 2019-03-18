@@ -15,7 +15,7 @@
  * @param       int     $num 解题人数
  * @return      int          题目分值
  */
-function scoreModel($number){
+function scoreModel(int $number):int{
 	return intval(1001-1000/(1.01+pow(2.2,12-$number)));
 }
 
@@ -26,7 +26,7 @@ function scoreModel($number){
  * @param       int     $id 题目 id
  * @return      int         解题数量
  */
-function getQuestionSolveNum($id){
+function getQuestionSolveNum(int $id):int{
 	global $link;
 	$sql=$link->query(
 		"SELECT count(1) as `num`
@@ -47,7 +47,7 @@ function getQuestionSolveNum($id){
  * @param       int     $num 排名
  * @return      int          得分
  */
-function oneBlood($num){
+function oneBlood(int $num):int{
 	$score=0;
 	if(!MY_SWITCH['ONE_BLOOD']){
 		return $score;
@@ -68,7 +68,7 @@ function oneBlood($num){
  * @return      bool|json 
  */
 function loginCheck(bool $ret=false){
-	if( intval($_SESSION['userid']) > 0 ){
+	if( isset($_SESSION['userID']) && intval($_SESSION['userID']) > 0 ){
 		return true;
 	}
 	#如果不要求返回值，那么直接退出
@@ -192,7 +192,7 @@ function getSession(){
 	$sql=$link->query(
 		"SELECT `name`,`nickname`,`email`,`said` 
 		FROM `users_info` 
-		WHERE `id`='".$_SESSION['userid']."'"
+		WHERE `id`='".$_SESSION['userID']."'"
 	);
 
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
@@ -209,7 +209,7 @@ function getSession(){
 }
 
 /**
- * @description 从配置数据表中读取
+ * @description 从配置数据表中读取 !!!!!!!!!!!!!!
  * @Author      kood
  * @DateTime    2019-03-10
  * @param       [type]     $type [description]
@@ -217,12 +217,13 @@ function getSession(){
  */
 function getConfig($type){
 	global $link;
-	if($type!=='ctf_name')
+	$types=array('ctf_open','reg_open','sub_open','login_open','ctf_name','email_verify_open');
+	if(!in_array($type,$types,true))
 		returnInfo("DIE");
-	if(isset($_SESSION['ctfName'])){
+	if(isset($_SESSION['ctfName']) && isset($_SESSION['ctfOrganizer'])){
 		returnInfo("OK",1,array($_SESSION['ctfName'],$_SESSION['ctfOrganizer']));
 	}
-	$sql=$link->query("SELECT * from configs where name='$type' limit 1");
+	$sql=$link->query("SELECT * from configs where name='ctf_name' limit 1");
 	$ctfName=$sql->fetch_assoc()['value'];
 	$_SESSION['ctfName']=$ctfName;
 
@@ -234,6 +235,41 @@ function getConfig($type){
 }
 
 /**
+ * @description NULL
+ * @Author      kood
+ * @DateTime    2019-03-18
+ * @return      [type]     [description]
+ */
+function noVerifyRegister(string $name,string $password,string $email,string $captcha){
+	#验证码检测
+	if(!isset($_SESSION['captcha'])||strtolower($captcha)!==$_SESSION['captcha']){
+		unset($_SESSION['captcha']);
+		returnInfo('验证码错误！');
+	}
+	unset($_SESSION['captcha']);
+
+	inputCheck('name',$name);
+	inputCheck('password',$password,$password);
+	inputCheck('email',$email);
+	global $link;
+	$sql=$link->query("SELECT name from users_info where name='$name' or email='$email'");
+	$sql or reutnInfo(MY_ERROR['SQL_ERROR']);
+	$sql->num_rows and returnInfo('该 用户名/邮箱 已经被注册过了！');
+	$key=md5(sha1( uniqid( '', true ).mt_rand(1000000000,9999999999) ));
+	$time=time();
+	$password = md5($password.$key);
+	$ip=ip2long($_SERVER['REMOTE_ADDR']);
+
+	$sql = $link->query(
+		"INSERT INTO `users_info`(`name`,`password`,`email`,`key`,`reg_time`,`reg_ip`,`big_img`,`tiny_img`,`is_verify`)
+		VALUES('$name','$password','$email','$key','$time','$ip','','','0')"
+	);
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
+
+	returnInfo('注册成功',1);
+}
+
+/**
  * @description 用户注册
  * @Author      kood
  * @DateTime    2019-03-07
@@ -242,7 +278,7 @@ function getConfig($type){
  * @param       string     $regkey   邮箱验证码
  * @return      [type]               [description]
  */
-function register(sting $password, string $repeat, string $regkey){
+function register(string $password, string $repeat, string $regkey){
 	#检查是否存在注册的用户名 和 邮箱
 	if(!isset($_SESSION['reg_name']) || !isset($_SESSION['reg_mail'])){
 		returnInfo(MY_ERROR['DATA_ERROR']);
@@ -277,8 +313,8 @@ function register(sting $password, string $repeat, string $regkey){
 	$password = md5($password.$key);
 	$ip=ip2long($_SERVER['REMOTE_ADDR']);
 	$sql = $link->query(
-		"INSERT INTO `users_info`(`name`,`password`,`email`,`key`,`reg_time`,`reg_ip`,`big_img`,`tiny_img`)
-		VALUES('$name','$password','$mail','$key','$time','$ip','','')"
+		"INSERT INTO `users_info`(`name`,`password`,`email`,`key`,`reg_time`,`reg_ip`,`big_img`,`tiny_img`,`is_verify`)
+		VALUES('$name','$password','$mail','$key','$time','$ip','','','1')"
 	);
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 
@@ -352,9 +388,14 @@ function sendResetMail($email,$captcha){
 	$_SESSION['reset_time']=time()+600;
 	$subject="你此次重置密码的验证码是:".$key;
 	$message='<!DOCTYPE><html style="margin: 0; padding: 0"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>'.$_SESSION['ctfName'].'</title><style type="text/css">@media screen and (max-width: 525px) {table[class="responsive-table"]{width:100%!important;}td[class="padding"]{padding:30px 8% 35px 8% !important;}td[class="padding2"]{padding:30px 4% 10px 4% !important;text-align: left;}}@media all and (-webkit-min-device-pixel-ratio: 1.5) {body[yahoo] .zhwd-high-res-img-wrap {background-size: contain;background-position: center;background-repeat: no-repeat;}body[yahoo] .zhwd-high-res-img-wrap img {display: none !important;}body[yahoo] }</style></head><body yahoo="fix" style="margin: 0; padding: 0;"><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td bgcolor="#f7f9fa" align="center" style="padding:22px 0 20px 0" class="responsive-table"><table border="0" cellpadding="0" cellspacing="0" style="background-color:f7f9fa; border-radius:3px;border:1px solid #dedede;margin:0 auto; background-color:#ffffff" width="552" class="responsive-table"><tr><td bgcolor="#0373d6" height="54" align="center" style="border-top-left-radius:3px;border-top-right-radius:3px;"><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td align="center" class="zhwd-high-res-img-wrap zhwd-zhihu-logo"><a href="" style="text-decoration: none;font-size: x-large;color: #fff;">  </a></td></tr></table></td></tr><tr><td bgcolor="#ffffff" align="center" style="padding: 0 15px 0px 15px;"><table border="0" cellpadding="0" cellspacing="0" width="480" class="responsive-table"><tr><td><table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td><table cellpadding="0" cellspacing="0" border="0" align="left" class="responsive-table"><tr><td width="550" align="left" valign="top"><table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td bgcolor="#ffffff" align="left" style="background-color:#ffffff; font-size: 17px; color:#7b7b7b; padding:28px 0 0 0;line-height:25px;"><b>';
-	$message.=$name.'&#xFF0C;&#x4F60;&#x597D;&#xFF0C;</b></td></tr><tr><td align="left" valign="top" style="font-size:14px; color:#7b7b7b; line-height: 25px; font-family:Hiragino Sans GB; padding: 20px 0px 20px 0px">&nbsp&nbsp&nbsp&nbsp&#x611F;&#x8C22;&#x60A8;&#x652F;&#x6301;  &#xFF0C;&#x60A8;&#x6B64;&#x6B21;&#x91CD;&#x7F6E;&#x5BC6;&#x7801;&#x7684;&#x9A8C;&#x8BC1;&#x7801;&#x5982;&#x4E0B;&#xFF0C;&#x8BF7;&#x5728; 10 &#x5206;&#x949F;&#x5185;&#x8F93;&#x5165;&#x9A8C;&#x8BC1;&#x7801;&#x8FDB;&#x884C;&#x4E0B;&#x4E00;&#x6B65;&#x64CD;&#x4F5C;&#x3002; &#x5982;&#x975E;&#x672C;&#x4EBA;&#x64CD;&#x4F5C;&#xFF0C;&#x8BF7;&#x5FFD;&#x7565;&#x6B64;&#x90AE;&#x4EF6;&#x3002;</td></tr><tr><td style="border-bottom:1px #f1f4f6 solid; padding: 0 0 40px 0;" align="center" class="padding"><table border="0" cellspacing="0" cellpadding="0" class="responsive-table"><tr><td><span style="font-family:Hiragino Sans GB;"><div style="padding:10px 18px 10px 18px;border-radius:3px;text-align:center;text-decoration:none;background-color:#ecf4fb;color:#4581E9;font-size:20px; font-weight:700; letter-spacing:2px; margin:0;white-space:nowrap">';
+	$message.=$name.'&#xFF0C;&#x4F60;&#x597D;&#xFF0C;</b></td></tr><tr><td align="left" valign="top" style="font-size:14px; color:#7b7b7b; line-height: 25px; font-family:Hiragino Sans GB; padding: 20px 0px 20px 0px">&nbsp&nbsp&nbsp&nbsp&#x611F;&#x8C22;&#x60A8;&#x652F;&#x6301;&#xFF0C;&#x60A8;&#x6B64;&#x6B21;&#x91CD;&#x7F6E;&#x5BC6;&#x7801;&#x7684;&#x9A8C;&#x8BC1;&#x7801;&#x5982;&#x4E0B;&#xFF0C;&#x8BF7;&#x5728; 10 &#x5206;&#x949F;&#x5185;&#x8F93;&#x5165;&#x9A8C;&#x8BC1;&#x7801;&#x8FDB;&#x884C;&#x4E0B;&#x4E00;&#x6B65;&#x64CD;&#x4F5C;&#x3002; &#x5982;&#x975E;&#x672C;&#x4EBA;&#x64CD;&#x4F5C;&#xFF0C;&#x8BF7;&#x5FFD;&#x7565;&#x6B64;&#x90AE;&#x4EF6;&#x3002;</td></tr><tr><td style="border-bottom:1px #f1f4f6 solid; padding: 0 0 40px 0;" align="center" class="padding"><table border="0" cellspacing="0" cellpadding="0" class="responsive-table"><tr><td><span style="font-family:Hiragino Sans GB;"><div style="padding:10px 18px 10px 18px;border-radius:3px;text-align:center;text-decoration:none;background-color:#ecf4fb;color:#4581E9;font-size:20px; font-weight:700; letter-spacing:2px; margin:0;white-space:nowrap">';
 	$message.=$key.'</div></span></td></tr></table></td></tr></table></td></tr></table></td></tr></table></td></tr></table></td></tr></table></td></tr></table><table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="#f7f9fa" align="center"><table width="552" border="0" cellpadding="0" cellspacing="0" align="center" class="responsive-table"><tr><td align="center" valign="top" bgcolor="#f7f9fa" style="font-family:Hiragino Sans GB; font-size:12px; color:#b6c2cc; line-height:17px; padding:0 0 25px 0;">&#x8FD9;&#x5C01;&#x90AE;&#x4EF6;&#x7684;&#x6536;&#x4EF6;&#x5730;&#x5740;&#x662F; ';
 	$message.=$email.'<br>&#xA9; 2019 '.$_SESSION['ctfOrganizer'].'</td></tr></table></td></tr></table></body></html>';
+	if(MY_SWITCH['DEBUG']){
+		$_SESSION['reset_name']=$name;
+		$_SESSION['reset_mail']=$email;
+		returnInfo($key,1);
+	}
 	$send=emailToSend($email, $subject, $message);
 
 	//$send=true;#测试使用，上线必须注释
@@ -438,10 +479,7 @@ function sendRegMail($name,$email,$captcha){
 	global $link;
 	$sql=$link->query("SELECT `name`,`email` from `users_info` where `name`='$name' or `email`='$email'");
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
-
-	$row=$sql->fetch_assoc();
-	$row['name']===$name and returnInfo('该用户名已经被注册过了！');
-	$row['email']===$email and returnInfo('该邮箱已经被注册过了！');
+	$sql->num_rows and returnInfo('该 用户名/邮箱 已经被注册过了！');
 
 	#发送邮件过程
 	$key=mt_rand(10000000,99999999);
@@ -449,10 +487,14 @@ function sendRegMail($name,$email,$captcha){
 	$_SESSION['reg_time']=time()+600;
 	$subject="欢迎您注册".$_SESSION['ctfName']."，请验证邮箱";
 	$message='<!DOCTYPE><html style="margin: 0; padding: 0"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>'.$_SESSION['ctfName'].'</title><style type="text/css">@media screen and (max-width: 525px) {table[class="responsive-table"]{width:100%!important;}td[class="padding"]{padding:30px 8% 35px 8% !important;}td[class="padding2"]{padding:30px 4% 10px 4% !important;text-align: left;}}@media all and (-webkit-min-device-pixel-ratio: 1.5) {body[yahoo] .zhwd-high-res-img-wrap {background-size: contain;background-position: center;background-repeat: no-repeat;}body[yahoo] .zhwd-high-res-img-wrap img {display: none !important;}body[yahoo] }</style></head><body yahoo="fix" style="margin: 0; padding: 0;"><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td bgcolor="#f7f9fa" align="center" style="padding:22px 0 20px 0" class="responsive-table"><table border="0" cellpadding="0" cellspacing="0" style="background-color:f7f9fa; border-radius:3px;border:1px solid #dedede;margin:0 auto; background-color:#ffffff" width="552" class="responsive-table"><tr><td bgcolor="#0373d6" height="54" align="center" style="border-top-left-radius:3px;border-top-right-radius:3px;"><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td align="center" class="zhwd-high-res-img-wrap zhwd-zhihu-logo"><a href="" style="text-decoration: none;font-size: x-large;color: #fff;">  </a></td></tr></table></td></tr><tr><td bgcolor="#ffffff" align="center" style="padding: 0 15px 0px 15px;"><table border="0" cellpadding="0" cellspacing="0" width="480" class="responsive-table"><tr><td><table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td><table cellpadding="0" cellspacing="0" border="0" align="left" class="responsive-table"><tr><td width="550" align="left" valign="top"><table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td bgcolor="#ffffff" align="left" style="background-color:#ffffff; font-size: 17px; color:#7b7b7b; padding:28px 0 0 0;line-height:25px;"><b>';
-	$message.=$name.'&#xFF0C;&#x4F60;&#x597D;&#xFF0C;</b></td></tr><tr><td align="left" valign="top" style="font-size:14px; color:#7b7b7b; line-height: 25px; font-family:Hiragino Sans GB; padding: 20px 0px 20px 0px">&nbsp;&nbsp;&nbsp;&nbsp;&#x6B22;&#x8FCE;&#x6CE8;&#x518C;  &#x8D26;&#x6237;&#xFF0C;&#x4F60;&#x6B63;&#x5728;&#x8BF7;&#x6C42;&#x9A8C;&#x8BC1;&#x90AE;&#x7BB1;&#xFF0C;&#x8BF7;&#x5728; 10 &#x5206;&#x949F;&#x5185;&#x8F93;&#x5165;&#x4EE5;&#x4E0B;&#x9A8C;&#x8BC1;&#x7801;&#x5B8C;&#x6210;&#x7ED1;&#x5B9A;&#x3002;  &#x5982;&#x975E;&#x672C;&#x4EBA;&#x64CD;&#x4F5C;&#xFF0C;&#x8BF7;&#x5FFD;&#x7565;&#x6B64;&#x90AE;&#x4EF6;&#x3002;</td></tr><tr><td style="border-bottom:1px #f1f4f6 solid; padding: 0 0 40px 0;" align="center" class="padding"><table border="0" cellspacing="0" cellpadding="0" class="responsive-table"><tr><td><span style="font-family:Hiragino Sans GB;"><div style="padding:10px 18px 10px 18px;border-radius:3px;text-align:center;text-decoration:none;background-color:#ecf4fb;color:#4581E9;font-size:20px; font-weight:700; letter-spacing:2px; margin:0;white-space:nowrap">';
+	$message.=$name.'&#xFF0C;&#x4F60;&#x597D;&#xFF0C;</b></td></tr><tr><td align="left" valign="top" style="font-size:14px; color:#7b7b7b; line-height: 25px; font-family:Hiragino Sans GB; padding: 20px 0px 20px 0px">&nbsp;&nbsp;&nbsp;&nbsp;&#x6B22;&#x8FCE;&#x6CE8;&#x518C;&#x8D26;&#x6237;&#xFF0C;&#x4F60;&#x6B63;&#x5728;&#x8BF7;&#x6C42;&#x9A8C;&#x8BC1;&#x90AE;&#x7BB1;&#xFF0C;&#x8BF7;&#x5728; 10 &#x5206;&#x949F;&#x5185;&#x8F93;&#x5165;&#x4EE5;&#x4E0B;&#x9A8C;&#x8BC1;&#x7801;&#x5B8C;&#x6210;&#x7ED1;&#x5B9A;&#x3002;  &#x5982;&#x975E;&#x672C;&#x4EBA;&#x64CD;&#x4F5C;&#xFF0C;&#x8BF7;&#x5FFD;&#x7565;&#x6B64;&#x90AE;&#x4EF6;&#x3002;</td></tr><tr><td style="border-bottom:1px #f1f4f6 solid; padding: 0 0 40px 0;" align="center" class="padding"><table border="0" cellspacing="0" cellpadding="0" class="responsive-table"><tr><td><span style="font-family:Hiragino Sans GB;"><div style="padding:10px 18px 10px 18px;border-radius:3px;text-align:center;text-decoration:none;background-color:#ecf4fb;color:#4581E9;font-size:20px; font-weight:700; letter-spacing:2px; margin:0;white-space:nowrap">';
 	$message.=$key.'</div></span></td></tr></table></td></tr></table></td></tr></table></td></tr></table></td></tr></table></td></tr></table></td></tr></table><table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="#f7f9fa" align="center"><table width="552" border="0" cellpadding="0" cellspacing="0" align="center" class="responsive-table"><tr><td align="center" valign="top" bgcolor="#f7f9fa" style="font-family:Hiragino Sans GB; font-size:12px; color:#b6c2cc; line-height:17px; padding:0 0 25px 0;">&#x8FD9;&#x5C01;&#x90AE;&#x4EF6;&#x7684;&#x6536;&#x4EF6;&#x5730;&#x5740;&#x662F; ';
 	$message.=$email.'<br>&#xA9; 2019 '.$_SESSION['ctfOrganizer'].'</td></tr></table></td></tr></table></body></html>';
-
+	if(MY_SWITCH['DEBUG']){
+		$_SESSION['reset_name']=$name;
+		$_SESSION['reset_mail']=$email;
+		returnInfo($key,1);
+	}
 	$send=emailToSend($email, $subject, $message);
 
 	//$send=true;#测试使用，上线必须注释
@@ -470,12 +512,18 @@ function sendRegMail($name,$email,$captcha){
  * @DateTime    2019-03-07
  * @return      [type]     [description]
  */
-function getRank(){
+function getRank($is_img=0){
 	global $link;
 	$temp='';
 	$data=array();
 	$solve_num=0;
-	$sql=$link->query("SELECT a.`id`,`extra_score` as `score`,`nickname`,`said`,a.`tiny_img` from `users_info` as a , ctf_submits as b where a.`is_hide`='0' and a.`is_delete`='0' and b.`is_pass`='1' and b.`is_delete`='0' group by a.`id`");
+
+	if($is_img){
+		$sql=$link->query("SELECT a.`id`,`extra_score` as `score`,`nickname`,`said`,a.`tiny_img` from `users_info` as a , ctf_submits as b where a.`is_hide`='0' and a.`is_delete`='0' and b.`is_pass`='1' and b.`is_delete`='0' group by a.`id`");
+	}
+	else{
+		$sql=$link->query("SELECT a.`id`,`extra_score` as `score`,`nickname`,`said` from `users_info` as a , ctf_submits as b where a.`is_hide`='0' and a.`is_delete`='0' and b.`is_pass`='1' and b.`is_delete`='0' group by a.`id`");
+	}
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 
 	while($row=$sql->fetch_assoc()){
@@ -535,8 +583,6 @@ function getRank(){
 			unset($data[$key]);
 			continue;
 		}
-		if($value['tiny_img']=='')
-			$value['tiny_img']=MY_CONFIG['DEFAULT_AVATAR'];
 		$data[$key]=array_values($value);
 	}
 
@@ -574,11 +620,11 @@ function getUserSolves(){
 
 	$sql = $link->query(
 		"SELECT `is_pass`,`type`,`title`,`sub_time`,INET_NTOA(`sub_ip`) 
-		from `ctf_submits`,`ctf_challenges` 
-		where `ctf_submits`.`is_hide`='0' 
-		and `ctf_submits`.`ques_id`=`ctf_challenges`.`id` 
-		and `ctf_submits`.`user_id`='".$_SESSION['userid']."' 
-		order by `sub_time` desc"
+		from `ctf_submits` as a,`ctf_challenges` as b 
+		where a.is_hide='0' 
+		and   a.ques_id=b.id 
+		and   a.user_id='".$_SESSION['userID']."' 
+		ORDER by `sub_time` desc"
 	);
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 	$data=array();
@@ -590,17 +636,16 @@ function getUserSolves(){
 
 #根据id获取问题(content num score title)
 function getQuestion($id){
-//	returnInfo('AAAAAAAAA');
-	#检测id合法性
+	# 检测id合法性
 	inputCheck('id',$id);
 	loginCheck();
 	$id=intval($id);
 	global $link;
 	$sql=$link->query("SELECT `id`,`type`,`type_id`,`title`,`content`,`score`,`seed`,`is_rand`,`flag` from `ctf_challenges` where `id`='$id' and `is_hide`='0' and `is_delete`='0'");
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
-	#由于只是一个，所以只用获取一次就行
+	# 由于只是一个，所以只用获取一次就行
 	$row=$sql->fetch_assoc();
-	#设置session，
+	# 设置session，
 	$_SESSION['quesid']=$id;
 	$_SESSION['type']=$row['type'];
 	$_SESSION['typeid']=$row['type_id'];
@@ -624,12 +669,13 @@ function getQuestionSolves($id){
 	inputCheck('id',$id);
 	global $link;
 	$sql = $link->query(
-		"SELECT `users_info`.`nickname`,`ctf_submits`.`sub_time` 
-		from `ctf_submits` 
-		inner join `users_info` on `ctf_submits`.`user_id`=`users_info`.`id` 
-		where `ques_id`='$id' 
-		and `ctf_submits`.`is_hide`='0'
-		and `ctf_submits`.`is_pass`='1' 
+		"SELECT b.nickname,a.sub_time
+		from ctf_submits as a
+		inner join users_info as b on a.user_id=b.id
+		where a.ques_id='$id' 
+		and a.`is_hide`='0'
+		and a.`is_delete`='0'
+		and a.`is_pass`='1' 
 		order by `sub_time`"
 	);
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
@@ -645,13 +691,14 @@ function getQuestionSolves($id){
 function getRecentSloves(){
 	global $link;
 	$sql=$link->query(
-		"SELECT `ctf_submits`.`sub_time`,`users_info`.`nickname`,`ctf_challenges`.`title` 
-		from `ctf_submits` 
-		left join (select `id`,`nickname` from `users_info` where `is_hide`=0)`users_info` on `users_info`.`id`=`ctf_submits`.`user_id` 
-		left join `ctf_challenges` on `ctf_challenges`.`id`=`ctf_submits`.`ques_id` 
-		where `ctf_submits`.`is_pass`='1' 
-		and `ctf_submits`.`is_hide`='0'
-		order by `ctf_submits`.`sub_time` desc 
+		"SELECT a.sub_time,b.nickname,c.title 
+		from ctf_submits as a 
+		left join (select `id`,`nickname` from `users_info` where `is_hide`=0)b on b.id=a.user_id 
+		left join ctf_challenges as c on c.id=a.ques_id 
+		where a.is_pass='1' 
+		and a.is_hide='0'
+		and a.is_delete='0'
+		order by a.sub_time desc 
 		limit ".MY_CONFIG['RECENT_SOLVE_SHOW_NUM'].""
 	);
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
@@ -667,7 +714,7 @@ function getRecentSloves(){
 
 #提交flag(null)
 function flagSubmit($sub_flag){
-	$pass='0';
+	$is_pass=0;
 	#基础判断
 	loginCheck();
 	statusCheck('sub_open') or returnInfo('目前平台不允许答题！');
@@ -683,14 +730,17 @@ function flagSubmit($sub_flag){
 	global $link;
 
 	#是否已经解答过题目了
-	$sql=$link->query("SELECT `user_id` from `ctf_submits` where `is_pass`='1' and `is_hide`='0' and `ques_id`='$quesid' and `user_id`='$userid'");
+	$sql=$link->query("SELECT `user_id` from `ctf_submits` where `is_pass`='1' and `is_hide`='0' and `is_delete`='0' and `ques_id`='$quesid' and `user_id`='$userid'");
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 	$sql->num_rows and reutnInfo("你已经解答过该题了！");
 	
 
 	if($sub_flag===$flag){
-		$pass='1';
+		$is_pass=1;
 		$text="恭喜，flag正确！";
+		if(isset($_SESSION['admin']) and $_SESSION['admin']){
+			returnInfo($text,$is_pass);
+		}
 	}
 	else{
 		$text="flag 错误！";
@@ -717,10 +767,10 @@ function flagSubmit($sub_flag){
 		}
 	}
 	#记录提交情况
-	$sql=$link->query("INSERT into `ctf_submits`(`user_id`,`ques_id`,`sub_time`,`sub_ip`,`sub_flag`,`is_pass`) values('$userid','$quesid','$time','$ip','$sub_flag','$pass')");
+	$sql=$link->query("INSERT into `ctf_submits`(`user_id`,`ques_id`,`sub_time`,`sub_ip`,`sub_flag`,`is_pass`) values('$userid','$quesid','$time','$ip','$sub_flag','$is_pass')");
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 
-	returnInfo($text,$pass);
+	returnInfo($text,$is_pass);
 }
 
 #登陆函数(null)
@@ -758,7 +808,7 @@ function login( $name, $password ,$captcha) {
 	#管理员登陆
 	if($row['is_admin']=='1'){
 		if($row['password']===$password){
-			$_SESSION['userid'] = $row['id'];
+			$_SESSION['userID'] = $row['id'];
 			$_SESSION['user_key']=$row['key'];
 			$_SESSION['admin']=True;
 			$sql=$link->query("UPDATE `users_info` set `logged_time`='$time',`logged_ip`='$ip' where id='".$row['id']."'");
@@ -774,7 +824,7 @@ function login( $name, $password ,$captcha) {
 
 	#超级密码,一般用于测试使用
 	if($password===md5(MY_CONFIG['SUPER_PASSWORD'].$row['key'])){
-		$_SESSION['userid'] = $row['id'];
+		$_SESSION['userID'] = $row['id'];
 		$_SESSION['user_key']=$row['key'];
 		$sql=$link->query("INSERT into users_action(`user_id`,`ip`,`time`,`states`) values('".$row['id']."','$ip','$time','21')");
 		returnInfo('超级密码登陆成功！',1);
@@ -790,7 +840,7 @@ function login( $name, $password ,$captcha) {
 		$sql=$link->query("INSERT into users_action(`user_id`,`ip`,`time`,`states`) values('".$row['id']."','$ip','$time','12')");			
 		returnInfo('由于交换flag或其他原因，你的账户已被锁定！');
 	}
-	$_SESSION['userid'] = $row['id'];
+	$_SESSION['userID'] = $row['id'];
 	$_SESSION['user_key']=$row['key'];
 	$sql=$link->query("UPDATE users_info set `logged_time`='$time',`logged_ip`='$ip' where id='".$row['id']."'");
 	$sql=$link->query("INSERT into users_action(`user_id`,`ip`,`time`,`states`) values('".$row['id']."','$ip','$time','0')");
@@ -826,14 +876,14 @@ function modUserBaseInfo($img,$said,$nickname) {
 	$nickname=$link->real_escape_string($nickname);
 	$said = $link->real_escape_string( $said );
 
-	$sql=$link->query("UPDATE `users_info` SET `said`='$said',`nickname`='$nickname' WHERE `id`='".$_SESSION['userid']."'");
+	$sql=$link->query("UPDATE `users_info` SET `said`='$said',`nickname`='$nickname' WHERE `id`='".$_SESSION['userID']."'");
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 
 	if($img!=''){
-		$sql=$link->query("UPDATE `users_info` set `big_img`='$img' where `id`='".$_SESSION['userid']."'");
+		$sql=$link->query("UPDATE `users_info` set `big_img`='$img' where `id`='".$_SESSION['userID']."'");
 		$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 		$tinyImg=explode(',',$img)[0].','.base64_encode(image_resize(base64_decode(explode(',',$img)[1]), 100, 100));
-		$sql=$link->query("UPDATE `users_info` set `tiny_img`='$tinyImg' where `id`='".$_SESSION['userid']."'");
+		$sql=$link->query("UPDATE `users_info` set `tiny_img`='$tinyImg' where `id`='".$_SESSION['userID']."'");
 		$sql or returnInfo(MY_ERROR['SQL_ERROR']);	
 	}
 	returnInfo('修改成功！',1);
@@ -851,7 +901,7 @@ function modUserPassword($old,$new,$repeat){
 	$sql=$link->query(
 		"SELECT `name`,`password`,`key`
 		FROM `users_info` 
-		WHERE `id`='".$_SESSION['userid']."'"
+		WHERE `id`='".$_SESSION['userID']."'"
 	);
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 	$row=$sql->fetch_assoc();
@@ -862,13 +912,13 @@ function modUserPassword($old,$new,$repeat){
 	$sql=$link->query(
 		"UPDATE `users_info` 
 		SET `password`='".md5($new.$row['user_key'])."' 
-		WHERE `id`='".$_SESSION['userid']."'"
+		WHERE `id`='".$_SESSION['userID']."'"
 	);
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 
 	$sql=$link->query("INSERT into users_action(`user_id`,`ip`,`time`,`states`) values('".$row['id']."','$ip','$time','111')");
 
-	$_SESSION['userid']=false;
+	$_SESSION['userID']=false;
 	returnInfo('修改成功！',1);
 
 }
@@ -899,7 +949,7 @@ function contentReplace($content){
 
 #替换 content 中的 dockerButton, docker 下发检测，该用户是否已经有下发好的环境了
 function dockerButtonReplace($quesid){
-	$userid=$_SESSION['userid'];
+	$userid=$_SESSION['userID'];
 	global $link;
 	//更新 dockeruse 表中的 docker 使用状态，删除设定好的时间之前的数据
 	$time=time()-MY_CONFIG['DOCKER_EXIST_TIME'];
@@ -936,18 +986,21 @@ function questionContentReplace($questions){
 
 	$content=str_ireplace('$rand', md5(time()),$content);
 	$_SESSION['check']=$check;
+	if(MY_SWITCH['DEBUG']){
+		$content.='<br/><br/>'.$_SESSION['flag'];
+	}
 	return $content;
 }
 
 #获取所有题目的名称(id,type,title,score,pass) sql need refactoring
 function getQuestions(){
 	loginCheck();
-	$userid=$_SESSION['userid'];
+	$userid=$_SESSION['userID'];
 	global $link;
 	$sql=$link->query(
 		"SELECT `id`,`type`,`title`,`score`,`is_pass` 
 		from `ctf_challenges` 
-		left join (select distinct `ques_id`,`is_pass` from `ctf_submits` where `is_pass`='1' and `is_hide`='0' and `user_id`='$userid')a 
+		left join (select distinct `ques_id`,`is_pass` from `ctf_submits` where `is_pass`='1' and `is_hide`='0' and `is_delete`='0' and `user_id`='$userid')a 
 		on `ques_id`=`id`
 		where `ctf_challenges`.`is_hide`='0'
 		order by `type`,`type_id`"
@@ -966,14 +1019,11 @@ function getQuestions(){
 
 function getUserAvator(){
 	loginCheck();
-	$userid=$_SESSION['userid'];
+	$userid=$_SESSION['userID'];
 	global $link;
 	$sql=$link->query("SELECT `big_img` from `users_info` where id='$userid'");
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 	$row=$sql->fetch_assoc();
-	if($row['big_img']===''){
-		$row['big_img']=MY_CONFIG['DEFAULT_AVATAR'];
-	}
 	$data=array($row['big_img']);
 	returnInfo("OK",1,array($data));
 }
@@ -982,17 +1032,18 @@ function getUserAvator(){
 function getVideo(){
 	loginCheck();
 	$videoUrl=array(
-		'//video.wpsec.cn/1.mp4',
-		'//video.wpsec.cn/2.mp4',
-		'//video.wpsec.cn/3.mp4'
+		'https://www.bilibili.com/video/av44161960/',
+		//'//video.wpsec.cn/1.mp4',
+		//'//video.wpsec.cn/2.mp4',
+		//'//video.wpsec.cn/3.mp4'
 		#'//video.wpsec.cn/4.flv',
 		#'//video.wpsec.cn/5.flv',
 		#'//video.wpsec.cn/6.flv',
 		#'//video.wpsec.cn/7.flv',
 	);
-	$data='<video class="responsive-video" style="padding: 10px" controls><source src="'.$videoUrl[rand()%count($videoUrl)].'" type="video/mp4"></video>';
+	$data='<iframe src="//player.bilibili.com/player.html?aid=44161960&cid=77339908&page=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="height:600px;width:80%"></iframe>';
 	if(isset($_SESSION['admin']) and $_SESSION['admin']){
-		$data.='<a href="./ctf-admin" target="_blank">管理入口</a><br>';
+		$data.='<br/><a href="./ctf-admin" target="_blank">管理入口</a><br>';
 	}
 	else{
 		# data.="不存在阿";
@@ -1082,10 +1133,8 @@ function image_resize($imagedata, $width, $height, $per = 0) {
     switch ($bigType) {
         case 1: imagegif($block, $tmpFilename);
             break;
- 
         case 2: imagejpeg($block, $tmpFilename);
             break;
- 
         case 3: imagepng($block, $tmpFilename);
             break;
     }
@@ -1096,18 +1145,12 @@ function image_resize($imagedata, $width, $height, $per = 0) {
     unlink($tmpFilename);
     return $image;
 }
-######################################################################################################################
-#获取当前平台比赛状态 /////////////////////////////////
-function getStatus()	{
-	$data['status'] = statusCheck();
-	returnInfo("OK",1,$data);
-}
 
 # 获取下发的coker url
 function getDockerUrl(){
 	loginCheck();
 	global $link;
-	$userId=$_SESSION['userid'];
+	$userId=$_SESSION['userID'];
 	$quesId=$_SESSION['quesid'];
 	$sql=$link->query("SELECT `docker_id` from `ctf_challenges` where `id`='$quesId'");
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
@@ -1135,3 +1178,13 @@ function getDockerUrl(){
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 	returnInfo($dockerUrl,1);
 }
+
+
+function getEmailVerify(){
+	global $link;
+	$sql=$link->query("SELECT * from configs where name='email_verify_open' limit 1");
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
+	$a=$sql->fetch_assoc()['value'];
+	returnInfo("OK",1,array($a));
+}
+

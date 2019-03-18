@@ -5,11 +5,10 @@ function loadAccount(){
 		$('#lin').hide();
 		$('#lout').show();
 		$('#info').show();
-		$("#setMenu").show();
+		$('#setMenu').show();
 		getUserSolves();
 		/*用于显示base info区域的信息*/
 		getUserAvator();
-		//$('.headImgShow').attr('src',$.cookie('avatar'));
 		$('#username').val(name);
 		$('#nickname').val(nickname);
 		$('#said').val(said);
@@ -19,7 +18,7 @@ function loadAccount(){
 		$('#lin').show();
 		$('#lout').hide();
 		$('#info').hide();
-		$("#setMenu").hide();
+		$('#setMenu').hide();
 		getCaptcha();
 	}
 	return false;
@@ -117,7 +116,7 @@ function getUserSolveType(data){
 			floating:true,
 		},
 		chart: {
-			//到时候调整一下
+			/*到时候调整一下*/
 			spacing: [0, 0, 0, 0],
 			style:{fontFamily:"Dosis, sans-serif"},
 		},
@@ -165,16 +164,16 @@ function getUserSolveType(data){
 		series: [{
 			type: 'pie',
 			innerSize: '60%',
-			//name: '-',
+			/*name: '-',*/
 			data: data
 		}]
 	},
-	//设置title文字位置
+	/*设置title文字位置*/
 	function(c) {
 		var centerY = c.series[0].center[1],
 		titleHeight = parseInt(c.title.styles.fontSize);
 		c.setTitle({
-			//莫名其妙要 /3 .。。 官方实例也是要/3才能正中 debug半天..
+			/*莫名其妙要 /3 .。。 官方实例也是要/3才能正中 debug半天..*/
 			y: centerY + titleHeight/3,
 		});
 		chart = c
@@ -186,7 +185,6 @@ function getUserSolve(data){
 	$( '<th><b>' ).text( 'No.' ).appendTo( thead );
 	$( '<th><b>' ).text( 'Type' ).appendTo( thead );
 	$( '<th><b>' ).text( 'Title' ).appendTo( thead );
-	//$( '<th><b>' ).text( 'Flag' ).appendTo( thead );
 	$( '<th><b>' ).text( 'Date' ).appendTo( thead );
 	$( '<th><b>' ).text( 'IP' ).appendTo( thead );
 	$( '<th><b>' ).text( 'Kill' ).appendTo( thead );
@@ -230,14 +228,14 @@ function getUserSolves(){
 				return false;
 			}
 			$.each(data[1],function(n,data){
-				//填充数据 正确率图表
+				/*填充数据 正确率图表*/
 				if(data[0]=='1'){
 					allData.push({'id':'3.1','parent':'2.'+(parseInt(data[1])+1),'name':data[2],'value':1});
 				}
 				else{
 					allData.push({'id':'3.2','parent':'2.'+(parseInt(data[1])+8),'name':data[2],'value':1});
 				}
-				//填充数据 答题类型图表
+				/*填充数据 答题类型图表*/
 				correctType[parseInt(data[1])][1]+=data[0]=='1'?1:0;
 			});
 			getUserSolveNum(allData);
@@ -261,7 +259,7 @@ function getUserAvator(){
 			if(errorCheck(data)){
 				return false;
 			}
-			$('.headImgShow').attr('src',data[1]);
+			$('.headImgShow').attr('src',textToImg(data[1],name));
 		},
 		error: function(data)	{
 			debugLog(data);
@@ -282,19 +280,13 @@ function imgCheck(imgInfo){
 	imgName=imgInfo.name;
 	extStart = imgName.lastIndexOf('.'),
 	ext = imgName.substring(extStart,imgName.length).toUpperCase();
-	//判断图片格式
+	/*判断图片格式*/
 	if(ext !== '.PNG' && ext !== '.JPG' && ext !== '.JPEG' && ext !== '.GIF'){
 		Materialize.toast("请上传正确格式的图片",4000);
 		return false;
 	}
 	return true;
 }
-
-//$(".imgInput").change(function(){
-//	debugLog("触发");
-//	debugLog(URL.createObjectURL($(this)[0].files[0]));
-//	$(".img").attr("src",URL.createObjectURL($(this)[0].files[0]));
-//});
 
 $(".headImgShow").click(function(){
 	debugLog("触发click");
@@ -326,7 +318,6 @@ $(document).ready(function(){
 			type: 'POST',
 			url: 'ajax.php?m=login',
 			data: info,
-			// async: false,
 			dataType: 'json',
 			processData: false,
 			contentType: false,
@@ -338,31 +329,7 @@ $(document).ready(function(){
 				}
 				loadSession();
 				loadAccount();
-				//location.reload();
 				Materialize.toast(data[0][1], 4000);
-			},
-			error:function(data){
-				debugLog(data);
-			}
-		});
-		return false;
-	});
-	
-	$('#logout').click(function(){
-		if(!loggedin){
-			Materialize.toast("你还没有登录!", 4000);
-			loadAccount();
-			return false;
-		}
-		$.ajax({
-			type: 'POST',
-			url: 'ajax.php?m=logout',
-			data:"token="+token,
-			dataType: 'json',
-			success: function(data) {
-				Materialize.toast(data[0][1], 4000);
-				loadSession();
-				loadAccount();
 			},
 			error:function(data){
 				debugLog(data);
@@ -390,7 +357,6 @@ $(document).ready(function(){
 		if(!imgCheck(imgInfo)){
 			return false;
 		}
-		//Materialize.toast("1111111111111!", 4000);return false;
 		var baseAjax=function(imgdata){
 			$.ajax({
 				type: 'POST',
@@ -420,12 +386,12 @@ $(document).ready(function(){
 		}
 
 		var reader = new FileReader();
-		//将文件以Data URL形式读入页面
+		/*将文件以Data URL形式读入页面*/
 		var imgUrlBase64 = reader.readAsDataURL(imgInfo);
-		//debugLog(imgUrlBase64);
-		//尼玛的坑壁异步
+		/*debugLog(imgUrlBase64);*/
+		/*尼玛的坑壁异步*/
 		reader.onload = function (e) {
-			//var ImgFileSize = reader.result.substring(reader.result.indexOf(",") + 1).length;//截取base64码部分（可选可不选，需要与后台沟通）
+			/*var ImgFileSize = reader.result.substring(reader.result.indexOf(",") + 1).length;//截取base64码部分（可选可不选，需要与后台沟通）*/
 			imgBase64Data=reader.result;
 			debugLog("----->");
 			debugLog(imgBase64Data);
@@ -434,7 +400,6 @@ $(document).ready(function(){
 
 		debugLog("AAAAAAAAAAAAAAAAAAAAAAAA");
 		debugLog(imgBase64Data);
-		//Materialize.toast("1111111111111!", 4000);return false;
 		return false;
 	});
 

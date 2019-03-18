@@ -16,10 +16,10 @@
 </head>
 <body>
 	<header style="padding-bottom: 3px;">
-		<nav class="blue" role="navigation">
+		<nav class="white" role="navigation">
 			<div class="container">
 				<div class="nav-wrapper">
-					<ul class="right hide-on-small-only">
+					<ul class="right hide-on-small-only head-menu">
 						<li><a href="./index.html">首页</a></li>
 						<li><a href="./scoreboard.html">排行</a></li>
 						<li><a href="./notice.html">公告</a></li>
@@ -49,7 +49,7 @@
 			<div class="section" id="lin" style="display: none;">
 				<div class="no-pad-bot section" id="index-banner">
 					<div class="container">
-						<h1 class="header center blue-text text-darken-2" id="header">Login</h1>
+						<h1 class="header center" id="header">Login</h1>
 					</div>
 				</div>
 				<div class="row">
@@ -75,7 +75,7 @@
 						</div>
 					</form>
 					<div class="col s5 offset-s8">
-						<a href="createaccount.html">注册账户</a> / <a href="resetpwd.html">忘记密码</a>
+						<a href="register.html">注册账户</a> / <a href="resetpwd.html">忘记密码</a>
 					</div>
 				</div>
 			</div>
@@ -88,7 +88,7 @@
 						<li class="tab col s2"><a href="#quesinfo">答题信息</a></li>
 						<li class="tab col s2"><a href="#baseinfo">个人信息</a></li>
 						<li class="tab col s2"><a href="#changpass">修改密码</a></li>
-						<li class="tab col s2"><a href="#beta" onclick="loadVideo()">秘密通道</a></li>
+						<li class="tab col s2"><a href="#beta" onclick="loadVideo()">解题视频</a></li>
 					</ul>
 				</div>
 				<div id="quesinfo" class="col s12">
@@ -109,6 +109,7 @@
 							<div class="input-field col s6 offset-s3">
 								<input type="file" class="imgInput" style="display: none;"/>
 								<img class="headImgShow" style="width:200px; height:200px; border-style:solid; border-color: #e1e1e1; border-width: 1px; border-radius:200px;" src="//upload.jianshu.io/users/upload_avatars/4525478/7332f531-3114-4c1a-a9b7-f9df29c79220.jpg"/>
+								<canvas id="headImg" style="display: none;"></canvas>
 								<!-- 遮罩层，暂时取消-->
 								<!-- <div class="headImgs">
 									<a href="#" class="headImg">

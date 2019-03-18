@@ -19,7 +19,7 @@ define('MY_ERROR',[
 define('MY_SWITCH',[
 	'DYNAMIC_SCORE'	=> true, // 定义是否开启动态得分机制
 	'ONE_BLOOD'		=> true, // 定义是否开启一血机制，加分人数随着下面的oneBlood数目而定
-	'DEBUG'			=> true, // 是否是测试，上线请修改为 flase
+	'DEBUG'			=> false, // 是否是测试，上线请修改为 flase
 ]);
 
 // 一些配置数据

@@ -24,7 +24,7 @@ function getQuestion(obj)
 	});
 	return false;
 }
-function getQ(id)
+/*function getQ(id)
 {
 	quesid=id;
 	debugLog('click');
@@ -47,7 +47,7 @@ function getQ(id)
 		}
 	});
 	return false;
-}
+}*/
 function getQuestionSolves()
 {
 	$.ajax({
@@ -106,10 +106,10 @@ function getQuestions()
 						if(num){
 							ques+='<br><br></div>';
 						}
-						ques+='<div style="height:auto;margin:0 auto; overflow:hidden" class="row questionsType"><h3 class="header blue-text text-darken-5">'+quesType[content[1]]+'</h3><hr>';
+						ques+='<div style="height:auto;margin:0 auto; overflow:hidden" class="row questionsType"><h3 class="header">'+quesType[content[1]]+'</h3><hr>';
 					}
 					if(content[4]){
-						ques+='<button class="green accent-4 btn-large col s6 m4 l3" id="'+content[0]+'" onclick="getQuestion(this)"><div style="min-height:30%">'+content[2]+'</div><span>'+content[3]+'</span></button>';
+						ques+='<button class="green lighten-2 btn-large col s6 m4 l3" id="'+content[0]+'" onclick="getQuestion(this)"><div style="min-height:30%">'+content[2]+'</div><span>'+content[3]+'</span></button>';
 					}
 					else{
 						ques+='<button class="btn-large col s6 m4 l3" id="'+content[0]+'" onclick="getQuestion(this)"><div style="min-height:30%">'+content[2]+'</div><span>'+content[3]+'</span></button>';
@@ -176,7 +176,7 @@ $(document).ready(function(){
 		}
 	});
 	getQuestions();
-	//getQ(30);
+	/*getQ(1);*/
 	$( 'form' ).submit(function(){
 		$.ajax({
 			type: 'POST',
@@ -199,7 +199,7 @@ $(document).ready(function(){
 					);
 				}
 				if(data[0][0]=='1'){
-					$('[id="'+quesid+'"]').addClass("green accent-4");
+					$('[id="'+quesid+'"]').addClass("green lighten-2");
 				}
 			},
 			error: function(data){
