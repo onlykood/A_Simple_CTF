@@ -47,10 +47,12 @@ function regVerifyCheck(){
 			errorCheck(data);
 			if(data[1][0]=='0'){
 				$('.no-verify').show();
+				$('#no-captcha').attr('src','/ajax.php?m=getCaptcha&1');
 				$('.on-verify').hide();
 			}
 			else{
 				$('.on-verify').show();
+				$('#on-captcha').attr('src','/ajax.php?m=getCaptcha&2');
 				$('.no-verify').hide();
 			}
 		},
@@ -62,8 +64,7 @@ function regVerifyCheck(){
 }
 
 $('.no-verify').submit(function(){
-	//console.log($("form").serializeArray());
-	//console.log($("form").serialize());
+	debugLog($("form").serializeArray());
 	$.ajax({
 		type:'post',
 		url:'ajax.php?m=noVerifyRegister',
@@ -71,19 +72,17 @@ $('.no-verify').submit(function(){
 		dataType:'json',
 		success:function(data){
 			debugLog(data);
-			$("#no-captcha").click();
 			if(errorCheck(data)){
+				$("#no-captcha").click();
 				return false;
 			}
-			Materialize.toast(data[0][1],4000);
-			setTimeout(function(){
-				window.location.href="./account.html";
-			},20000);
+			Materialize.toast(data[0][1],2000,"",function(){window.location.href="./account.html"});
 		},
 		error:function(data){
 			debugLog(data);
 		}
 	});
+	$("#no-captcha").click();
 	return false;
 })
 
@@ -103,8 +102,8 @@ $(document).ready(function(){
 			dataType:'json',
 			success: function(data) {
 				debugLog(data);
-				$("#on-captcha").click();
 				if(errorCheck(data)){
+					$("#on-captcha").click();
 					return false;
 				}
 				Materialize.toast(data[0][1], 4000);
@@ -116,11 +115,12 @@ $(document).ready(function(){
 				debugLog(data);
 			}
 		});
+		$("#on-captcha").click();
 		return false;
 	});
 
 	$('#regaccount').click(function(){
-		 if(!$( '[name="verify_agree"]' ).prop( 'checked' ))	{
+		 if(!$( '[name="verify_agree"]' ).prop( 'checked' )){
 			Materialize.toast("请同意注册协议！", 4000);
 			return false;
 		}	
@@ -134,6 +134,7 @@ $(document).ready(function(){
 				success: function(data){
 					debugLog(data);
 					if(errorCheck(data)){
+						$('#regaccount').html('注册');
 						return false;
 					}
 					Materialize.toast(data[0][1],4000);

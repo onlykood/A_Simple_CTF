@@ -91,24 +91,6 @@ function postCheck(...$array){
 }
 
 /**
- * @description 查询平台当前的一些状态！！！！！！！！！！！！！！！！！！！！！！！！！
- * @Author      kood
- * @DateTime    2019-03-07
- * @param       string     $type 需要获取的状态名称
- * @return      [type]           状态值
- */
-function statusCheck($type='ctf_open'){
-	$types=array('ctf_open','reg_open','sub_open','login_open');
-	if(!in_array($type,$types,true)){
-		return 0;
-	}
-	global $link;
-	$sql=$link->query("SELECT * from configs where name='$type' limit 1");
-	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
-	return $sql->fetch_assoc()['value'];
-}
-
-/**
  * @description 对输入按照一定规则进行判断
  * @Author      kood
  * @DateTime    2019-03-07
@@ -208,6 +190,50 @@ function getSession(){
 	returnInfo("OK",1,array_values($data));
 }
 
+
+/**
+ * @description 查询平台当前的一些状态！！！！！！！！！！！！！！！！！！！！！！！！！
+ * @Author      kood
+ * @DateTime    2019-03-07
+ * @param       string     $type 需要获取的状态名称
+ * @return      [type]           状态值
+ */
+function statusCheck($type='ctf_open'){
+	$types=array('ctf_open','reg_open','sub_open','login_open');
+	if(!in_array($type,$types,true)){
+		return 0;
+	}
+	global $link;
+	$sql=$link->query("SELECT * from configs where name='$type' limit 1");
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
+	return $sql->fetch_assoc()['value'];
+}
+
+/**
+ * @description 从配置数据表中读取配置
+ * @Author      kood
+ * @DateTime    2019-03-20
+ * @param       string       $configName 配置名称
+ * @param       bool|boolean $retJson    数据是否以json直接返回
+ * @return      [type]                   [description]
+ */
+function getConfig(string $configName,bool $retJson=false){
+	global $link;
+	$configName=$link->real_escape_string($configName);
+	$sql=$link->query(
+		"SELECT 
+			name,value 
+		FROM 
+			configs
+		where 
+			name='$configName'");
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
+	$sql->num_rows or returnInfo("No found config");
+	if(!$retJson)
+		return $sql->fetch_assoc()['value'];
+	returnInfo("OK",1,$sql->fetch_assoc()['value']);
+}
+
 /**
  * @description 从配置数据表中读取 !!!!!!!!!!!!!!
  * @Author      kood
@@ -215,21 +241,10 @@ function getSession(){
  * @param       [type]     $type [description]
  * @return      [type]           [description]
  */
-function getConfig($type){
-	global $link;
-	$types=array('ctf_open','reg_open','sub_open','login_open','ctf_name','email_verify_open');
-	if(!in_array($type,$types,true))
-		returnInfo("DIE");
-	if(isset($_SESSION['ctfName']) && isset($_SESSION['ctfOrganizer'])){
-		returnInfo("OK",1,array($_SESSION['ctfName'],$_SESSION['ctfOrganizer']));
-	}
-	$sql=$link->query("SELECT * from configs where name='ctf_name' limit 1");
-	$ctfName=$sql->fetch_assoc()['value'];
-	$_SESSION['ctfName']=$ctfName;
+function getTitle(){
 
-	$sql=$link->query("SELECT * from configs where name='ctf_organizer' limit 1");
-	$ctfOrganizer=$sql->fetch_assoc()['value'];
-	$_SESSION['ctfOrganizer']=$ctfOrganizer;
+	$ctfName=getConfig('ctf_name');
+	$ctfOrganizer=getConfig('ctf_organizer');
 
 	returnInfo("OK",1,array($ctfName,$ctfOrganizer));
 }
@@ -247,6 +262,8 @@ function noVerifyRegister(string $name,string $password,string $email,string $ca
 		returnInfo('验证码错误！');
 	}
 	unset($_SESSION['captcha']);
+
+	if(MY_CONFIG['email_verify_open'])
 
 	inputCheck('name',$name);
 	inputCheck('password',$password,$password);
@@ -386,11 +403,14 @@ function sendResetMail($email,$captcha){
 	$key=mt_rand(10000000,99999999);
 	$_SESSION['reset_key']=$key;
 	$_SESSION['reset_time']=time()+600;
+
+	$ctfName=getConfig1('ctf_name');
+	$ctfOrganizer=getConfig1('ctf_organizer');
 	$subject="你此次重置密码的验证码是:".$key;
-	$message='<!DOCTYPE><html style="margin: 0; padding: 0"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>'.$_SESSION['ctfName'].'</title><style type="text/css">@media screen and (max-width: 525px) {table[class="responsive-table"]{width:100%!important;}td[class="padding"]{padding:30px 8% 35px 8% !important;}td[class="padding2"]{padding:30px 4% 10px 4% !important;text-align: left;}}@media all and (-webkit-min-device-pixel-ratio: 1.5) {body[yahoo] .zhwd-high-res-img-wrap {background-size: contain;background-position: center;background-repeat: no-repeat;}body[yahoo] .zhwd-high-res-img-wrap img {display: none !important;}body[yahoo] }</style></head><body yahoo="fix" style="margin: 0; padding: 0;"><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td bgcolor="#f7f9fa" align="center" style="padding:22px 0 20px 0" class="responsive-table"><table border="0" cellpadding="0" cellspacing="0" style="background-color:f7f9fa; border-radius:3px;border:1px solid #dedede;margin:0 auto; background-color:#ffffff" width="552" class="responsive-table"><tr><td bgcolor="#0373d6" height="54" align="center" style="border-top-left-radius:3px;border-top-right-radius:3px;"><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td align="center" class="zhwd-high-res-img-wrap zhwd-zhihu-logo"><a href="" style="text-decoration: none;font-size: x-large;color: #fff;">  </a></td></tr></table></td></tr><tr><td bgcolor="#ffffff" align="center" style="padding: 0 15px 0px 15px;"><table border="0" cellpadding="0" cellspacing="0" width="480" class="responsive-table"><tr><td><table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td><table cellpadding="0" cellspacing="0" border="0" align="left" class="responsive-table"><tr><td width="550" align="left" valign="top"><table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td bgcolor="#ffffff" align="left" style="background-color:#ffffff; font-size: 17px; color:#7b7b7b; padding:28px 0 0 0;line-height:25px;"><b>';
+	$message='<!DOCTYPE><html style="margin: 0; padding: 0"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>'.$ctfName.'</title><style type="text/css">@media screen and (max-width: 525px) {table[class="responsive-table"]{width:100%!important;}td[class="padding"]{padding:30px 8% 35px 8% !important;}td[class="padding2"]{padding:30px 4% 10px 4% !important;text-align: left;}}@media all and (-webkit-min-device-pixel-ratio: 1.5) {body[yahoo] .zhwd-high-res-img-wrap {background-size: contain;background-position: center;background-repeat: no-repeat;}body[yahoo] .zhwd-high-res-img-wrap img {display: none !important;}body[yahoo] }</style></head><body yahoo="fix" style="margin: 0; padding: 0;"><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td bgcolor="#f7f9fa" align="center" style="padding:22px 0 20px 0" class="responsive-table"><table border="0" cellpadding="0" cellspacing="0" style="background-color:f7f9fa; border-radius:3px;border:1px solid #dedede;margin:0 auto; background-color:#ffffff" width="552" class="responsive-table"><tr><td bgcolor="#0373d6" height="54" align="center" style="border-top-left-radius:3px;border-top-right-radius:3px;"><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td align="center" class="zhwd-high-res-img-wrap zhwd-zhihu-logo"><a href="" style="text-decoration: none;font-size: x-large;color: #fff;">  </a></td></tr></table></td></tr><tr><td bgcolor="#ffffff" align="center" style="padding: 0 15px 0px 15px;"><table border="0" cellpadding="0" cellspacing="0" width="480" class="responsive-table"><tr><td><table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td><table cellpadding="0" cellspacing="0" border="0" align="left" class="responsive-table"><tr><td width="550" align="left" valign="top"><table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td bgcolor="#ffffff" align="left" style="background-color:#ffffff; font-size: 17px; color:#7b7b7b; padding:28px 0 0 0;line-height:25px;"><b>';
 	$message.=$name.'&#xFF0C;&#x4F60;&#x597D;&#xFF0C;</b></td></tr><tr><td align="left" valign="top" style="font-size:14px; color:#7b7b7b; line-height: 25px; font-family:Hiragino Sans GB; padding: 20px 0px 20px 0px">&nbsp&nbsp&nbsp&nbsp&#x611F;&#x8C22;&#x60A8;&#x652F;&#x6301;&#xFF0C;&#x60A8;&#x6B64;&#x6B21;&#x91CD;&#x7F6E;&#x5BC6;&#x7801;&#x7684;&#x9A8C;&#x8BC1;&#x7801;&#x5982;&#x4E0B;&#xFF0C;&#x8BF7;&#x5728; 10 &#x5206;&#x949F;&#x5185;&#x8F93;&#x5165;&#x9A8C;&#x8BC1;&#x7801;&#x8FDB;&#x884C;&#x4E0B;&#x4E00;&#x6B65;&#x64CD;&#x4F5C;&#x3002; &#x5982;&#x975E;&#x672C;&#x4EBA;&#x64CD;&#x4F5C;&#xFF0C;&#x8BF7;&#x5FFD;&#x7565;&#x6B64;&#x90AE;&#x4EF6;&#x3002;</td></tr><tr><td style="border-bottom:1px #f1f4f6 solid; padding: 0 0 40px 0;" align="center" class="padding"><table border="0" cellspacing="0" cellpadding="0" class="responsive-table"><tr><td><span style="font-family:Hiragino Sans GB;"><div style="padding:10px 18px 10px 18px;border-radius:3px;text-align:center;text-decoration:none;background-color:#ecf4fb;color:#4581E9;font-size:20px; font-weight:700; letter-spacing:2px; margin:0;white-space:nowrap">';
 	$message.=$key.'</div></span></td></tr></table></td></tr></table></td></tr></table></td></tr></table></td></tr></table></td></tr></table></td></tr></table><table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="#f7f9fa" align="center"><table width="552" border="0" cellpadding="0" cellspacing="0" align="center" class="responsive-table"><tr><td align="center" valign="top" bgcolor="#f7f9fa" style="font-family:Hiragino Sans GB; font-size:12px; color:#b6c2cc; line-height:17px; padding:0 0 25px 0;">&#x8FD9;&#x5C01;&#x90AE;&#x4EF6;&#x7684;&#x6536;&#x4EF6;&#x5730;&#x5740;&#x662F; ';
-	$message.=$email.'<br>&#xA9; 2019 '.$_SESSION['ctfOrganizer'].'</td></tr></table></td></tr></table></body></html>';
+	$message.=$email.'<br>&#xA9; 2019 '.$ctfOrganizer.'</td></tr></table></td></tr></table></body></html>';
 	if(MY_SWITCH['DEBUG']){
 		$_SESSION['reset_name']=$name;
 		$_SESSION['reset_mail']=$email;
@@ -485,14 +505,16 @@ function sendRegMail($name,$email,$captcha){
 	$key=mt_rand(10000000,99999999);
 	$_SESSION['reg_key']=$key;
 	$_SESSION['reg_time']=time()+600;
-	$subject="欢迎您注册".$_SESSION['ctfName']."，请验证邮箱";
-	$message='<!DOCTYPE><html style="margin: 0; padding: 0"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>'.$_SESSION['ctfName'].'</title><style type="text/css">@media screen and (max-width: 525px) {table[class="responsive-table"]{width:100%!important;}td[class="padding"]{padding:30px 8% 35px 8% !important;}td[class="padding2"]{padding:30px 4% 10px 4% !important;text-align: left;}}@media all and (-webkit-min-device-pixel-ratio: 1.5) {body[yahoo] .zhwd-high-res-img-wrap {background-size: contain;background-position: center;background-repeat: no-repeat;}body[yahoo] .zhwd-high-res-img-wrap img {display: none !important;}body[yahoo] }</style></head><body yahoo="fix" style="margin: 0; padding: 0;"><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td bgcolor="#f7f9fa" align="center" style="padding:22px 0 20px 0" class="responsive-table"><table border="0" cellpadding="0" cellspacing="0" style="background-color:f7f9fa; border-radius:3px;border:1px solid #dedede;margin:0 auto; background-color:#ffffff" width="552" class="responsive-table"><tr><td bgcolor="#0373d6" height="54" align="center" style="border-top-left-radius:3px;border-top-right-radius:3px;"><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td align="center" class="zhwd-high-res-img-wrap zhwd-zhihu-logo"><a href="" style="text-decoration: none;font-size: x-large;color: #fff;">  </a></td></tr></table></td></tr><tr><td bgcolor="#ffffff" align="center" style="padding: 0 15px 0px 15px;"><table border="0" cellpadding="0" cellspacing="0" width="480" class="responsive-table"><tr><td><table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td><table cellpadding="0" cellspacing="0" border="0" align="left" class="responsive-table"><tr><td width="550" align="left" valign="top"><table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td bgcolor="#ffffff" align="left" style="background-color:#ffffff; font-size: 17px; color:#7b7b7b; padding:28px 0 0 0;line-height:25px;"><b>';
+	$ctfName=getConfig1('ctf_name');
+	$ctfOrganizer=getConfig1('ctf_organizer');
+	$subject="欢迎您注册".$ctfName."，请验证邮箱";
+	$message='<!DOCTYPE><html style="margin: 0; padding: 0"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>'.$ctfName.'</title><style type="text/css">@media screen and (max-width: 525px) {table[class="responsive-table"]{width:100%!important;}td[class="padding"]{padding:30px 8% 35px 8% !important;}td[class="padding2"]{padding:30px 4% 10px 4% !important;text-align: left;}}@media all and (-webkit-min-device-pixel-ratio: 1.5) {body[yahoo] .zhwd-high-res-img-wrap {background-size: contain;background-position: center;background-repeat: no-repeat;}body[yahoo] .zhwd-high-res-img-wrap img {display: none !important;}body[yahoo] }</style></head><body yahoo="fix" style="margin: 0; padding: 0;"><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td bgcolor="#f7f9fa" align="center" style="padding:22px 0 20px 0" class="responsive-table"><table border="0" cellpadding="0" cellspacing="0" style="background-color:f7f9fa; border-radius:3px;border:1px solid #dedede;margin:0 auto; background-color:#ffffff" width="552" class="responsive-table"><tr><td bgcolor="#0373d6" height="54" align="center" style="border-top-left-radius:3px;border-top-right-radius:3px;"><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td align="center" class="zhwd-high-res-img-wrap zhwd-zhihu-logo"><a href="" style="text-decoration: none;font-size: x-large;color: #fff;">  </a></td></tr></table></td></tr><tr><td bgcolor="#ffffff" align="center" style="padding: 0 15px 0px 15px;"><table border="0" cellpadding="0" cellspacing="0" width="480" class="responsive-table"><tr><td><table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td><table cellpadding="0" cellspacing="0" border="0" align="left" class="responsive-table"><tr><td width="550" align="left" valign="top"><table width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td bgcolor="#ffffff" align="left" style="background-color:#ffffff; font-size: 17px; color:#7b7b7b; padding:28px 0 0 0;line-height:25px;"><b>';
 	$message.=$name.'&#xFF0C;&#x4F60;&#x597D;&#xFF0C;</b></td></tr><tr><td align="left" valign="top" style="font-size:14px; color:#7b7b7b; line-height: 25px; font-family:Hiragino Sans GB; padding: 20px 0px 20px 0px">&nbsp;&nbsp;&nbsp;&nbsp;&#x6B22;&#x8FCE;&#x6CE8;&#x518C;&#x8D26;&#x6237;&#xFF0C;&#x4F60;&#x6B63;&#x5728;&#x8BF7;&#x6C42;&#x9A8C;&#x8BC1;&#x90AE;&#x7BB1;&#xFF0C;&#x8BF7;&#x5728; 10 &#x5206;&#x949F;&#x5185;&#x8F93;&#x5165;&#x4EE5;&#x4E0B;&#x9A8C;&#x8BC1;&#x7801;&#x5B8C;&#x6210;&#x7ED1;&#x5B9A;&#x3002;  &#x5982;&#x975E;&#x672C;&#x4EBA;&#x64CD;&#x4F5C;&#xFF0C;&#x8BF7;&#x5FFD;&#x7565;&#x6B64;&#x90AE;&#x4EF6;&#x3002;</td></tr><tr><td style="border-bottom:1px #f1f4f6 solid; padding: 0 0 40px 0;" align="center" class="padding"><table border="0" cellspacing="0" cellpadding="0" class="responsive-table"><tr><td><span style="font-family:Hiragino Sans GB;"><div style="padding:10px 18px 10px 18px;border-radius:3px;text-align:center;text-decoration:none;background-color:#ecf4fb;color:#4581E9;font-size:20px; font-weight:700; letter-spacing:2px; margin:0;white-space:nowrap">';
 	$message.=$key.'</div></span></td></tr></table></td></tr></table></td></tr></table></td></tr></table></td></tr></table></td></tr></table></td></tr></table><table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="#f7f9fa" align="center"><table width="552" border="0" cellpadding="0" cellspacing="0" align="center" class="responsive-table"><tr><td align="center" valign="top" bgcolor="#f7f9fa" style="font-family:Hiragino Sans GB; font-size:12px; color:#b6c2cc; line-height:17px; padding:0 0 25px 0;">&#x8FD9;&#x5C01;&#x90AE;&#x4EF6;&#x7684;&#x6536;&#x4EF6;&#x5730;&#x5740;&#x662F; ';
-	$message.=$email.'<br>&#xA9; 2019 '.$_SESSION['ctfOrganizer'].'</td></tr></table></td></tr></table></body></html>';
+	$message.=$email.'<br>&#xA9; 2019 '.$ctfOrganizer.'</td></tr></table></td></tr></table></body></html>';
 	if(MY_SWITCH['DEBUG']){
-		$_SESSION['reset_name']=$name;
-		$_SESSION['reset_mail']=$email;
+		$_SESSION['reg_name']=$name;
+		$_SESSION['reg_mail']=$email;
 		returnInfo($key,1);
 	}
 	$send=emailToSend($email, $subject, $message);
@@ -519,10 +541,26 @@ function getRank($is_img=0){
 	$solve_num=0;
 
 	if($is_img){
-		$sql=$link->query("SELECT a.`id`,`extra_score` as `score`,`nickname`,`said`,a.`tiny_img` from `users_info` as a , ctf_submits as b where a.`is_hide`='0' and a.`is_delete`='0' and b.`is_pass`='1' and b.`is_delete`='0' group by a.`id`");
+		$sql=$link->query(
+			"SELECT 
+				a.`id`,`extra_score` as `score`,`nickname`,`said`,a.`tiny_img` 
+			from 
+				`users_info` as a , ctf_submits as b 
+			where 
+				a.`is_hide`='0' and a.`is_delete`='0' and b.`is_pass`='1' and b.`is_delete`='0' 
+			group by 
+				a.`id`");
 	}
 	else{
-		$sql=$link->query("SELECT a.`id`,`extra_score` as `score`,`nickname`,`said` from `users_info` as a , ctf_submits as b where a.`is_hide`='0' and a.`is_delete`='0' and b.`is_pass`='1' and b.`is_delete`='0' group by a.`id`");
+		$sql=$link->query(
+			"SELECT 
+				a.id,`extra_score` as `score`,`nickname`,`said` 
+			from 
+				`users_info` as a , ctf_submits as b 
+			where 
+				a.is_hide='0' and a.is_delete='0' and b.is_pass='1' and b.is_delete='0' 
+			group by 
+				a.id");
 	}
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 
@@ -544,10 +582,13 @@ function getRank($is_img=0){
 	}
 	else{
 		$sql=$link->query(
-			"SELECT b.`score`,a.`ques_id`,a.`user_id`,a.`sub_time` 
-			FROM `ctf_challenges` as b,`ctf_submits` as a 
-			WHERE a.`is_pass`='1' and a.`is_hide`='0' and a.`is_delete`='0' and b.`id`=a.`ques_id`
-			ORDER BY a.`sub_time`"
+			"SELECT 
+				b.score,a.ques_id,a.user_id,a.sub_time 
+			FROM 
+				`ctf_submits` as a, `ctf_challenges` as b 
+			WHERE 
+				a.is_pass='1' and a.is_hide='0' and a.is_delete='0' and b.id=a.ques_id 
+			ORDER BY a.sub_time"
 		);
 	}
 
@@ -646,9 +687,9 @@ function getQuestion($id){
 	# 由于只是一个，所以只用获取一次就行
 	$row=$sql->fetch_assoc();
 	# 设置session，
-	$_SESSION['quesid']=$id;
+	$_SESSION['quesID']=$id;
 	$_SESSION['type']=$row['type'];
-	$_SESSION['typeid']=$row['type_id'];
+	$_SESSION['typeID']=$row['type_id'];
 	$_SESSION['flag']=$row['is_rand']?MY_CONFIG['RAND_FLAG_HEADER'].'{'.md5($_SESSION['user_key'].$row['seed']).'}':$row['flag'];
 
 	$data['title']=$row['title'];
@@ -721,8 +762,8 @@ function flagSubmit($sub_flag){
 
 	inputCheck('flag',$sub_flag);
 
-	$quesid=$_SESSION['quesid'];
-	$userid=$_SESSION["userid"];
+	$quesid=$_SESSION['quesID'];
+	$userid=$_SESSION["userID"];
 	$flag=$_SESSION['flag'];
 	$ip=ip2long($_SERVER['REMOTE_ADDR']);
 	$time=time();
@@ -955,9 +996,9 @@ function dockerButtonReplace($quesid){
 	$time=time()-MY_CONFIG['DOCKER_EXIST_TIME'];
 	//$sql=$link->query("DELETE from dockeruse where `time` < '$time'");
 	//$sql or returnInfo(MY_ERROR['SQL_ERROR']);
-	returnInfo("Break!!");
+	//returnInfo("Break!!");
 
-	$sql=$link->query("SELECT `ret_url` from `docker_use_lists` where `user_id`='$userid' and `ques_id`='$quesid' and `time`> '$time'");
+	$sql=$link->query("SELECT `ret_url` from `docker_use_lists` where `user_id`='$userid' and `ques_id`='$quesid' and `create_time`> '$time'");
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 
 	if(!$sql->num_rows){
@@ -1150,9 +1191,9 @@ function image_resize($imagedata, $width, $height, $per = 0) {
 function getDockerUrl(){
 	loginCheck();
 	global $link;
-	$userId=$_SESSION['userID'];
-	$quesId=$_SESSION['quesid'];
-	$sql=$link->query("SELECT `docker_id` from `ctf_challenges` where `id`='$quesId'");
+	$userID=$_SESSION['userID'];
+	$quesID=$_SESSION['quesID'];
+	$sql=$link->query("SELECT `docker_id` from `ctf_challenges` where `id`='$quesID'");
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 	$sql->num_rows or returnInfo("No this docker");
 	$dockerID=$sql->fetch_assoc()['docker_id'];
@@ -1174,17 +1215,8 @@ function getDockerUrl(){
 	}
 	$dockerUrl="http://118.25.49.126:".$port;
 	$time=time();
-	$sql=$link->query("INSERT INTO `docker_use_lists`(`user_id`,`ques_id`,`docker_id`,`ret_url`,`create_time`) values('$userId','$quesId','$dockerID','$dockerUrl','$time')");
+	$sql=$link->query("INSERT INTO `docker_use_lists`(`user_id`,`ques_id`,`docker_id`,`ret_url`,`create_time`) values('$userID','$quesID','$dockerID','$dockerUrl','$time')");
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 	returnInfo($dockerUrl,1);
-}
-
-
-function getEmailVerify(){
-	global $link;
-	$sql=$link->query("SELECT * from configs where name='email_verify_open' limit 1");
-	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
-	$a=$sql->fetch_assoc()['value'];
-	returnInfo("OK",1,array($a));
 }
 

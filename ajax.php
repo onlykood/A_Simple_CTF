@@ -10,7 +10,7 @@ if( !isset( $_GET['m'] ) || !is_string( $_GET['m'] ) )
 
 //检测token令牌是否存在/被改写
 if(!isset($_POST['token'])||($_SESSION['token'] !== $_POST['token'])){
-	if($_GET['m']!='getSession' && $_GET['m']!='getCaptcha' && $_GET['m']!='getConfig'){
+	if($_GET['m']!='getSession' && $_GET['m']!='getCaptcha' && $_GET['m']!='getTitle'){
 		unset($_SESSION['token']);
 		if(!isset($_POST['token'])){
 			returnInfo(MY_ERROR['DATA_MISS']);
@@ -19,9 +19,9 @@ if(!isset($_POST['token'])||($_SESSION['token'] !== $_POST['token'])){
 	}
 }
 switch( $_GET['m'] )	{
-	case 'getConfig':
-		postCheck('type');
-		getConfig($_POST['type']);
+	case 'getTitle':
+		postCheck();
+		getTitle();
 	case 'noVerifyRegister':
 		postCheck('username','password','email','captcha');
 		noVerifyRegister($_POST['username'],$_POST['password'],$_POST['email'],$_POST['captcha']);
@@ -44,7 +44,6 @@ switch( $_GET['m'] )	{
 		getQuestionSolves($_POST['id']);
 
 	case 'register':
-		// returnInfo(serialize($_POST));
 		postCheck('password','repeat','regkey');
 		register($_POST['password'],$_POST['repeat'],$_POST['regkey']);
 
@@ -89,7 +88,7 @@ switch( $_GET['m'] )	{
 	case 'getDockerUrl':
 		getDockerUrl();
 	case 'getEmailVerify':
-		getEmailVerify();
+		getConfig1('email_verify_open');
 	default:
 		returnInfo(MY_ERROR['DATA_ERROR']);
 }

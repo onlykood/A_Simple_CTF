@@ -45,7 +45,7 @@ function loadSession()
 	});
 }
 
-function getThemeColor(){
+function loadThemeColor(){
 	var color=localStorage.getItem('themeColor');
 	if(color==null){
 		localStorage.setItem('themeColor', 'grey darken-4');
@@ -57,7 +57,7 @@ function getThemeColor(){
 
 function setThemeColor(color){
 	localStorage.setItem('themeColor',color);
-	getThemeColor();
+	loadThemeColor();
 	return false;
 }
 function login(data){
@@ -120,14 +120,15 @@ function errorCheck(data){
 }
 
 function loadTitle(){
-	title=sessionStorage.getItem('title');
-	pageTitle=sessionStorage.getItem('pageTitle');
-	if(title==null || pageTitle==null){
+	title=localStorage.getItem('title');
+	pageTitle=localStorage.getItem('pageTitle');
+	debugLog(title+' '+pageTitle);
+	if(title==null && pageTitle==null){
+		debugLog("触发loadTitle");
 		$.ajax({
 			type:'post',
-			url: 'ajax.php?m=getConfig',
+			url: 'ajax.php?m=getTitle',
 			dataType: 'json',
-			data:{'type':'ctf_name'},
 			success:function(data){
 				debugLog(data);
 				if(errorCheck(data)){
@@ -135,8 +136,8 @@ function loadTitle(){
 				}
 				document.title = data[1][0];
 				$('.page-title').text(data[1][1]);
-				sessionStorage.setItem('title',data[1][0]);
-				sessionStorage.setItem('pageTitle',data[1][1]);
+				localStorage.setItem('title',data[1][0]);
+				localStorage.setItem('pageTitle',data[1][1]);
 			},
 			error:function(data){
 				debugLog(data);
@@ -172,9 +173,9 @@ function textToImg(img,uname) {
 	return canvas.toDataURL('image/png');
 };
 
-loadTitle();
 $(document).ready(function(){
-	getThemeColor();
+	loadTitle();
+	loadThemeColor();
 	loadSession();
 	$(".button-collapse").sideNav();
 	$('.modal').modal();
