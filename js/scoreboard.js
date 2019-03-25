@@ -79,6 +79,9 @@ function getRanks(){
 			if(errorCheck(data)){
 				return false;
 			}
+			if(data[1].length==0){
+				return false;
+			}
 			getRankList(data[1]);
 			getRankPic(data[1]);
 		},

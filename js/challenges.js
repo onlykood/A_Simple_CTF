@@ -134,7 +134,28 @@ function closeModal(){
 	$('#modal').modal('close');
 	return false;
 }
-
+$("#ques_con").on("click","#destroyDocker",function(){
+	var tmp=this;
+	debugLog(this);
+	$.ajax({
+		type:'POST',
+		url:'ajax.php?m=destroyDocker',
+		data:{'token':token},
+		dataType:'json',
+		success:function(data){
+			debugLog(data);
+			if(errorCheck(data)){
+				return false;
+			}
+			Materialize.toast("销毁成功");
+			$('#modal').modal('close');
+		},
+		error:function(data){
+			debugLog(data);
+		}
+	});
+	return false;
+});
 $("#ques_con").on("click","#dockerButton",function(){
 	var tmp=this;
 	debugLog(this);
@@ -147,6 +168,7 @@ $("#ques_con").on("click","#dockerButton",function(){
 		success:function(data){
 			debugLog(data);
 			if(errorCheck(data)){
+				tmp.text="下发docker";
 				return false;
 			}
 			Materialize.toast("下发成功，请点击按钮进入 Challenge , 有效期：1h",4000);

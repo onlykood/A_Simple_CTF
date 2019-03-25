@@ -16,6 +16,8 @@ flag.php
 *.sql
 !1.sql
 
+# docker 管理里页面
+docker.php
 
 # lock 文件
 *.lock

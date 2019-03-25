@@ -983,7 +983,7 @@ function contentReplace($content){
 	#依次替换隐藏文字 tips
 	while(preg_match('/\/\*(.+?)\*\//',$content,$matches)){
 		#确实用不了ssl,如果使用的话后续的处理会很麻烦,无所谓
-		$content=str_replace($matches[0],'<font color="white">'.$matches[1].'</font>', $content);
+		$content=str_replace($matches[0],'<font style="color:#000;background-color:#000">'.$matches[1].'</font>', $content);
 	}
 	return $content;
 }
@@ -998,14 +998,14 @@ function dockerButtonReplace($quesid){
 	//$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 	//returnInfo("Break!!");
 
-	$sql=$link->query("SELECT `ret_url` from `docker_use_lists` where `user_id`='$userid' and `ques_id`='$quesid' and `create_time`> '$time'");
+	$sql=$link->query("SELECT `ret_url` from `docker_use_lists` where `user_id`='$userid' and `ques_id`='$quesid' and `create_time`> '$time' and user_delete='0'");
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 
 	if(!$sql->num_rows){
 		return '<center><a class="waves-effect waves-light btn" id="dockerButton"><i class="material-icons right">cloud</i>下发docker</a></center>';
 	}
 	$url=$sql->fetch_assoc()['ret_url'];
-	return '<center><a class="waves-effect waves-light btn" id="dockerUrl" href="'.$url.'" target="_blank">点击进入</a></center>';
+	return '<center><a class="waves-effect waves-light btn" id="dockerUrl" href="'.$url.'" target="_blank">点击进入</a><a href="#" id="destroyDocker">销毁</a></center>';
 }
 
 #把 content 的一些东西替换成真正想显示的东西(null)
@@ -1021,7 +1021,7 @@ function questionContentReplace($questions){
 		$content=str_replace($matches[0],'<a class="btn grey" href="./QD-'.$check.'" target="_blank">'.$matches[1].'</a>', $content);
 	}
 	$content=str_ireplace('$Dlink','<a class="btn grey" href="./QD-'.$check.'" target="_blank">'.$questions['title'].'</a>', $content);
-	if(strpos($content,'$dockerButton')){
+	if(strpos($content,'$dockerButton')!==false){
 		$content=str_replace('$dockerButton',dockerButtonReplace($questions['id']),$content);
 	}
 
@@ -1187,12 +1187,14 @@ function image_resize($imagedata, $width, $height, $per = 0) {
     return $image;
 }
 
-# 获取下发的coker url
+# 下发 docker
 function getDockerUrl(){
 	loginCheck();
 	global $link;
+	isset($_SESSION['quesID']) or returnInfo("请选中 Challenge");
 	$userID=$_SESSION['userID'];
 	$quesID=$_SESSION['quesID'];
+	$dockerPort=$_SESSION['type']=='2' ? '8888' :'80';
 	$sql=$link->query("SELECT `docker_id` from `ctf_challenges` where `id`='$quesID'");
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
 	$sql->num_rows or returnInfo("No this docker");
@@ -1203,20 +1205,46 @@ function getDockerUrl(){
 	}
 
 	$token=MY_CONFIG['GET_DOCKER_TOKEN'];
-	$url=MY_CONFIG['DOCKER_SERVER']."?token=$token&dockerID=$dockerID";
-	$a=json_decode(file_get_contents($url),true);
-	// print_r($a);
-	if($a["code"]==1){
-		$port=$a['data'];
+	$url=MY_CONFIG['DOCKER_SERVER']."?action=create&token=$token&dockerID=$dockerID&port=$dockerPort";
+	$content=json_decode(file_get_contents($url),true);
+	// print_r($content);
+	if($content[0]["code"]==1){
+		$port=$content[1]['port'];
+		$dockerName=$content[1]['dockerName'];
+		$createTime=$content[1]['createTime'];
 	}
 	else{
-		returnInfo($a['data']);
-		# echo $a['data'];
+		returnInfo($content[0]['text']);
+		# echo $content['data'];
 	}
-	$dockerUrl="http://118.25.49.126:".$port;
-	$time=time();
-	$sql=$link->query("INSERT INTO `docker_use_lists`(`user_id`,`ques_id`,`docker_id`,`ret_url`,`create_time`) values('$userID','$quesID','$dockerID','$dockerUrl','$time')");
-	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
+	$dockerUrl=explode(':',MY_CONFIG['DOCKER_SERVER']);
+	$dockerUrl=$dockerUrl[0].':'.$dockerUrl[1].':'.$port;
+	# "http://118.25.49.126:".$port;
+	$sql=$link->query(
+		"INSERT INTO `docker_use_lists`(`user_id`,`ques_id`,`docker_id`,`docker_name`,`ret_url`,`create_time`) 
+		values('$userID','$quesID','$dockerID','$dockerName','$dockerUrl','$createTime')");
+	$sql or returnInfo(MY_ERROR['SQL_ERROR'].$dockerName);
 	returnInfo($dockerUrl,1);
 }
 
+# 销毁 docker
+function destroyDocker(){
+	loginCheck();
+	global $link;
+	isset($_SESSION['quesID']) or returnInfo("请选中 Challenge");
+	$userID=$_SESSION['userID'];
+	$quesID=$_SESSION['quesID'];
+	$sql=$link->query("SELECT * from docker_use_lists where ques_id='$quesID' and `user_id`='$userID'");
+	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
+	$sql->num_rows or returnInfo("No this docker");
+
+	$dockerName=$sql->fetch_assoc()['docker_name'];
+	$token=MY_CONFIG['GET_DOCKER_TOKEN'];
+	$url=MY_CONFIG['DOCKER_SERVER']."?token=$token&dockerName=$dockerName&action=destroy";
+	$content=json_decode(file_get_contents($url),true);
+	
+	$sql=$link->query(
+		"UPDATE docker_use_lists set user_delete=1 
+		WHERE docker_name='$dockerName' and ques_id='$quesID' and `user_id`='$userID'");
+	returnInfo($content[0]['text'],$content[0]['code']);
+}

@@ -10,7 +10,7 @@ function mailSendCheck()
 	$.ajax({
 		type:'post',
 		url:'ajax.php?m=mailSendCheck',
-		data:"token="+token,
+		data: {"token":token},
 		dataType:'json',
 		success:function(data){
 			debugLog(data);
@@ -37,6 +37,7 @@ function regVerifyCheck(){
 		window.location.href="account.html";
 		return false;
 	}
+	debugLog("verify run"+token);
 	$.ajax({
 		type:'post',
 		url:'ajax.php?m=getEmailVerify',

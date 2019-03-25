@@ -66,6 +66,7 @@ function inputCheck($data,$type)
 			if (!preg_match( "/^([0-9A-Za-z\\-_\\.]+)@([0-9a-z]+\\.[a-z]{2,3}(\\.[a-z]{2})?)$/i", $data)){ 
 				returnInfo('邮箱格式不正确！');
 			}
+			break;
 		case 'name':
 			if(empty($data)){
 				returnInfo('你必须输入用户名！');
@@ -79,6 +80,7 @@ function inputCheck($data,$type)
 			if( preg_match("/[\'.,:;*?~`!@#$%^&+=)(<>{}]|\]|\[|\/|\\\|\"|\|/", $data)){
 				returnInfo('用户名中请不要输入特殊字符！');
 			}
+			break;
 		default:
 			returnInfo(DATA_ERROR);
 			break;

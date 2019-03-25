@@ -51,7 +51,7 @@ $link->query("CREATE TABLE IF NOT EXISTS `users_info`(
   `key`         char(32)         NOT NULL DEFAULT '00000000000000000000000000000000' ,
   `extra_score` int(11)          NOT NULL DEFAULT '0'                                ,
   `hint_score`  int(11)          NOT NULL DEFAULT '0'                                ,
-  `nickname`    varchar(50)      NOT NULL DEFAULT '匿名'                             ,
+  `nickname`    varchar(50)      NOT NULL DEFAULT 'anonymous'                             ,
   `said`        varchar(50)      NOT NULL DEFAULT ''                                 ,
   `reg_time`    int(11) UNSIGNED NOT NULL DEFAULT '0'                                ,
   `reg_ip`      int(11) UNSIGNED NOT NULL DEFAULT '0'                                ,
@@ -130,8 +130,10 @@ $link->query("CREATE TABLE IF NOT EXISTS `docker_use_lists` (
   `user_id`     int(11)      	 NOT NULL DEFAULT '0'    ,
   `ques_id`     int(11)      	 NOT NULL DEFAULT '0'    ,
   `docker_id`   int(11)      	 NOT NULL DEFAULT '0'    ,
+  `docker_name` varchar(32)		 NOT NULL DEFAULT ''	 ,
   `ret_url`     varchar(100) 	 NOT NULL DEFAULT '#'    ,
   `create_time` int(11) UNSIGNED NOT NULL DEFAULT '0'    ,
+  `user_delete` tinyint(1)		 NOT NULL DEFAULT '0'    ,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8") or die('SQL error6');
 

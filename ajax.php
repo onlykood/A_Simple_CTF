@@ -87,8 +87,10 @@ switch( $_GET['m'] )	{
 		getUserAvator();
 	case 'getDockerUrl':
 		getDockerUrl();
+	case 'destroyDocker':
+		destroyDocker();
 	case 'getEmailVerify':
-		getConfig1('email_verify_open');
+		getConfig('email_verify_open',true);
 	default:
 		returnInfo(MY_ERROR['DATA_ERROR']);
 }
