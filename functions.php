@@ -1130,8 +1130,11 @@ function getQuestions()
 	for ($i = 0; $row = $sql->fetch_assoc(); $i++) {
 		if ($row['depends'] != '') {
 			if (!checkQuestionDepend($row['depends'], $row['id'])) {
-				$i--;
-				continue;
+				if(MY_SWITCH[ 'CHALLENGE_DEPEND_HIDE']){
+					$i--;
+					continue;
+				}
+				$row['is_pass']="lock";
 			}
 		}
 		if (MY_SWITCH['DYNAMIC_SCORE']) {

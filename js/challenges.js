@@ -108,11 +108,17 @@ function getQuestions()
 						}
 						ques+='<div style="height:auto;margin:0 auto; overflow:hidden" class="row questionsType"><h3 class="header">'+quesType[content[1]]+'</h3><hr>';
 					}
-					if(content[4]){
+					if(content[4]==='1'){
 						ques+='<button class="green lighten-2 btn-large col s6 m4 l3" id="'+content[0]+'" onclick="getQuestion(this)"><div style="min-height:30%">'+content[2]+'</div><span>'+content[3]+'</span></button>';
 					}
-					else{
+					else if(content[4]==='lock'){
+						ques += '<button class="grey lighten-1 btn-large col s6 m4 l3" id="' + content[0] + '" onclick="getQuestion(this)"><div style="min-height:30%">' + content[2] + '</div><span>' + content[3] + '</span></button>';
+					}
+					else if (content[4] === null){
 						ques+='<button class="btn-large col s6 m4 l3" id="'+content[0]+'" onclick="getQuestion(this)"><div style="min-height:30%">'+content[2]+'</div><span>'+content[3]+'</span></button>';
+					}
+					else{
+						ques+='';
 					}
 				}
 			);
