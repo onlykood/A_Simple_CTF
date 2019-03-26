@@ -701,7 +701,7 @@ function getQuestion($id)
 	inputCheck('id', $id);
 	loginCheck();
 	$id = intval($id);
-	if(!checkQuestionDepend("None",$id)){
+	if(!checkQuestionDepend("None",$id)&& !$_SESSION['admin']){
 		returnInfo("请解答前置依赖赛题才能解锁本赛题！");
 	}
 	global $link;
@@ -1128,7 +1128,7 @@ function getQuestions()
 
 	$data = array();
 	for ($i = 0; $row = $sql->fetch_assoc(); $i++) {
-		if ($row['depends'] != '') {
+		if ($row['depends'] != '' && !$_SESSION['admin']) {
 			if (!checkQuestionDepend($row['depends'], $row['id'])) {
 				if(MY_SWITCH[ 'CHALLENGE_DEPEND_HIDE']){
 					$i--;
