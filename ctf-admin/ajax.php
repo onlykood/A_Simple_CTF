@@ -32,8 +32,8 @@ switch( $_GET['m'] )	{
 		postCheck('userid','userkey','name','nickname','email','said','password');
 		modUserInfo($_POST['userid'],$_POST['userkey'],$_POST['name'],$_POST['nickname'],$_POST['email'],$_POST['said'],$_POST['password']);
 	case 'modQuesInfo':
-		postCheck('quesid','title','score','content','flag',"dockerid");
-		modQuesInfo($_POST['quesid'],$_POST['title'],$_POST['score'],$_POST['content'],$_POST['flag'],$_POST['dockerid']);
+		postCheck('quesid','title','score','content','flag',"dockerid",'depends');
+		modQuesInfo($_POST['quesid'],$_POST['title'],$_POST['score'],$_POST['content'],$_POST['flag'],$_POST['dockerid'],$_POST['depends']);
 	case 'userAdd':
 		postCheck('username','email','password');
 		userAdd($_POST['username'],$_POST['email'],$_POST['password']);

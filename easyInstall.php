@@ -90,6 +90,7 @@ $link->query("CREATE TABLE IF NOT EXISTS `ctf_challenges` (
   `title`       varchar(100)     NOT NULL DEFAULT ''      ,
   `content`     text             NOT NULL                 ,
   `flag`        varchar(100)     NOT NULL DEFAULT ''      ,
+  `depend`		varchar(100)	 NOT NULL DEFAULT ''	  ,
   `seed`        char(5)          NOT NULL DEFAULT 'ILWYE' ,
   `is_rand`     tinyint(1)       NOT NULL DEFAULT '0'     ,
   `is_hide`     tinyint(1)       NOT NULL DEFAULT '1'     ,

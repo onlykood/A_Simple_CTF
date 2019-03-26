@@ -279,11 +279,20 @@ function modUserInfo($id,$key,$name,$nickname,$email,$said,$password)
 }
 
 #修改问题信息
-function modQuesInfo($id,$title,$score,$content,$flag,$dockerid)
+function modQuesInfo($id,$title,$score,$content,$flag,$dockerid,$depends)
 {
 	$id=intval($id);
 	$score=intval($score);
 	$dockerid=intval($dockerid);
+	if( $depends !== ''){
+		if (!preg_match('/^\[[\d,]+?\]$/', $depends)){
+			returnInfo("赛题依赖格式错误，如果没有依赖请留空，否则请按照格式操作");
+		}
+		if(strlen($depends)>80){
+			returnInfo("depends 数据过长，请缩短数据后重新提交");
+		}
+	}
+
 	$link=Database::getConnection();
 	inputCheck($title,'title');
 	$title=$link->real_escape_string($title);
@@ -296,7 +305,7 @@ function modQuesInfo($id,$title,$score,$content,$flag,$dockerid)
 		inputCheck($flag,'flag');
 		$flag=$link->real_escape_string($flag);
 	}
-	$sql=$link->query("UPDATE ctf_challenges set title='$title',score='$score',content='$content',flag='$flag',is_rand='$rand',docker_id='$dockerid' where id='$id'");
+	$sql=$link->query("UPDATE ctf_challenges set title='$title',score='$score',content='$content',flag='$flag',is_rand='$rand',docker_id='$dockerid',depends='$depends' where id='$id'");
 	if(!$sql){
 		returnInfo(SQL_ERROR);
 	}
