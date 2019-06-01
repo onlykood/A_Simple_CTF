@@ -1,4 +1,4 @@
-# 配置文件，修改 init.php_bak -> init.php
+﻿# 配置文件，修改 init.php_bak -> init.php
 # 
 init.php
 /ctf-admin/init.php
@@ -15,12 +15,17 @@ flag.php
 # 数据库文件
 *.sql
 !1.sql
+/sql
 
 # docker 管理里页面
 docker.php
+/docker
 
 # lock 文件
 *.lock
 
 # sql配置文件
 config.php
+
+#vs奇怪东西
+/.vscode/

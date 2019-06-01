@@ -4,11 +4,20 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
 	<title>  </title>
-	<link href="//cdn.bootcss.com/materialize/0.98.2/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+	<!-- 本地，无外网情况 -->
+	<link href="./script/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection" />
+	<script type="text/javascript" src="./script/jquery.min.js"></script>
+	<script type="text/javascript" src="./script/highcharts.js"></script>
+	<script type="text/javascript" src="./script/sunburst.js"></script>
+	<script type="text/javascript" src="./script/materialize.min.js"></script>
+
+	<!-- 外网情况 -->
+<!-- 	<link href="//cdn.bootcss.com/materialize/0.98.2/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
 	<script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
 	<script src="//cdn.bootcss.com/highcharts/6.0.7/highcharts.js"></script>
 	<script src="//cdn.bootcss.com/highcharts/6.0.7/modules/sunburst.js"></script>
-	<script src="//cdn.bootcss.com/materialize/0.98.2/js/materialize.min.js"></script>
+	<script src="//cdn.bootcss.com/materialize/0.98.2/js/materialize.min.js"></script> -->
+
 	<link href="./favicon.ico" rel="shortcut icon"/>
 	<link href="./css/style.css" rel="stylesheet" type="text/css"/>
 	<script src="./js/ctf.js"></script>
@@ -49,8 +58,25 @@
 			</div>
 		</div>
 
+		<!-- 导航栏式赛题布置 -->
+		<div class="container row" >
+			<div class="tables blue cols s12">
+				<div class="tab col s2 offset-s1"><a href="#o_web">Web</a></div>
+				<div class="tab col s2"><a href="#o_re">Re</a></div>
+				<div class="tab col s2"><a href="#o_pwn">Pwn</a></div>
+				<div class="tab col s2"><a href="#o_misc">Misc</a></div>
+				<div class="tab col s2"><a href="#o_crypto">Crypto</a></div>
+			</div>
+			<div id="o_re" class="col s12 center">
+				<div class="row">
+
+				</div>
+			</div>
+
+		</div>
+
 		<!-- 题目板块 -->
-		<div class="container">
+		<div class="container" style="display: none;">
 			<div class="questions">
 			</div>
 		</div>

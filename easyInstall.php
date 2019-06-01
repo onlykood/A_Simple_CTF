@@ -74,6 +74,7 @@ $link->query("CREATE TABLE IF NOT EXISTS `users_team`(
   `create_time` int(11) UNSIGNED NOT NULL DEFAULT '0'       ,
   `is_leader`   tinyint(1)       NOT NULL DEFAULT '0'       ,
   `is_hide`     tinyint(1)       NOT NULL DEFAULT '0'       ,
+  `is_delete`     tinyint(1)       NOT NULL DEFAULT '0'       ,
   PRIMARY KEY(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8") or die('SQL error2');
 
@@ -90,7 +91,7 @@ $link->query("CREATE TABLE IF NOT EXISTS `ctf_challenges` (
   `title`       varchar(100)     NOT NULL DEFAULT ''      ,
   `content`     text             NOT NULL                 ,
   `flag`        varchar(100)     NOT NULL DEFAULT ''      ,
-  `depend`		varchar(100)	 NOT NULL DEFAULT ''	  ,
+  `depends`		varchar(100)	 NOT NULL DEFAULT ''	  ,
   `seed`        char(5)          NOT NULL DEFAULT 'ILWYE' ,
   `is_rand`     tinyint(1)       NOT NULL DEFAULT '0'     ,
   `is_hide`     tinyint(1)       NOT NULL DEFAULT '1'     ,
@@ -114,14 +115,14 @@ $link->query("CREATE TABLE IF NOT EXISTS `ctf_submits` (
 
 $link->query("DROP TABLE IF EXISTS `notices`") or die('SQL error');
 $link->query("CREATE TABLE IF NOT EXISTS `notices` (
-  `id`          int(11)          NOT NULL AUTO_INCREMENT ,
-  `create_time` int(11) UNSIGNED NOT NULL DEFAULT '0'    ,
-  `create_user_id` int(11)       NOT NULL DEFAULT '0'    ,
-  `edit_time`   int(11) UNSIGNED NOT NULL DEFAULT '0'    ,
-  `edit_user_id`   int(11)       NOT NULL DEFAULT '0'    ,
-  `content`     text             NOT NULL                ,
-  `is_hide`     tinyint(1)       NOT NULL DEFAULT '1'    ,
-  `is_delete`   tinyint(1)       NOT NULL DEFAULT '0'    ,
+  `id`          	int(11)          NOT NULL AUTO_INCREMENT ,
+  `create_time` 	int(11) UNSIGNED NOT NULL DEFAULT '0'    ,
+  `create_user_id`  int(11)       	 NOT NULL DEFAULT '0'    ,
+  `edit_time`   	int(11) UNSIGNED NOT NULL DEFAULT '0'    ,
+  `edit_user_id`    int(11)       	NOT NULL DEFAULT '0'    ,
+  `content`     	text             NOT NULL                ,
+  `is_hide`     	tinyint(1)       NOT NULL DEFAULT '1'    ,
+  `is_delete`   	tinyint(1)       NOT NULL DEFAULT '0'    ,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8") or die('SQL error5');
 
@@ -146,7 +147,8 @@ $link->query("CREATE TABLE IF NOT EXISTS `users_action`(
   `ip`      int(11) UNSIGNED NOT NULL DEFAULT '0'    ,
   `time`    int(11) UNSIGNED NOT NULL DEFAULT '0'    ,
   `states`  int(11)          NOT NULL DEFAULT '0'    ,
-  `is_delete`   tinyint(1)       NOT NULL DEFAULT '0'    ,
+  `is_hide`   tinyint(1)       NOT NULL DEFAULT '0'    ,
+  `is_delete` tinyint(1)       NOT NULL DEFAULT '0'    ,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8") or die('SQL error7');
 

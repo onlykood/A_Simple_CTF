@@ -80,6 +80,20 @@ function loginCheck(bool $ret = false)
 	return false;
 }
 
+/**
+ * @description admin检查
+ * @Author      kood
+ * @DateTime    2019-04-09
+ * @return      bool     
+ */
+function adminCheck(){
+	if(isset($_SESSION['admin']) and $_SESSION['admin']===true){
+		return true;
+	}
+	else{
+		return false;
+	}
+}
 
 /**
  * @description 用于ajax.php中的参数提交，检测存在参数
@@ -275,9 +289,9 @@ function noVerifyRegister(string $name, string $password, string $email, string 
 	}
 	unset($_SESSION['captcha']);
 
-	if (MY_CONFIG['email_verify_open'])
-
-		inputCheck('name', $name);
+	#if (MY_CONFIG['email_verify_open'])
+	statusCheck('reg_open') or returnInfo("目前平台不允许注册！");
+	inputCheck('name', $name);
 	inputCheck('password', $password, $password);
 	inputCheck('email', $email);
 	global $link;
@@ -701,7 +715,8 @@ function getQuestion($id)
 	inputCheck('id', $id);
 	loginCheck();
 	$id = intval($id);
-	if(!checkQuestionDepend("None",$id)&& !$_SESSION['admin']){
+
+	if(!checkQuestionDepend("None",$id) and !adminCheck()){
 		returnInfo("请解答前置依赖赛题才能解锁本赛题！");
 	}
 	global $link;
@@ -714,7 +729,6 @@ function getQuestion($id)
 	$_SESSION['type'] = $row['type'];
 	$_SESSION['typeID'] = $row['type_id'];
 	$_SESSION['flag'] = $row['is_rand'] ? MY_CONFIG['RAND_FLAG_HEADER'] . '{' . md5($_SESSION['user_key'] . $row['seed']) . '}' : $row['flag'];
-
 	$data['title'] = $row['title'];
 	$data['content'] = questionContentReplace($row);
 	$data['num'] = getQuestionSolveNum($id);
@@ -804,7 +818,7 @@ function flagSubmit($sub_flag)
 	if ($sub_flag === $flag) {
 		$is_pass = 1;
 		$text = "恭喜，flag正确！";
-		if (isset($_SESSION['admin']) and $_SESSION['admin']) {
+		if (adminCheck()) {
 			returnInfo($text, $is_pass);
 		}
 	} else {
@@ -838,6 +852,15 @@ function flagSubmit($sub_flag)
 }
 
 #登陆函数(null)
+/**
+ * @description 登陆函数
+ * @Author      kood
+ * @DateTime    2019-03-07
+ * @param       string     $name     用户名
+ * @param       string     $password 密码
+ * @param       string     $captcha  验证码
+ * @return      json       通过 returnInfo 返回json信息
+ */
 function login($name, $password, $captcha)
 {
 	#验证码检测
@@ -978,7 +1001,7 @@ function modUserPassword($old, $new, $repeat)
 
 	$sql = $link->query(
 		"UPDATE `users_info` 
-		SET `password`='" . md5($new . $row['user_key']) . "' 
+		SET `password`='" . md5($new . $row['key']) . "' 
 		WHERE `id`='" . $_SESSION['userID'] . "'"
 	);
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);
@@ -1111,6 +1134,12 @@ function checkQuestionDepend($depends,$quesID=false)
 }
 
 #获取所有题目的名称(id,type,title,score,pass) sql need refactoring
+/**
+ * @description 获取所有题目的名称
+ * @Author      kood
+ * @DateTime    2019-03-08
+ * @return      json     返回的所有赛题的情况
+ */
 function getQuestions()
 {
 	loginCheck();
@@ -1128,7 +1157,7 @@ function getQuestions()
 
 	$data = array();
 	for ($i = 0; $row = $sql->fetch_assoc(); $i++) {
-		if ($row['depends'] != '' && !$_SESSION['admin']) {
+		if ($row['depends'] != '' and !adminCheck()) {
 			if (!checkQuestionDepend($row['depends'], $row['id'])) {
 				if(MY_SWITCH[ 'CHALLENGE_DEPEND_HIDE']){
 					$i--;
@@ -1172,9 +1201,9 @@ function getVideo()
 		#'//video.wpsec.cn/6.flv',
 		#'//video.wpsec.cn/7.flv',
 	);
-	#$data='<iframe src="//player.bilibili.com/player.html?aid=44161960&cid=77339908&page=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="height:600px;width:80%"></iframe>';
-	$data = '功能有待完善';
-	if (isset($_SESSION['admin']) and $_SESSION['admin']) {
+	$data='<iframe src="//player.bilibili.com/player.html?aid=44161960&cid=77339908&page=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="height:600px;width:80%"></iframe>';
+	#$data = '功能有待完善';
+	if (adminCheck()) {
 		$data .= '<br/><a href="./ctf-admin" target="_blank">管理入口</a><br>';
 	} else {
 		# data.="不存在阿";
@@ -1313,7 +1342,12 @@ function getDockerUrl()
 		# echo $content['data'];
 	}
 	$dockerUrl = explode(':', MY_CONFIG['DOCKER_SERVER']);
-	$dockerUrl = $dockerUrl[0] . ':' . $dockerUrl[1] . ':' . $port;
+	if($dockerPort==='8888'){
+		$dockerUrl=$dockerUrl[1].' '.$port;
+	}
+	else{
+		$dockerUrl = $dockerUrl[0] . ':' . $dockerUrl[1] . ':' . $port;
+	}
 	# "http://118.25.49.126:".$port;
 	$sql = $link->query(
 		"INSERT INTO `docker_use_lists`(`user_id`,`ques_id`,`docker_id`,`docker_name`,`ret_url`,`create_time`) 
