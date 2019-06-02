@@ -84,6 +84,25 @@ function getQuestionSolves()
 	});
 	return false;	
 }
+function getQuess()
+{
+	$.ajax({
+		type:'post',
+		url:'ajax.php?m=getQuestions',
+		dataType:'json',
+		data:{'token':token},
+		success:function(data){
+			if(errorCheck(data)){
+				$('.questions').html('<h2 class="center">Where there is a will, there is a way.</h2>');
+				return false;
+			}
+		},
+		error:function(data){
+			debugLog(data);
+		}
+	});
+	return false;
+}
 function getQuestions()
 {
 	$.ajax({

@@ -3,7 +3,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
-	<title>  </title>
+	<title></title>
 	<!-- 本地，无外网情况 -->
 	<link href="./script/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection" />
 	<script type="text/javascript" src="./script/jquery.min.js"></script>
@@ -46,7 +46,7 @@
 						<li><a href="./account.html">TEAM</a></li>
 					</ul>
 					<a href="#" data-activates="slide-out" class="button-collapse"><i class="large material-icons">reorder</i></a>
-					<a href="#" data-activates="slide-out" class="page-title" style="font-size: 30px;">  </a>
+					<a href="#" data-activates="slide-out" class="page-title" style="font-size: 30px;"></a>
 				</div>
 			</div>
 		</nav>
@@ -60,19 +60,99 @@
 
 		<!-- 导航栏式赛题布置 -->
 		<div class="container row" >
-			<div class="tables blue cols s12">
-				<div class="tab col s2 offset-s1"><a href="#o_web">Web</a></div>
-				<div class="tab col s2"><a href="#o_re">Re</a></div>
-				<div class="tab col s2"><a href="#o_pwn">Pwn</a></div>
-				<div class="tab col s2"><a href="#o_misc">Misc</a></div>
-				<div class="tab col s2"><a href="#o_crypto">Crypto</a></div>
+			<ul class="tabs blue cols s12">
+				<li class="tab col s2"><a href="#o_all">All</a></li>
+				<li class="tab col s2"><a href="#o_web">Web</a></li>
+				<li class="tab col s2"><a href="#o_re">Re</a></li>
+				<li class="tab col s2"><a href="#o_pwn">Pwn</a></li>
+				<li class="tab col s2"><a href="#o_misc">Misc</a></li>
+				<li class="tab col s2"><a href="#o_crypto">Crypto</a></li>
+			</ul>
+			<div id="o_all" class="col s12">
+				<ul class="row collapsible" data-collapsible="accordion">
+				<li>
+					<div class="collapsible-header">all1 - 1 Solves<div class="right chip">PWN</div><div class="right chip">300</div></div>
+					<div class="collapsible-body" style="padding: 0;padding-top:2rem">
+						<div class="container">
+							aaaaaaaaaaaaaa
+						</div>
+						<form class="row" style="margin-bottom: 0">
+							<div class="col s8 offset-s1 center">
+								<input type="text" placeholder="Flag" name="flag"/>
+							</div>
+							<div class="col s3">
+								<button class="btn waves-effect waves-light" type="submit" name="action">Submit</button>
+							</div>
+						</form>
+					</div>
+				</li>
+				<li><div class="collapsible-header light-green lighten-3">web2</div><div class="collapsible-body"><p>人的一生，其实就是一场自己对自己的战争。</p></div></li>
+				<li><div class="collapsible-header">web3</div><div class="collapsible-body"><p>人的一生，其实就是一场自己对自己的战争。</p></div></li>
+				</ul>
 			</div>
-			<div id="o_re" class="col s12 center">
-				<div class="row">
-
-				</div>
+			<div id="o_web" class="col s12">
+				<ul class="row collapsible" data-collapsible="accordion">
+				<li>
+					<div class="collapsible-header">web1</div>
+					<div class="collapsible-body">
+						<div class="container">
+							aaaaaaa
+						</div>
+						<form class="row">
+							<div class="col s8 offset-s1 center">
+								<input type="text" placeholder="Flag" name="flag"/>
+							</div>
+							<div class="col s3">
+								<button class="btn waves-effect waves-light" type="submit" name="action">Submit</button>
+							</div>
+						</form>
+					</div>
+				</li>
+				<li><div class="collapsible-header">web2</div><div class="collapsible-body"><p>人的一生，其实就是一场自己对自己的战争。</p></div></li><li><div class="collapsible-header">web3</div><div class="collapsible-body"><p>人的一生，其实就是一场自己对自己的战争。</p></div></li>
+				</ul>
 			</div>
-
+			<div id="o_re" class="col s12">
+				<ul class="row collapsible" data-collapsible="accordion">
+				<li>
+					<div class="collapsible-header">all2</div>
+					<div class="collapsible-body">
+						<div class="container">
+							aaaaaaa
+						</div>
+						<form class="row">
+							<div class="col s8 offset-s1 center">
+								<input type="text" placeholder="Flag" name="flag"/>
+							</div>
+							<div class="col s3">
+								<button class="btn waves-effect waves-light" type="submit" name="action">Submit</button>
+							</div>
+						</form>
+					</div>
+				</li>
+				<li><div class="collapsible-header">web2</div><div class="collapsible-body"><p>人的一生，其实就是一场自己对自己的战争。</p></div></li><li><div class="collapsible-header">web3</div><div class="collapsible-body"><p>人的一生，其实就是一场自己对自己的战争。</p></div></li>
+				</ul>
+			</div>
+			<div id="o_pwn" class="col s12">
+				<ul class="row collapsible" data-collapsible="accordion">
+				<li>
+					<div class="collapsible-header">all3</div>
+					<div class="collapsible-body">
+						<div class="container">
+							aaaaaaa
+						</div>
+						<form class="row">
+							<div class="col s8 offset-s1 center">
+								<input type="text" placeholder="Flag" name="flag"/>
+							</div>
+							<div class="col s3">
+								<button class="btn waves-effect waves-light" type="submit" name="action">Submit</button>
+							</div>
+						</form>
+					</div>
+				</li>
+				<li><div class="collapsible-header">web2</div><div class="collapsible-body"><p>人的一生，其实就是一场自己对自己的战争。</p></div></li><li><div class="collapsible-header">web3</div><div class="collapsible-body"><p>人的一生，其实就是一场自己对自己的战争。</p></div></li>
+				</ul>
+			</div>
 		</div>
 
 		<!-- 题目板块 -->
