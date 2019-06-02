@@ -1,6 +1,7 @@
 /*Globals*/
 var DEBUG=true;
 var loggedin = false;
+var mq=false;
 
 var token;
 var name = '';

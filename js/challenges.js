@@ -88,7 +88,7 @@ function makeques(id,name,solves,type,score){
 	//var tmpHtml='<li><div class="collapsible-header">'+name+' - '+solves+' Solves<div class="right chip">'+type+'</div><div class="right chip">'+score+'</div></div><div class="collapsible-body" style="padding: 0;padding-top:2rem">';
 	var tmpHtml='<li><div id="qq'+id+'" class="collapsible-header" onclick="getQ('+id+')">'+name+'<div class="right chip">'+type+'</div><div class="right chip">'+score+'</div></div><div class="collapsible-body" style="padding: 0;padding-top:2rem">';
 	tmpHtml+='<div id="q'+id+'" class="container"><div class="progress"><div class="indeterminate"></div></div></div>';
-	tmpHtml+='<form id="mques" class="row" style="margin-bottom: 0" onsubmit="subFlag(this);return false;"><div class="col s6 offset-s2 center">';
+	tmpHtml+='<form class="row" style="margin-bottom: 0" onsubmit="subFlag(this);return false;"><div class="col s6 offset-s2 center">';
 	tmpHtml+='<input type="text" placeholder="Flag" name="flag"/>';
 	tmpHtml+='</div><div class="col s3"><button class="btn waves-effect waves-light" type="submit">Submit</button></div></form></div></li>';
 	return tmpHtml;
@@ -184,7 +184,7 @@ function getQuess(type)
 				ques='<h2 class="center">No Questions, Please Contact The Administrator.</h2>';
 			}
 			$( '#quesList' ).html( ques );
-			$('#hideques').show();
+			$('#mques').show();
 		},
 		error:function(data){
 			debugLog(data);
@@ -199,7 +199,7 @@ function getQuestions()
 		type: 'post',
 		url: 'ajax.php?m=getQuestions',
 		dataType:'json',
-		data:{"token":token},
+		data:{"token":token,'type':7},
 		success: function(data) {
 			debugLog(data);
 			if(errorCheck(data)){
@@ -243,6 +243,7 @@ function getQuestions()
 			debugLog(data);
 		}
 	});
+	$('#bques').show();
 	return false;
 }
 function closeModal(){
@@ -321,9 +322,10 @@ $(document).ready(function(){
 			$('ul.tabs').tabs('select_tab', 'mod1');
 		}
 	});
-	//getQuestions();
-	getQuess(7);
-	/*getQ(1);*/
+	if(mq)
+		getQuess(7);
+	else
+		getQuestions();
 	$( 'form' ).submit(function(){
 		$.ajax({
 			type: 'POST',
