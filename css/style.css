@@ -182,3 +182,8 @@ ul.countdown li p {
   border-radius: 10px;
   background: #EDEDED;
 }
+
+/********challenge 使用*******/
+.progress{
+  width: 80%;
+}

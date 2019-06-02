@@ -1140,9 +1140,11 @@ function checkQuestionDepend($depends,$quesID=false)
  * @DateTime    2019-03-08
  * @return      json     返回的所有赛题的情况
  */
-function getQuestions()
+function getQuestions($type)
 {
 	loginCheck();
+	$type=intval($type);
+	$typeCommand=$type===7 ?	'':'and `type`='.$type;
 	$userid = $_SESSION['userID'];
 	global $link;
 	$sql = $link->query(
@@ -1150,7 +1152,7 @@ function getQuestions()
 		from `ctf_challenges` 
 		left join (select distinct `ques_id`,`is_pass` from `ctf_submits` where `is_pass`='1' and `is_hide`='0' and `is_delete`='0' and `user_id`='$userid')a 
 		on `ques_id`=`id`
-		where `ctf_challenges`.`is_hide`='0'
+		where `ctf_challenges`.`is_hide`='0'".$typeCommand."
 		order by `type`,`type_id`"
 	);
 	$sql or returnInfo(MY_ERROR['SQL_ERROR']);

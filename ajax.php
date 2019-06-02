@@ -27,9 +27,18 @@ switch( $_GET['m'] )	{
 		noVerifyRegister($_POST['username'],$_POST['password'],$_POST['email'],$_POST['captcha']);
 	case 'getNotice':
 		getNotice();
+
+	// challengs
+	case 'getQuestions':
+		postCheck('type');
+		getQuestions($_POST['type']);
 	case 'getQuestion':
 		postCheck('id');
 		getQuestion($_POST['id']);
+	case 'getQuestionSolves':
+		postCheck('id');
+		getQuestionSolves($_POST['id']);
+
 	case 'getRank':
 		postCheck('is_img');
 		getRank($_POST['is_img']);
@@ -39,9 +48,6 @@ switch( $_GET['m'] )	{
 	case 'getUserSolves':
 			getUserSolves();
 
-	case 'getQuestionSolves':
-		postCheck('id');
-		getQuestionSolves($_POST['id']);
 
 	case 'register':
 		postCheck('password','repeat','regkey');
@@ -77,8 +83,7 @@ switch( $_GET['m'] )	{
 		resetPassword($_POST['password'],$_POST['repeat'],$_POST['resetkey']);
 	case 'mailSendCheck':
 		mailSendCheck();
-	case 'getQuestions':
-		getQuestions();
+
 	case 'getCaptcha':
 		getCaptcha();
 	case 'getVideo':
