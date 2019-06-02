@@ -184,6 +184,7 @@ function getQuess(type)
 				ques='<h2 class="center">No Questions, Please Contact The Administrator.</h2>';
 			}
 			$( '#quesList' ).html( ques );
+			$('#hideques').show();
 		},
 		error:function(data){
 			debugLog(data);
