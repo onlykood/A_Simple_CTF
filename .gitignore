@@ -1,31 +1,15 @@
-﻿# 配置文件，修改 init.php_bak -> init.php
-# 
-init.php
-/ctf-admin/init.php
-
-# 测试文件
-# 
-test*.php
-flag.php
-
-# 短信测试文件
-/qcloudsms_php/
-短信发送.php
-
-# 数据库文件
-*.sql
-!1.sql
-/sql
-
-# docker 管理里页面
-docker.php
-/docker
-
-# lock 文件
-*.lock
-
-# sql配置文件
-config.php
-
-#vs奇怪东西
+﻿/sql
+/.idea
 /.vscode/
+/docker
+/questions
+/qcloudsms_php/
+*.sql
+test*.php
+config.php
+短信发送.php
+favicon.ico
+
+# 待更新
+mingan.txt
+manage.php

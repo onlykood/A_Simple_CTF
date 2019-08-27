@@ -2,13 +2,13 @@
 include 'init.php';
 include 'functions.php';
 if (!isset($_GET['id'])) {
-	die("~No id");
+    die("~No id");
 }
 $id = intval($_GET['id']);
 $link = Database::getConnection();
 $sql = $link->query("SELECT * from ctf_challenges where id='$id'");
 if (!$sql) {
-	returnInfo(SQL_ERROR);
+    returnInfo(SQL_ERROR);
 }
 $row = $sql->fetch_assoc();
 ?>
@@ -28,15 +28,15 @@ $row = $sql->fetch_assoc();
     <script type="text/javascript" src="./js/xadmin.js"></script>
     <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
     <!--[if lt IE 9]>
-			<script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
-			<script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
-		<![endif]-->
+            <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+            <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
 </head>
 
 <body>
     <div class="x-body">
         <form class="layui-form">
-            <input type="hidden" id="quesid" name="quesid" value="<?php echo $row['id']; ?>">
+            <input type="hidden" id="quesid" name="quesid" value="<?=$row['id']?>">
             <div class="layui-form-item">
                 <label for="L_title" class="layui-form-label">
                     <span class="x-red">*</span>标题
@@ -51,6 +51,23 @@ $row = $sql->fetch_assoc();
                 </label>
                 <div class="layui-input-inline">
                     <input type="text" id="L_score" name="score" required="" lay-verify="score" autocomplete="off" class="layui-input" value="<?php echo $row['score']; ?>">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label for="L_type" class="layui-form-label">
+                    <span class="x-red">*</span>类型
+                </label>
+                <div class="layui-input-inline">
+                  <select id="L_type" name="type" lay-verify="type">
+                    <option value=""></option>
+                    <option value="0">Web</option>
+                    <option value="1">Reverse</option>
+                    <option value="2">Pwn</option>
+                    <option value="3">Misc</option>
+                    <option value="4">Crypto</option>
+                    <option value="5">Stega</option>
+                    <option value="6">Ppc</option>
+                  </select>
                 </div>
             </div>
             <div class="layui-form-item">
@@ -110,19 +127,19 @@ $row = $sql->fetch_assoc();
             //自定义验证规则
             //form.verify({
             // username:function(value){
-            // 	if(value.length<2){
-            // 		return '用户名至少2个字符';
-            // 	}
+            //     if(value.length<2){
+            //         return '用户名至少2个字符';
+            //     }
             // },
             // nikename: function(value){
-            // 	if(value.length < 2){
-            // 		return '昵称至少2个字符';
-            // 	}
+            //     if(value.length < 2){
+            //         return '昵称至少2个字符';
+            //     }
             // },
             // password:function(value){
-            // 	if(value!=''&&value.length<6){
-            // 		return '密码必须大于6字符';
-            // 	}
+            //     if(value!=''&&value.length<6){
+            //         return '密码必须大于6字符';
+            //     }
             // },
             // email:[/^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/,'邮箱格式不正确'],
             // //ip: [/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/, 'IP格式不正确']
@@ -137,8 +154,9 @@ $row = $sql->fetch_assoc();
                     dataType: 'json',
                     data: {
                         "quesid": $("#quesid").val(),
-						"dockerid": $("#L_dockerid").val(),
-						"depends":$("#L_depends").val(),
+                        "type":$("#L_type").val(),
+                        "dockerid": $("#L_dockerid").val(),
+                        "depends":$("#L_depends").val(),
                         "title": $('#L_title').val(),
                         "score": $('#L_score').val(),
                         "content": $('#L_content').val(),

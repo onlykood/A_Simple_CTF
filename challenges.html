@@ -1,123 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
-	<title></title>
-	<!-- 本地，无外网情况 -->
-	<link href="./script/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection" />
-	<script type="text/javascript" src="./script/jquery.min.js"></script>
-	<script type="text/javascript" src="./script/highcharts.js"></script>
-	<script type="text/javascript" src="./script/sunburst.js"></script>
-	<script type="text/javascript" src="./script/materialize.min.js"></script>
-
-	<!-- 外网情况 -->
-<!-- 	<link href="//cdn.bootcss.com/materialize/0.98.2/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
-	<script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
-	<script src="//cdn.bootcss.com/highcharts/6.0.7/highcharts.js"></script>
-	<script src="//cdn.bootcss.com/highcharts/6.0.7/modules/sunburst.js"></script>
-	<script src="//cdn.bootcss.com/materialize/0.98.2/js/materialize.min.js"></script> -->
-
-	<link href="./favicon.ico" rel="shortcut icon"/>
-	<link href="./css/style.css" rel="stylesheet" type="text/css"/>
-	<script src="./js/ctf.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+    <title>  </title>
+    <!-- 本地，无外网情况 -->
+    <!--<link href="./script/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection" />
+    <script type="text/javascript" src="./script/jquery.min.js"></script>
+    <script type="text/javascript" src="./script/highcharts.js"></script>
+    <script type="text/javascript" src="./script/sunburst.js"></script>
+    <script type="text/javascript" src="./script/materialize.min.js"></script> -->
+    <!-- 外网情况 -->
+    <link href="//cdn.bootcss.com/materialize/0.98.2/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="//cdn.bootcss.com/highcharts/6.0.7/highcharts.js"></script>
+    <script src="//cdn.bootcss.com/highcharts/6.0.7/modules/sunburst.js"></script>
+    <script src="//cdn.bootcss.com/materialize/0.98.2/js/materialize.min.js"></script>
+    <link href="./favicon.ico" rel="shortcut icon"/>
+    <link href="./css/style.css" rel="stylesheet" type="text/css"/>
+    <script src="./js/ctf.js"></script>
 </head>
 <body>
-	<header style="padding-bottom: 3px;">
-		<nav class="white" role="navigation">
-			<div class="container">
-				<div class="nav-wrapper">
-					<ul class="right hide-on-small-only head-menu">
-						<li><a href="./index.html">首页</a></li>
-						<li><a href="./scoreboard.html">排行</a></li>
-						<li><a href="./notice.html">公告</a></li>
-						<li><a href="./challenges.html">题目</a></li>
-						<li><a href="./about.html">关于</a></li>
-						<li><a href="./account.html">TEAM</a></li>
-					</ul>
-					<ul id="slide-out" class="side-nav">
-						<li class="logo"><a id="logo-container" href="/" class="brand-logo">
-							<object id="front-page-logo" type="image/png"></object></a></li>
-						<li><a href="./index.html">首页</a></li>
-						<li><a href="./scoreboard.html">排行</a></li>
-						<li><a href="./notice.html">公告</a></li>
-						<li><a href="./challenges.html">题目</a></li>
-						<li><a href="./about.html">关于</a></li>
-						<li><a href="./account.html">TEAM</a></li>
-					</ul>
-					<a href="#" data-activates="slide-out" class="button-collapse"><i class="large material-icons">reorder</i></a>
-					<a href="#" data-activates="slide-out" class="page-title" style="font-size: 30px;"></a>
-				</div>
-			</div>
-		</nav>
-	</header>
-	<main>
-		<div class="no-pad-bot section" id="index-banner">
-			<div class="container">
-				<h1 class="header center">Questions</h1>
-			</div>
-		</div>
+    <header style="padding-bottom: 3px;">
+        <nav class="white" role="navigation">
+            <div class="container">
+                <div class="nav-wrapper">
+                    <ul class="right hide-on-small-only head-menu">
+                        <li><a href="./index.html">首页</a></li>
+                        <li><a href="./scoreboard.html">排行</a></li>
+                        <li><a href="./notice.html">公告</a></li>
+                        <li><a href="./challenges.html">题目</a></li>
+                        <li><a href="./about.html">关于</a></li>
+                        <li><a href="./account.html">TEAM</a></li>
+                    </ul>
+                    <ul id="slide-out" class="side-nav">
+                        <li class="logo"><a id="logo-container" href="/" class="brand-logo">
+                            <object id="front-page-logo" type="image/png"></object></a></li>
+                        <li><a href="./index.html">首页</a></li>
+                        <li><a href="./scoreboard.html">排行</a></li>
+                        <li><a href="./notice.html">公告</a></li>
+                        <li><a href="./challenges.html">题目</a></li>
+                        <li><a href="./about.html">关于</a></li>
+                        <li><a href="./account.html">TEAM</a></li>
+                    </ul>
+                    <a href="#" data-activates="slide-out" class="button-collapse"><i class="large material-icons">reorder</i></a>
+                    <a href="#" data-activates="slide-out" class="page-title" style="font-size: 30px;"></a>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <div class="no-pad-bot section" id="index-banner">
+            <div class="container">
+                <h1 class="header center">Questions</h1>
+            </div>
+        </div>
 
-		<!-- 导航栏式赛题布置 -->
-		<div class="container row" id="mques" style="display: none;">
-			<ul class="tabs black cols s12">
-				<li class="tab col s2"><a href="javascript:;" id="o_all">All</a></li>
-				<li class="tab col s2"><a href="javascript:;" id="o_web">Web</a></li>
-				<li class="tab col s2"><a href="javascript:;" id="o_re">Re</a></li>
-				<li class="tab col s2"><a href="javascript:;" id="o_pwn">Pwn</a></li>
-				<li class="tab col s2"><a href="javascript:;" id="o_misc">Misc</a></li>
-				<li class="tab col s2"><a href="javascript:;" id="o_crypto">Crypto</a></li>
-			</ul>
-			<div class="col s12">
-				<ul class="row collapsible" data-collapsible="accordion" id="quesList">
+        <!-- 导航栏式赛题布置 -->
+        <div class="container row" id="mques" style="display: none;">
+            <ul class="tabs black cols s12">
+                <li class="tab col s2"><a href="javascript:;" id="o_all">All</a></li>
+                <li class="tab col s2"><a href="javascript:;" id="o_web">Web</a></li>
+                <li class="tab col s2"><a href="javascript:;" id="o_re">Re</a></li>
+                <li class="tab col s2"><a href="javascript:;" id="o_pwn">Pwn</a></li>
+                <li class="tab col s2"><a href="javascript:;" id="o_misc">Misc</a></li>
+                <li class="tab col s2"><a href="javascript:;" id="o_crypto">Crypto</a></li>
+            </ul>
+            <div class="col s12">
+                <ul class="row collapsible" data-collapsible="accordion" id="quesList">
 
-				</ul>
-			</div>
-		</div>
+                </ul>
+            </div>
+        </div>
 
-		<!-- 题目板块 -->
-		<div class="container" id="bques" style="display: none;">
-			<div class="questions">
-			</div>
-		</div>
-	</main>
+        <!-- 题目板块 -->
+        <div class="container" id="bques" style="display: none;">
+            <div class="questions">
+            </div>
+        </div>
+    </main>
 
-	<!-- 模态框 -->
-	<div id="modal" class="modal row scroll-bar1">
-		<ul class="tabs">
-			<li class="tab col s3"><a href="#mod1" class="active tmp1">Challenge</a></li>
-			<li class="tab col s3"><a href="#mod2" class="tmp1" onclick="getQuestionSolves()">Solves</a></li>
-		</ul>
-		<!-- 展示题目具体内容 -->
-		<div id="mod1" class="col s12">
-			<div class="modal-content" style="padding: 0">
-				<div class="">
-					<h4 class="center col s12" id="ques_tit"></h4>
-					<h5 class="center col s12" id="ques_score"></h5>
-				</div>
-				<div class="container">
-					<p id="ques_con"></p>
-				</div>
-			<form class="">
-				<div class="col s8 offset-s1 center">
-					<input type="text" placeholder="Flag" name="flag"/>
-				</div>
-				<div class="col s3">
-					<button class="btn waves-effect waves-light tmp1" style="height: 51px" type="submit" name="action">Submit</button>
-				</div>
-			</form>
-			</div>
-		</div>
-		<!--此处用于显示solves-->
-		<div id="mod2" class="col s12">
-			<div class="modal-content">
-				<h5 class="center col s12" id="ques_solve"></h5>
-				<div class="container">
-					<table class="bordered highlight centered" id="solves"></table>
-				</div>
-			</div>
-		</div>
-	</div>
-	<script src="./js/challenges.js"></script> 
+    <!-- 模态框 -->
+    <div id="modal" class="modal row scroll-bar1">
+        <ul class="tabs">
+            <li class="tab col s3"><a href="#mod1" class="active tmp1">Challenge</a></li>
+            <li class="tab col s3"><a href="#mod2" class="tmp1" onclick="getQuestionSolves()">Solves</a></li>
+        </ul>
+        <!-- 展示题目具体内容 -->
+        <div id="mod1" class="col s12">
+            <div class="modal-content" style="padding: 0">
+                <div class="">
+                    <h4 class="center col s12" id="ques_tit"></h4>
+                    <h5 class="center col s12" id="ques_score"></h5>
+                </div>
+                <div class="container">
+                    <p id="ques_con"></p>
+                </div>
+            <form class="">
+                <div class="col s8 offset-s1 center">
+                    <input type="text" placeholder="Flag" name="flag"/>
+                </div>
+                <div class="col s3">
+                    <button class="btn waves-effect waves-light tmp1" style="height: 51px" type="submit" name="action">Submit</button>
+                </div>
+            </form>
+            </div>
+        </div>
+        <!--此处用于显示solves-->
+        <div id="mod2" class="col s12">
+            <div class="modal-content">
+                <h5 class="center col s12" id="ques_solve"></h5>
+                <div class="container">
+                    <table class="bordered highlight centered" id="solves"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="./js/challenges.js"></script> 
 </body>
 </html>

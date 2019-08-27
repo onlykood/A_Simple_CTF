@@ -183,23 +183,24 @@ function errorCheck(data){
 }
 
 /*对所有选中部分进行操作*/
-    function allClicked(obj,operate){
-        var data=tableCheck.getData();
-        layer.confirm('确认要'+obj.name+'选中的所有行吗?',function(index){
-            $.ajax({
-                url:'ajax.php?m=modStatus',
-                type:'POST',
-                dataType:'json',
-                data:{'type':type,'operate':operate,'ids':data},
-                success:function(data){
-                    if(errorCheck(data)){
-                        return false;
-                    }
-                    layer.msg('操作成功',{icon:1});
+function allClicked(obj,operate){
+    var data=tableCheck.getData();
+    layer.confirm('确认要'+obj.name+'选中的所有行吗?',function(index){
+        $.ajax({
+            url:'ajax.php?m=modStatus',
+            type:'POST',
+            dataType:'json',
+            data:{'type':type,'operate':operate,'ids':data},
+            success:function(data){
+                debugLog(data);
+                if(errorCheck(data)){
+                    return false;
                 }
-            })
-        });
-    }
+                layer.msg('操作成功',{icon:1});
+            }
+        })
+    });
+}
 //IP 转成整型
 function ip2int(ip) 
 {

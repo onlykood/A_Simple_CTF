@@ -1,72 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
-	<title>  </title>
-	<!-- 本地，无外网情况 -->
-	<link href="./script/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection" />
-	<script type="text/javascript" src="./script/jquery.min.js"></script>
-	<script type="text/javascript" src="./script/highcharts.js"></script>
-	<script type="text/javascript" src="./script/sunburst.js"></script>
-	<script type="text/javascript" src="./script/materialize.min.js"></script>
-
-	<!-- 外网情况 -->
-<!-- 	<link href="//cdn.bootcss.com/materialize/0.98.2/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
-	<script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
-	<script src="//cdn.bootcss.com/highcharts/6.0.7/highcharts.js"></script>
-	<script src="//cdn.bootcss.com/highcharts/6.0.7/modules/sunburst.js"></script>
-	<script src="//cdn.bootcss.com/materialize/0.98.2/js/materialize.min.js"></script> -->
-
-	<link href="./favicon.ico" rel="shortcut icon"/>
-	<link href="./css/style.css" rel="stylesheet" type="text/css"/>
-	<script src="./js/ctf.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+    <title>  </title>
+    <!-- 本地，无外网情况 -->
+    <!--<link href="./script/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection" />
+    <script type="text/javascript" src="./script/jquery.min.js"></script>
+    <script type="text/javascript" src="./script/highcharts.js"></script>
+    <script type="text/javascript" src="./script/sunburst.js"></script>
+    <script type="text/javascript" src="./script/materialize.min.js"></script> -->
+    <!-- 外网情况 -->
+    <link href="//cdn.bootcss.com/materialize/0.98.2/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="//cdn.bootcss.com/highcharts/6.0.7/highcharts.js"></script>
+    <script src="//cdn.bootcss.com/highcharts/6.0.7/modules/sunburst.js"></script>
+    <script src="//cdn.bootcss.com/materialize/0.98.2/js/materialize.min.js"></script>
+    <link href="./favicon.ico" rel="shortcut icon"/>
+    <link href="./css/style.css" rel="stylesheet" type="text/css"/>
+    <script src="./js/ctf.js"></script>
 </head>
 <body>
-	<header style="padding-bottom: 3px;">
-		<nav class="white" role="navigation">
-			<div class="container">
-				<div class="nav-wrapper">
-					<ul class="right hide-on-small-only head-menu">
-						<li><a href="./index.html">首页</a></li>
-						<li><a href="./scoreboard.html">排行</a></li>
-						<li><a href="./notice.html">公告</a></li>
-						<li><a href="./challenges.html">题目</a></li>
-						<li><a href="./about.html">关于</a></li>
-						<li><a href="./account.html">TEAM</a></li>
-					</ul>
-					<ul id="slide-out" class="side-nav">
-						<li class="logo"><a id="logo-container" href="/" class="brand-logo">
-							<object id="front-page-logo" type="image/png"></object></a></li>
-						<li><a href="./index.html">首页</a></li>
-						<li><a href="./scoreboard.html">排行</a></li>
-						<li><a href="./notice.html">公告</a></li>
-						<li><a href="./challenges.html">题目</a></li>
-						<li><a href="./about.html">关于</a></li>
-						<li><a href="./account.html">TEAM</a></li>
-					</ul>
-					<a href="#" data-activates="slide-out" class="button-collapse"><i class="large material-icons">reorder</i></a>
-					<a href="#" data-activates="slide-out" class="page-title" style="font-size: 30px;">  </a>
-				</div>
-			</div>
-		</nav>
-	</header>
-	<main>
-		<div class="no-pad-bot section" id="index-banner">
-			<div class="container">
-				<h1 class="header center">Notice</h1>
-			</div>
-		</div>
-		<div class="container" style="font-size: 20px">
-			<div class="section">
-				<div class="row">
-					<div class="col s12 m12 center">
-						<table id="notice"></table>
-					</div>
-				</div>
-			</div>
-		</div>
-	</main>
-	<script src="./js/notice.js"></script>
+    <header style="padding-bottom: 3px;">
+        <nav class="white" role="navigation">
+            <div class="container">
+                <div class="nav-wrapper">
+                    <ul class="right hide-on-small-only head-menu">
+                        <li><a href="./index.html">首页</a></li>
+                        <li><a href="./scoreboard.html">排行</a></li>
+                        <li><a href="./notice.html">公告</a></li>
+                        <li><a href="./challenges.html">题目</a></li>
+                        <li><a href="./about.html">关于</a></li>
+                        <li><a href="./account.html">TEAM</a></li>
+                    </ul>
+                    <ul id="slide-out" class="side-nav">
+                        <li class="logo"><a id="logo-container" href="/" class="brand-logo">
+                            <object id="front-page-logo" type="image/png"></object></a></li>
+                        <li><a href="./index.html">首页</a></li>
+                        <li><a href="./scoreboard.html">排行</a></li>
+                        <li><a href="./notice.html">公告</a></li>
+                        <li><a href="./challenges.html">题目</a></li>
+                        <li><a href="./about.html">关于</a></li>
+                        <li><a href="./account.html">TEAM</a></li>
+                    </ul>
+                    <a href="#" data-activates="slide-out" class="button-collapse"><i class="large material-icons">reorder</i></a>
+                    <a href="#" data-activates="slide-out" class="page-title" style="font-size: 30px;">  </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <div class="no-pad-bot section" id="index-banner">
+            <div class="container">
+                <h1 class="header center">Notice</h1>
+            </div>
+        </div>
+        <div class="container" style="font-size: 20px">
+            <div class="section">
+                <div class="row">
+                    <div class="col s12 m12 center">
+                        <table id="notice"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="./js/notice.js"></script>
 </body>
 </html>

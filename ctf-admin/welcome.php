@@ -91,7 +91,7 @@
                     </tr>
                     <tr>
                         <td>当前Session </td>
-			<td><?php print_r($_SESSION);?></td>
+            <td><?php print_r($_SESSION);?></td>
                     </tr>
                     <tr>
                         <td>当前系统用户名 </td>
