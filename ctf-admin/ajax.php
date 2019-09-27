@@ -54,8 +54,8 @@ switch( $_GET['m'] )    {
         postCheck('operate','id','content');
         noticeManage($_POST['operate'],$_POST['id'],$_POST['content']);
     case 'updateConfig':
-        postCheck('website_open','ctf_open','reg_open','login_open','sub_open','dynamic_score_open','one_blood_open','email_verify_open','challenge_depend_hide','cache_open','blood_score','recent_solve_show_num','ctf_name','ctf_organizer','docker_exist_time','get_docker_token','docker_server','email_username','email_password','super_password','dynamic_flag_head_fmt');
-        updateConfig($_POST['website_open'],$_POST['ctf_open'],$_POST['reg_open'],$_POST['login_open'],$_POST['sub_open'],$_POST['dynamic_score_open'],$_POST['one_blood_open'],$_POST['email_verify_open'],$_POST['challenge_depend_hide'],$_POST['cache_open'],$_POST['blood_score'],$_POST['recent_solve_show_num'],$_POST['ctf_name'],$_POST['ctf_organizer'],$_POST['docker_exist_time'],$_POST['get_docker_token'],$_POST['docker_server'],$_POST['email_username'],$_POST['email_password'],$_POST['super_password'],$_POST['dynamic_flag_head_fmt']);
+        postCheck('name','value');
+        updateConfig($_POST['name'],$_POST['value']);
     case 'getConfigs':
         getConfigs();
     default:returnInfo(DATA_ERROR);

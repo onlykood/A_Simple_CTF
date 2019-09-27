@@ -15,7 +15,7 @@
  * @param       int     $num 解题人数
  * @return      int          题目分值
  */
-function scoreModel(int $number): int
+function scoreModel(int $number=0): int
 {
     return intval(1001 - 1000 / (1.01 + pow(2.2, 12 - $number)));
 }
@@ -27,7 +27,7 @@ function scoreModel(int $number): int
  * @param       int     $id 题目 id
  * @return      int         解题数量
  */
-function getQuestionSolveNum(int $id): int
+function getQuestionSolveNum(int $id=0): int
 {
     global $link;
     $sql = $link->query(
@@ -49,7 +49,7 @@ function getQuestionSolveNum(int $id): int
  * @param       int     $num 排名
  * @return      int          得分
  */
-function oneBlood(int $num): int
+function oneBlood(int $num=0): int
 {
     $score = 0;
     if (!getConfig('one_blood_open') or $num<1) {
@@ -83,6 +83,22 @@ function loginCheck(bool $ret = false)
 }
 
 /**
+ * @description 增加记录
+ * @Author      kood
+ * @DateTime    2019-09-02
+ * @param       int|integer $userID  [description]
+ * @param       int|integer $code    [description]
+ * @param       string      $descrip [description]
+ * @return      [type]               [description]
+ */
+function recordAction(int $userID=0,int $code=0,string $descrip=''){
+    #$ip=ip2long($_SERVER['REMOTE_ADDR']);
+    #$time=time();
+    #$sql = $link->query("INSERT into users_action(`user_id`,`ip`,`time`,`states`,`descrip`) values('$userID','$ip','$time','$code','$descrip')");
+    #$sql or returnInfo(MY_ERROR['SQL_ERROR']);
+}
+
+/**
  * @description admin检查
  * @Author      kood
  * @DateTime    2019-04-09
@@ -95,6 +111,26 @@ function adminCheck(){
     else{
         return false;
     }
+}
+
+/**
+ * @description 判断是否是在比赛中
+ * @Author      kood
+ * @DateTime    2019-09-26
+ * @return      bool     true|false
+ */
+function ctfStartCheck(){
+    $ctfType=getConfig('ctf_type');
+    if($ctfType=='1'){
+        return false;
+    }
+    $startTime=getConfig('ctf_start_time');
+    $endTime=getConfig('ctf_end_time');
+    $nowTime=time();
+    if($nowTime<$startTime || $nowTime>$endTime){
+        return false;
+    }
+    return true;
 }
 
 /**
@@ -120,7 +156,7 @@ function postCheck(...$array)
  * @param       boolean    $data1 为密码校验额外提供的
  * @return      bool|json         验证通过，返回 true，否则直接json返回
  */
-function inputCheck($type, $data, $data1 = false)
+function inputCheck(string $type='', string $data='', $data1 = false)
 {
     switch ($type) {
         case 'flag':
@@ -220,7 +256,7 @@ function getSession()
  * @param       string     $type 需要获取的状态名称
  * @return      [type]           状态值
  */
-function statusCheck($type = 'ctf_open')
+function statusCheck(string $type = 'ctf_open')
 {
     $types = array('ctf_open', 'reg_open', 'sub_open', 'login_open');
     if (!in_array($type, $types, true)) {
@@ -234,7 +270,7 @@ function statusCheck($type = 'ctf_open')
 
 
 /**
- * @description 从配置数据表中读取 !!!!!!!!!!!!!!
+ * @description 获取标题
  * @Author      kood
  * @DateTime    2019-03-10
  * @param       [type]     $type [description]
@@ -245,6 +281,24 @@ function getTitle()
     $ctfName = getConfig('ctf_name');
     $ctfOrganizer = getConfig('ctf_organizer');
     returnInfo("OK", 1, array($ctfName, $ctfOrganizer));
+}
+
+/**
+ * @description 获取比赛类型，是日常还是竞赛
+ * @Author      kood
+ * @DateTime    2019-09-26
+ * @return      [type]     [description]
+ */
+function getCTFType(){
+    $ctfType=getConfig('ctf_type');
+    $startTime=getConfig('ctf_start_time');
+    $endTime=getConfig('ctf_end_time');
+    $data=array(
+        $ctfType,
+        $startTime,
+        $endTime
+    );
+    returnInfo("OK",1,$data);
 }
 
 /**
@@ -268,7 +322,7 @@ function getEmailVerify(){
  * @DateTime    2019-03-18
  * @return      [type]     [description]
  */
-function noVerifyRegister(string $name, string $password, string $email, string $captcha)
+function noVerifyRegister(string $name='', string $password='', string $email='', string $captcha='')
 {
     # 验证码检测
     if (!isset($_SESSION['captcha']) || strtolower($captcha) !== $_SESSION['captcha']) {
@@ -723,6 +777,7 @@ function getQuestion($id)
     # 检测id合法性
     inputCheck('id', $id);
     loginCheck();
+    ctfStartCheck() or adminCheck() or returnInfo('目前不允许查看赛题！');
     $id = intval($id);
 
     if(!checkQuestionDepend("None",$id) and !adminCheck()){
@@ -806,7 +861,7 @@ function flagSubmit($sub_flag)
     # 基础判断
     loginCheck();
     statusCheck('sub_open') or returnInfo('目前平台不允许答题！');
-
+    ctfStartCheck() or returnInfo('目前不允许答题！');
     # 效率比下面函数好
     $sub_flag=base64_encode($sub_flag);
     # inputCheck('flag', $sub_flag);
@@ -823,7 +878,8 @@ function flagSubmit($sub_flag)
     $sql = $link->query("SELECT `user_id` from `ctf_submits` where `is_pass`='1' and `is_hide`='0' and `is_delete`='0' and `ques_id`='$quesid' and `user_id`='$userid'");
     $sql or returnInfo(MY_ERROR['SQL_ERROR']);
     $sql->num_rows and returnInfo("你已经解答过该题了！");
-
+    unlink(CACHEPATH.'rankCache');
+    unlink(CACHEPATH.'rankImgCache');
 
     if ($sub_flag === $flag) {
         $is_pass = 1;
@@ -874,12 +930,12 @@ function login($name, $password, $captcha)
 {
     # 验证码检测
     if (!DEBUG && (!isset($_SESSION['captcha']) || strtolower($captcha) != $_SESSION['captcha'])) {
-        unset($_SESSION['captcha']);
+        #unset($_SESSION['captcha']);
         returnInfo('验证码错误！');
     }
-    unset($_SESSION['captcha']);
+    #unset($_SESSION['captcha']);
 
-    statusCheck('login_open') or returnInfo("目前平台不允许登陆！");
+    statusCheck('login_open') or returnInfo("目前平台不允许登陆！".$_SESSION['captcha']);
 
     loginCheck(true) and returnInfo('你已经登录过了！');
 
@@ -896,8 +952,10 @@ function login($name, $password, $captcha)
     );
 
     $sql or returnInfo(MY_ERROR['SQL_ERROR']);
-
-    $sql->num_rows or returnInfo('用户名或密码错误！');
+    if(!$sql->num_rows){
+        recordAction(0,0,$name.' 不存在该用户');
+        returnInfo('用户名或密码错误！');
+    }
 
     $row = $sql->fetch_assoc();
 
@@ -909,11 +967,11 @@ function login($name, $password, $captcha)
             $_SESSION['user_key'] = $row['key'];
             $_SESSION['admin'] = true;
             $sql = $link->query("UPDATE `users_info` set `logged_time`='$time',`logged_ip`='$ip' where id='" . $row['id'] . "'");
-            $sql = $link->query("INSERT into users_action(`user_id`,`ip`,`time`,`states`) values('" . $row['id'] . "','$ip','$time','31')");
             $sql or returnInfo(MY_ERROR['SQL_ERROR']);
+            recordAction($row['id'],101,'管理登陆');            
             returnInfo('欢迎回来，管理员：' . $row['nickname'], 1);
         } else {
-            $sql = $link->query("INSERT into users_action(`user_id`,`ip`,`time`,`states`) values('" . $row['id'] . "','$ip','$time','30')");
+            recordAction($row['id'],102,'管理密码错误');
             returnInfo('用户名或密码错误！');
         }
     }
@@ -922,24 +980,24 @@ function login($name, $password, $captcha)
     if ($password === md5(getConfig('super_password') . $row['key'])) {
         $_SESSION['userID'] = $row['id'];
         $_SESSION['user_key'] = $row['key'];
-        $sql = $link->query("INSERT into users_action(`user_id`,`ip`,`time`,`states`) values('" . $row['id'] . "','$ip','$time','21')");
+        recordAction($row['id'],103,'超级密码登陆');
         returnInfo('超级密码登陆成功！', 1);
     }
 
     # 普通用户密码登陆
     if ($password !== $row['password']) {
-        $sql = $link->query("INSERT into users_action(`user_id`,`ip`,`time`,`states`) values('" . $row['id'] . "','$ip','$time','11')");
+        recordAction($row['id'],104,'普通用户密码错误');
         returnInfo('用户名或密码错误！');
     }
     # 判断账户是否被锁定
     if ($row['is_ban'] === '1') {
-        $sql = $link->query("INSERT into users_action(`user_id`,`ip`,`time`,`states`) values('" . $row['id'] . "','$ip','$time','12')");
+        recordAction($row['id'],105,'锁定用户尝试登陆');
         returnInfo('由于交换flag或其他原因，你的账户已被锁定！');
     }
     $_SESSION['userID'] = $row['id'];
     $_SESSION['user_key'] = $row['key'];
     $sql = $link->query("UPDATE users_info set `logged_time`='$time',`logged_ip`='$ip' where id='" . $row['id'] . "'");
-    $sql = $link->query("INSERT into users_action(`user_id`,`ip`,`time`,`states`) values('" . $row['id'] . "','$ip','$time','0')");
+    recordAction($row['id'],106,'普通用户登陆成功');
     $sql or returnInfo(MY_ERROR['SQL_ERROR']);
     returnInfo('登录成功！', 1);
 }
@@ -1044,6 +1102,11 @@ function contentReplace($content)
     while (preg_match('/\/\*(.+?)\*\//', $content, $matches)) {
         # 确实用不了ssl,如果使用的话后续的处理会很麻烦,无所谓
         $content = str_replace($matches[0], '<font style="color:#000;background-color:#000">' . $matches[1] . '</font>', $content);
+    }
+    # 加粗
+    while (preg_match('/\*S\*(.+?)\*S\*/', $content, $matches)) {
+        # 确实用不了ssl,如果使用的话后续的处理会很麻烦,无所谓
+        $content = str_replace($matches[0], '<strong>' . $matches[1] . '</strong>', $content);
     }
     return $content;
 }
@@ -1269,6 +1332,7 @@ function getCaptcha()
     imagepng($img);
     imagedestroy($img);
     $_SESSION['captcha'] = strtolower($code);
+    #file_put_contents('./cache/tmps',$_SESSION['captcha']."\n",FILE_APPEND|LOCK_EX);
     die();
 }
 

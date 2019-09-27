@@ -9,7 +9,8 @@ test*.php
 config.php
 短信发送.php
 favicon.ico
-
+/cache
 # 待更新
 mingan.txt
 manage.php
+/ctf-admin/oldConfigList.php

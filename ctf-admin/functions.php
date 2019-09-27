@@ -433,40 +433,14 @@ function noticeManage($operate,$id,$content)
     returnInfo("OK","1");
 }
 
-function updateConfig($website_open,$ctf_open,$reg_open,$login_open,$sub_open,$dynamic_score_open,$one_blood_open,$email_verify_open,$challenge_depend_hide,$cache_open,$blood_score,$recent_solve_show_num,$ctf_name,$ctf_organizer,$docker_exist_time,$get_docker_token,$docker_server,$email_username,$email_password,$super_password,$dynamic_flag_head_fmt){
-    $data=array(
-    'website_open'          => $website_open,
-    'ctf_open'              => $ctf_open,
-    'reg_open'              => $reg_open,
-    'login_open'            => $login_open,
-    'sub_open'              => $sub_open,
-    'dynamic_score_open'    => $dynamic_score_open,
-    'one_blood_open'        => $one_blood_open,
-    'email_verify_open'     => $email_verify_open,
-    'challenge_depend_hide' => $challenge_depend_hide,
-    'cache_open'            => $cache_open,
-    'blood_score'           => $blood_score,
-    'recent_solve_show_num' => $recent_solve_show_num,
-    'ctf_name'              => $ctf_name,
-    'ctf_organizer'         => $ctf_organizer,
-    'docker_exist_time'     => $docker_exist_time,
-    'get_docker_token'      => $get_docker_token,
-    'docker_server'         => $docker_server,
-    'email_username'        => $email_username,
-    'email_password'        => $email_password,
-    'super_password'        => $super_password,
-    'dynamic_flag_head_fmt' => $dynamic_flag_head_fmt
-);
+function updateConfig($name,$value){
     $link=Database::getConnection();
-    foreach ($data as $key => $value) {
-        $sql=$link->query("UPDATE configs set value='$value' where name='$key'");
-        $sql or die('<a href="javascript:history.go (-1)"> 操作失败，数据库异常！点击返回 </a>');#returnInfo("SQL_ERROR");
-    }
-
-    die('<a href="javascript:history.go (-1)"> 操作成功！点击返回 </a>');
-    #returnInfo("OK","1",$data);
-    //returnInfo($website_open.'|'.$ctf_open.'|'.$reg_open.'|'.$login_open.'|'.$sub_open.'|'.$dynamic_score_open.'|'.$one_blood_open.'|'.$email_verify_open.'|'.$challenge_depend_hide.'|'.$cache_open.'|'.$blood_score.'|'.$recent_solve_show_num.'|'.$ctf_name.'|'.$ctf_organizer.'|'.$docker_exist_time.'|'.$get_docker_token.'|'.$docker_server.'|'.$email_username.'|'.$email_password.'|'.$super_password.'|'.$dynamic_flag_head_fmt);
-
+    $name=$link->real_escape_string($name);
+    $value=$link->real_escape_string($value);
+    $sql=$link->query("UPDATE configs set value='$value' where name='$name'");
+    $sql or returnInfo(SQL_ERROR);
+    @unlink(CACHEPATH.'config');
+    #returnInfo("操作成功！","1");
 }
 
 function getConfigs(){

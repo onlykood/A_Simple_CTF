@@ -83,13 +83,16 @@ $('.no-verify').submit(function(){
             debugLog(data);
         }
     });
-    $("#no-captcha").click();
+    /*$("#no-captcha").click();*/
     return false;
 })
 
 $(document).ready(function(){
+    /*邮件验证是否开启*/
     regVerifyCheck();
+    /*对于开启情况的邮件发送检测*/
     mailSendCheck();
+
     $("#sendmail").click(function(){
         $.ajax({
             type:'post',
@@ -121,6 +124,8 @@ $(document).ready(function(){
     });
 
     $('#regaccount').click(function(){
+        debugLog("click this!");
+        return false;
          if(!$( '[name="verify_agree"]' ).prop( 'checked' )){
             Materialize.toast("请同意注册协议！", 4000);
             return false;

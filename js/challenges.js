@@ -335,10 +335,10 @@ $(document).ready(function(){
             success: function( data ){
                 debugLog(data);
                 $('#modal').modal('close');
-                if(errorCheck(data)){
+                Materialize.toast(data[0][1],4000);
+                if(data[0][0]=='0'){
                     return false;
                 }
-                Materialize.toast(data[0][1],4000);
                 if(data[0][0]=='-1'){
                     setTimeout(
                         function(){

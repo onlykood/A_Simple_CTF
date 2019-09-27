@@ -11,10 +11,10 @@
 安装方法很简单，除了 apache2 + php7.1 + mysql5.6以外，还需要安装 php 的几个扩展。
 
 ```bash
-    apt get install apache2 php7.1 mysql
-    apt get install libapache2-mod-php php-mysql php-xml php-gd
+    apt install apache2 php7.1 mysql
+    apt install libapache2-mod-php php-mysql php-xml php-gd
     git clone https://github.com/onlykood/A_Simple_CTF
-    mv A_Simple_CTF /var/www/html/
+    mv A_Simple_CTF/* /var/www/html/
 ```
 
 之后访问index.php即可自动跳转至安装页面，安装完成后即可访问。
@@ -38,4 +38,11 @@
 
     仅测试了 win10+wamp(php7.1.9) 以及 ubuntu16.04LTS + lamp 模式，其他环境如有问题，请先自己分析处理。
 
-    如果在使用过程中出现问题，欢迎联系QQ： 702142058#qq.com，同时您也可以对本项目加以修改，维护。
+    如果在使用过程中出现问题，欢迎联系QQ： 702142058，同时您也可以对本项目加以修改，维护。
+
+* ## QA:
+    Q: Not show captcha image?
+    A: maybe not install php-gd or not restart apache2, or config.php have a space in front of '<?php'
+
+    Q: cache questions
+    A: reset cache, will delete all files in CACHEPATH.

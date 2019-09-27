@@ -121,10 +121,10 @@ function errorCheck(data){
 }
 
 function loadTitle(){
-    title=sessionStorage.getItem('title');
-    pageTitle=sessionStorage.getItem('pageTitle');
-    debugLog(title+' '+pageTitle);
-    if(title==null && pageTitle==null){
+    //title=sessionStorage.getItem('title');
+    //pageTitle=sessionStorage.getItem('pageTitle');
+    //debugLog(title+' '+pageTitle);
+    //if(title==null && pageTitle==null){
         debugLog("触发loadTitle");
         $.ajax({
             type:'post',
@@ -132,23 +132,23 @@ function loadTitle(){
             dataType: 'json',
             success:function(data){
                 debugLog(data);
-                if(errorCheck(data)){
+                if(data[0][0]=='0'){
                     return false;
                 }
                 document.title = data[1][0];
                 $('.page-title').text(data[1][1]);
-                sessionStorage.setItem('title',data[1][0]);
-                sessionStorage.setItem('pageTitle',data[1][1]);
+                //sessionStorage.setItem('title',data[1][0]);
+                //sessionStorage.setItem('pageTitle',data[1][1]);
             },
             error:function(data){
                 debugLog(data);
             }
         });
-    }
-    else{
-        document.title = title;
-        $('.page-title').text(pageTitle);
-    }
+    //}
+    //else{
+    //    document.title = title;
+    //    $('.page-title').text(pageTitle);
+    //}
     return false;
 }
 

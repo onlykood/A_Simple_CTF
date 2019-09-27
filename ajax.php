@@ -19,8 +19,9 @@ if(!isset($_POST['token'])||($_SESSION['token'] !== $_POST['token'])){
     }
 }
 switch( $_GET['m'] ){
+    case 'getCTFType':
+        getCTFType();
     case 'getTitle':
-        postCheck();
         getTitle();
     case 'noVerifyRegister':
         postCheck('username','password','email','captcha');
