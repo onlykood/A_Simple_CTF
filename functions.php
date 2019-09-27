@@ -122,7 +122,7 @@ function adminCheck(){
 function ctfStartCheck(){
     $ctfType=getConfig('ctf_type');
     if($ctfType=='1'){
-        return false;
+        return true;
     }
     $startTime=getConfig('ctf_start_time');
     $endTime=getConfig('ctf_end_time');

@@ -237,7 +237,7 @@ function getQuestions()
             else{
                 ques='<h2 class="center">No Questions, Please Contact The Administrator.</h2>';
             }
-            $( '.questions' ).html( ques );
+            $( '.questions' ).html( ques+'<br><br><br><br><br><br>' );
         },
         error: function(data)    {
             debugLog(data);

@@ -167,9 +167,26 @@ function unixtime(strtime=false){ //不传入日期默认今日
 }
 /*对所有选中部分进行操作*/
 function modConfig(type,name){
+  console.log(type+'  '+name);
     //layer.confirm('确认要'+obj.name+'选中的所有行吗?',function(index){
     if(type=='bt' || type=='sbt'){
         value=1-$('#'+name+' >span').attr('val');
+        if(type=='bt'){
+          if($('#'+name)[0].innerText=='开启'){
+            $('#'+name)[0].innerHTML='<span val="0" class="layui-btn layui-btn-danger layui-btn-mini" onclick="modConfig(\'bt\',\''+name+'\')">关闭</span>';
+          }
+          else{
+            $('#'+name)[0].innerHTML='<span val="0" class="layui-btn layui-btn-normal layui-btn-mini" onclick="modConfig(\'bt\',\''+name+'\')">开启</span>';
+          }
+        }
+        else{
+          if($('#'+name)[0].innerText=='日常开放'){
+            $('#'+name)[0].innerHTML='<span val="0" class="layui-btn layui-btn-danger layui-btn-mini" onclick="modConfig(\'sbt\',\''+name+'\')">竞赛开放</span>';
+          }
+          else{
+            $('#'+name)[0].innerHTML='<span val="0" class="layui-btn layui-btn-normal layui-btn-mini" onclick="modConfig(\'sbt\',\''+name+'\')">日常开放</span>';
+          }
+        }
     }
     else if (type=='ipt'){
         value=$('#'+name).val();
@@ -196,9 +213,14 @@ function modConfig(type,name){
 }
 
 function getMyDate(str){
+    var getzf=function(num){
+        if(parseInt(num) < 10){  
+          num = '0'+num;  
+      }
+      return num; 
+    }
     /*补上3个0 转换为数字*/
-    str+='000';
-    str-=0;
+    str*=1000;
     var oDate = new Date(str),  
     oYear = oDate.getFullYear(),  
     oMonth = oDate.getMonth()+1,  
@@ -209,15 +231,6 @@ function getMyDate(str){
     oTime = oYear +'-'+ getzf(oMonth) +'-'+ getzf(oDay) +' '+ getzf(oHour) +':'+ getzf(oMin) +':'+getzf(oSen);//最后拼接时间  
     return oTime;  
 }
-
-/*补0操作*/
-function getzf(num){  
-    if(parseInt(num) < 10){  
-        num = '0'+num;  
-    }  
-    return num;  
-}
-
 function loadConfigs(){
     $.ajax({
         type:'POST',
@@ -243,7 +256,7 @@ function loadConfigs(){
                     tmp.val(getMyDate(content['value']));
                 }
                 else if(tmp.attr('ops')=='sbt'){
-                    state=content['value']==1?'<span val="1" class="layui-btn layui-btn-normal layui-btn-mini" onclick="modConfig(\'bt\',\''+content['name']+'\')">日常开放</span></td>':'<span val="0" class="layui-btn layui-btn-danger layui-btn-mini" onclick="modConfig(\'bt\',\''+content['name']+'\')">比赛开放</span></td>';
+                    state=content['value']==1?'<span val="1" class="layui-btn layui-btn-normal layui-btn-mini" onclick="modConfig(\'sbt\',\''+content['name']+'\')">日常开放</span></td>':'<span val="0" class="layui-btn layui-btn-danger layui-btn-mini" onclick="modConfig(\'sbt\',\''+content['name']+'\')">比赛开放</span></td>';
                     tmp.html(state);
                 }
                 else{

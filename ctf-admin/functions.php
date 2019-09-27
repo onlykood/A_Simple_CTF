@@ -6,18 +6,11 @@ if( !defined( 'INITIALIZED' ) ) {
 }
 
 //定义语句
-define('IS_DEBUG', true);
 define('SQL_CONNECT_FAIL','连接数据库失败，请重试！');
 define('SQL_ERROR','数据库异常，请重试！');
 define('DATA_ERROR','数据异常，请重试！');
 define('DATA_MISS','数据丢失，请重试！');
 define('NO_LOGIN','请登录后再次常试！');
-//定义超级密码，任意用户登录
-define("SUPER_PASSWORD","@whosyourdaddy");
-//定义首页recent显示的数目
-define("RECENT_NUM",10);
-//定义是否开启一血机制
-define("ONE_BLOOD",true);
 $questionType=array('Web','Reverse','Pwn','Misc','Crypto','Stega','Ppc');
 
 #数据json格式输出
@@ -44,9 +37,9 @@ function inputCheck($data,$type)
 {
     switch ($type){
         case 'flag':
-            if(!preg_match('/^[a-zA-Z0-9_{}\=\+\*\@\-]+$/', $data)){
-                returnInfo('Flag不符合格式！');
-            }
+            //if(!preg_match('/^[a-zA-Z0-9_{}\=\+\*\@\-]+$/', $data)){
+            //    returnInfo('Flag不符合格式！');
+            //}
             if(strlen($data)>100){
                 returnInfo('Flag过长！');
             }
@@ -440,7 +433,7 @@ function updateConfig($name,$value){
     $sql=$link->query("UPDATE configs set value='$value' where name='$name'");
     $sql or returnInfo(SQL_ERROR);
     @unlink(CACHEPATH.'config');
-    #returnInfo("操作成功！","1");
+    returnInfo("操作成功！","1");
 }
 
 function getConfigs(){

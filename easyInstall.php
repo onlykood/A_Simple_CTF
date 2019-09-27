@@ -159,34 +159,38 @@ $link->query("CREATE TABLE IF NOT EXISTS `configs`(
   `value`   varchar(100)   NOT NULL DEFAULT ''     ,
   `descrip` varchar(100)   NOT NULL DEFAULT ''     ,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8") or die('SQL error8');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8") or die('SQL error8');
 
 
 // 写入初始数据
 $a='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 $super_password=substr(str_shuffle($a),mt_rand(0,strlen($a)-11),10);
 $link->query("INSERT INTO `configs`(`id`,`name`,`value`,`descrip`) VALUES
-(1,'reg_open','1','是否开放注册'),
-(2,'sub_open','1','是否允许答题'),
-(3,'login_open','1','是否允许登陆'),
-(4,'ctf_open','1','是否开放ctf'),
-(5,'website_open','1','是否开放站点'),
-(6,'dynamic_score_open','0','是否使用动态积分'),
-(7,'one_blood_open','0','是否开启前几血加分'),
-(8,'blood_score','[10,6,3,1]','前几血加分数值'),
-(9,'recent_solve_show_num','10','首页显示最近题数量'),
-(10,'docker_exist_time','3600','docker的生存时间'),
-(11,'email_username','','邮件用户名'),
-(12,'email_password','','邮件密码'),
-(13,'super_password','$super_password','超级密码,一般用于测试使用'),
-(14,'dynamic_flag_head_fmt','flag','动态flag的flag头格式'),
-(15,'ctf_name','Simple CTF','网站标题'),
-(16,'ctf_organizer','Simple','菜单栏左侧标识'),
-(17,'email_verify_open','0','是否开启邮箱验证注册'),
-(18,'cache_open','0','是否启用缓存'),
-(19,'challenge_depend_hide','0','存在依赖的赛题是否隐藏'),
-(20,'get_docker_token','','与docker服务器交互的令牌'),
-(21,'docker_server','','docker服务器url')") or die('SQL error');
+(NULL,'reg_open','1','是否开放注册'),
+(NULL,'sub_open','1','是否允许答题'),
+(NULL,'login_open','1','是否允许登陆'),
+(NULL,'ctf_open','1','是否开放ctf'),
+(NULL,'website_open','1','是否开放站点'),
+(NULL,'dynamic_score_open','0','是否使用动态积分'),
+(NULL,'one_blood_open','0','是否开启前几血加分'),
+(NULL,'blood_score','[10,6,3,1]','前几血加分数值'),
+(NULL,'recent_solve_show_num','10','首页显示最近题数量'),
+(NULL,'docker_exist_time','3600','docker的生存时间'),
+(NULL,'email_username','','邮件用户名'),
+(NULL,'email_password','','邮件密码'),
+(NULL,'super_password','$super_password','超级密码,一般用于测试使用'),
+(NULL,'dynamic_flag_head_fmt','flag','动态flag的flag头格式'),
+(NULL,'ctf_name','Simple CTF','网站标题'),
+(NULL,'ctf_organizer','Simple','菜单栏左侧标识'),
+(NULL,'email_verify_open','0','是否开启邮箱验证注册'),
+(NULL,'cache_open','0','是否启用缓存'),
+(NULL,'challenge_depend_hide','0','存在依赖的赛题是否隐藏'),
+(NULL,'get_docker_token','','与docker服务器交互的令牌'),
+(NULL,'docker_server','','docker服务器url'),
+(NULL,'ctf_type','1','比赛模式'),
+(NULL,'ctf_start_time','0','比赛开始时间'),
+(NULL,'ctf_end_time','0','比赛结束时间'),
+") or die('SQL error');
 
 $link->query("INSERT INTO `users_info` (`name`,`password`,`email`,`key`,`reg_time`,`reg_ip`,`big_img`,`tiny_img`,`is_verify`,`is_hide`,`is_admin`) 
 VALUES('$username','$password','$email','$key','$time','$ip','','','1','1','1')") or die('SQL error');
