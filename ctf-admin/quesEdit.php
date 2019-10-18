@@ -50,7 +50,7 @@ $row = $sql->fetch_assoc();
                     <span class="x-red">*</span>分数
                 </label>
                 <div class="layui-input-inline">
-                    <input type="text" id="L_score" name="score" required="" lay-verify="score" autocomplete="off" class="layui-input" value="<?php echo $row['score']; ?>">
+                    <input type="text" id="L_score" name="score" required="" lay-verify="score" autocomplete="off" class="layui-input" value="<?=$row['score'];?>">
                 </div>
             </div>
             <div class="layui-form-item">
@@ -59,7 +59,7 @@ $row = $sql->fetch_assoc();
                 </label>
                 <div class="layui-input-inline">
                   <select id="L_type" name="type" lay-verify="type">
-                    <option value=""></option>
+                    <option value="<?=$row['type'];?>"></option>
                     <option value="0">Web</option>
                     <option value="1">Reverse</option>
                     <option value="2">Pwn</option>
@@ -75,7 +75,7 @@ $row = $sql->fetch_assoc();
                     Dockerid
                 </label>
                 <div class="layui-input-inline">
-                    <input type="text" id="L_dockerid" name="dockerid" lay-verify="dockerid" class="layui-input" value="<?php echo $row['docker_id']; ?>">
+                    <input type="text" id="L_dockerid" name="dockerid" lay-verify="dockerid" class="layui-input" value="<?=$row['docker_id']; ?>">
                 </div>
                 <div class="layui-form-mid layui-word-aux">
                     <span class="x-red">*</span>无docker id，则不填或填0

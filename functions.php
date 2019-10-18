@@ -604,6 +604,22 @@ function sendRegMail($name, $email, $captcha)
     returnInfo('已发送验证码至您的邮箱，请注意查收！', 1);
 }
 
+
+/*获取当前用户 当前赛题的解题名次， 对数据库查间次数过多，不友好0rz，后续修复*/
+function getNums($ques_id, $user_id){
+    global $link;
+    $sql=$link->query("SELECT * from ctf_submits where ques_id='$ques_id' and is_pass='1' order by sub_time");
+    $sql or returnInfo(SQL_ERROR);
+    $i=0;
+    while($row= $sql->fetch_assoc()){
+        $i++ ;
+        if($row['user_id']== $user_id){
+            break;
+        }
+    }
+    return $i;
+}
+
 /**
  * @description 获取排行榜数据
  * @Author      kood
@@ -678,14 +694,12 @@ function getRank($is_img = 0)
     }
 
     $sql or returnInfo(MY_ERROR['SQL_ERROR']);
-    $allQuestionId = array();
     while ($row = $sql->fetch_assoc()) {
         if ($temp != $row['user_id']) {
 
             $ttt = 0;
             $temp = $row['user_id'];
         }
-        $allQuestionId[] = $row['ques_id'];
 
         # 如果不存在user_id，判断为删除了
         if (!isset($data[$row['user_id']])) {
@@ -694,9 +708,9 @@ function getRank($is_img = 0)
 
         # 得分=基础分+一血分
         if (getConfig('dynamic_score_open')) {
-            $data[$row['user_id']]['score'] += scoreModel($row['num']) + oneBlood(array_count_values($allQuestionId)[$row['ques_id']]);
+            $data[$row['user_id']]['score'] += scoreModel($row['num']) + oneBlood(getNums($row['ques_id'],$row['user_id']));
         } else {
-            $data[$row['user_id']]['score'] += $row['score'] + oneBlood(array_count_values($allQuestionId)[$row['ques_id']]);
+            $data[$row['user_id']]['score'] += $row['score'] + oneBlood(getNums($row['ques_id'],$row['user_id']));
         }
         # 计算得分时间
         $data[$row['user_id']]['scoreDate'][$ttt++] = array($row['sub_time'] * 1000 + 28800000, $data[$row['user_id']]['score']);
@@ -930,12 +944,11 @@ function login($name, $password, $captcha)
 {
     # 验证码检测
     if (!DEBUG && (!isset($_SESSION['captcha']) || strtolower($captcha) != $_SESSION['captcha'])) {
-        #unset($_SESSION['captcha']);
+        unset($_SESSION['captcha']);
         returnInfo('验证码错误！');
     }
-    #unset($_SESSION['captcha']);
+    unset($_SESSION['captcha']);
 
-    statusCheck('login_open') or returnInfo("目前平台不允许登陆！".$_SESSION['captcha']);
 
     loginCheck(true) and returnInfo('你已经登录过了！');
 
@@ -984,6 +997,7 @@ function login($name, $password, $captcha)
         returnInfo('超级密码登陆成功！', 1);
     }
 
+    statusCheck('login_open') or returnInfo("目前平台不允许登陆！");#.$_SESSION['captcha']);
     # 普通用户密码登陆
     if ($password !== $row['password']) {
         recordAction($row['id'],104,'普通用户密码错误');
@@ -1280,7 +1294,7 @@ function getVideo()
     # $data='<iframe src="//player.bilibili.com/player.html?aid=44161960&cid=77339908&page=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="height:600px;width:80%"></iframe>';
     $data = '功能有待完善';
     if (adminCheck()) {
-        $data .= '<br/><a href="./ctf-admin" target="_blank">管理入口</a><br>';
+        $data .= '<br/><a href="./ctf-admin/index.php" target="_blank">管理入口</a><br>';
     } else {
         # data.="不存在阿";
     }
@@ -1421,12 +1435,13 @@ function getDockerUrl()
         returnInfo($content[0]['text']);
         # echo $content['data'];
     }
-    $dockerUrl = explode(':', getConfig('docker_server'));
+    $dockerUrl = parse_url(getConfig('docker_server'));
+
     if($dockerPort==='8888'){
-        $dockerUrl=$dockerUrl[1].' '.$port;
+        $dockerUrl=gethostbyname($dockerUrl['host']).' '.$port;
     }
     else{
-        $dockerUrl = $dockerUrl[0] . ':' . $dockerUrl[1] . ':' . $port;
+        $dockerUrl = $dockerUrl['scheme']."://". gethostbyname($dockerUrl['host']) . ':' . $port;
     }
     $sql = $link->query(
         "INSERT INTO `docker_use_lists`(`user_id`,`ques_id`,`docker_id`,`docker_name`,`ret_url`,`create_time`) 
@@ -1444,7 +1459,7 @@ function destroyDocker()
     isset($_SESSION['quesID']) or returnInfo("请选中 Challenge");
     $userID = $_SESSION['userID'];
     $quesID = $_SESSION['quesID'];
-    $sql = $link->query("SELECT * from docker_use_lists where ques_id='$quesID' and `user_id`='$userID'");
+    $sql = $link->query("SELECT * from docker_use_lists where ques_id='$quesID' and `user_id`='$userID' order by create_time desc limit 1");
     $sql or returnInfo(MY_ERROR['SQL_ERROR']);
     $sql->num_rows or returnInfo("No this docker");
 

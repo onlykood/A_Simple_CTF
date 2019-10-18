@@ -13,7 +13,7 @@ if(!isset($_POST['token'])||($_SESSION['token'] !== $_POST['token'])){
     if($_GET['m']!='getSession' && $_GET['m']!='getCaptcha' && $_GET['m']!='getTitle'){
         unset($_SESSION['token']);
         if(!isset($_POST['token'])){
-            returnInfo(MY_ERROR['DATA_MISS']);
+            returnInfo(MY_ERROR['DATA_MISS'],-3);
         }
         returnInfo(MY_ERROR['DATA_ERROR']);
     }

@@ -19,7 +19,7 @@ if(isset($_POST['DB_HOST']) && isset($_POST['DB_USER']) && isset($_POST['DB_PASS
     $dbHost=$_POST['DB_HOST'];
     $dbUser=$_POST['DB_USER'];
     $dbPassword=$_POST['DB_PASSWD'];
-    $path= DIRECTORY_SEPARATOR =='\\'? $_SERVER['TEMP']:'/tmp/';
+    $path= DIRECTORY_SEPARATOR =='\\'? mkdir('./tmp') and './tmp':'/tmp/';
     $content="<?php\ndefine('DEBUG',false);\ndefine('CACHEPATH','$path');\ndefine('SQL_CONFIG',[\n    'DB_HOST'    => '$dbHost',\n    'DB_USER'    => '$dbUser',\n    'DB_PASS'    => '$dbPassword',\n    'DB_NAME'    => '$dbName',\n]);";
 
     $ip=ip2long($_SERVER['REMOTE_ADDR']);
@@ -189,7 +189,7 @@ $link->query("INSERT INTO `configs`(`id`,`name`,`value`,`descrip`) VALUES
 (NULL,'docker_server','','docker服务器url'),
 (NULL,'ctf_type','1','比赛模式'),
 (NULL,'ctf_start_time','0','比赛开始时间'),
-(NULL,'ctf_end_time','0','比赛结束时间'),
+(NULL,'ctf_end_time','0','比赛结束时间')
 ") or die('SQL error');
 
 $link->query("INSERT INTO `users_info` (`name`,`password`,`email`,`key`,`reg_time`,`reg_ip`,`big_img`,`tiny_img`,`is_verify`,`is_hide`,`is_admin`) 
