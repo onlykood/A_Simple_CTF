@@ -46,3 +46,6 @@
 
     Q: cache questions
     A: reset cache, will delete all files in CACHEPATH.
+    
+    Q: docker使用问题
+    A: 参考 https://github.com/onlykood/dynamic_docker 。
