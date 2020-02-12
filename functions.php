@@ -1459,7 +1459,7 @@ function destroyDocker()
     isset($_SESSION['quesID']) or returnInfo("请选中 Challenge");
     $userID = $_SESSION['userID'];
     $quesID = $_SESSION['quesID'];
-    $sql = $link->query("SELECT * from docker_use_lists where ques_id='$quesID' and `user_id`='$userID' order by create_time desc limit 1");
+    $sql = $link->query("SELECT * from docker_use_lists where ques_id='$quesID' and `user_id`='$userID' and `user_delete`=0 order by create_time desc limit 1");
     $sql or returnInfo(MY_ERROR['SQL_ERROR']);
     $sql->num_rows or returnInfo("No this docker");
 
