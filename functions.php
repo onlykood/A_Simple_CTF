@@ -1241,7 +1241,7 @@ function getQuestions($type)
         left join (select distinct `ques_id`,`is_pass` from `ctf_submits` where `is_pass`='1' and `is_hide`='0' and `is_delete`='0' and `user_id`='$userid')a 
         on `ques_id`=`id`
         where `ctf_challenges`.`is_hide`='0'".$typeCommand."
-        order by `type`"
+        order by `type`,`id`"
     );
     $sql or returnInfo(MY_ERROR['SQL_ERROR']);
 
