@@ -1312,7 +1312,7 @@ function getCaptcha()
     $width = 130;
     $height = 50;
     # 指定的字体
-    $font = './fonts/roboto/Roboto-Medium.ttf';;
+    $font = realpath('./fonts/roboto/Roboto-Medium.ttf');
     # 指定字体大小
     $fontsize = 20;
     # 生成背景

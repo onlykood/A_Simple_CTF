@@ -11,7 +11,7 @@
 安装方法很简单，除了 apache2 + php7.1 + mysql5.6以外，还需要安装 php 的几个扩展。
 
 ```bash
-    apt install apache2 php7.1 mysql
+    apt install apache2 php7.1 mysql-server
     apt install libapache2-mod-php php-mysql php-xml php-gd
     git clone https://github.com/onlykood/A_Simple_CTF
     mv A_Simple_CTF/* /var/www/html/
@@ -28,6 +28,9 @@
     2019/08/26
     emmm , 由于服务器到期，已经挂了，以后会更新
 
+    2020/04/28
+    恢复上述域名访问
+
 * ## License
 
     该项目签署了 MIT 授权许可，详情请参阅 [LICENSE.md](https://github.com/onlykood/A_Simple_CTF/master/LICENSE)
@@ -42,10 +45,14 @@
 
 * ## QA:
     Q: Not show captcha image?
+
     A: maybe not install php-gd or not restart apache2, or config.php have a space in front of '<?php'
 
     Q: cache questions
+
     A: reset cache, will delete all files in CACHEPATH.
     
     Q: docker使用问题
+
     A: 参考 https://github.com/onlykood/dynamic_docker 。
+

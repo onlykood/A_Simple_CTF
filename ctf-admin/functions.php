@@ -397,7 +397,7 @@ function getSubmitsList()
         $data[$i]['quesname']=$row['title'];
         $data[$i]['time']=$row['sub_time'];
         $data[$i]['ip']=$row['sub_ip'];
-        $data[$i]['flag']=$row['sub_flag'];
+        $data[$i]['flag']=base64_decode($row['sub_flag']);
         $data[$i++]['pass']=$row['is_pass'];
     }
     returnInfo("OK","1",$data);
@@ -435,7 +435,10 @@ function updateConfig($name,$value){
     @unlink(CACHEPATH.'config');
     returnInfo("操作成功！","1");
 }
-
+function scoreModel(int $number=0): int
+{
+    return intval(1001 - 1000 / (1.01 + pow(2.2, 12 - $number)));
+}
 function getConfigs(){
     $link=Database::getConnection();
     $sql=$link->query("SELECT * from configs");
@@ -444,4 +447,158 @@ function getConfigs(){
         $data[]=$row;
     }
     returnInfo("OK","1",$data);
+}
+
+/**
+ * @description 从配置数据表中读取配置
+ * @Author      kood
+ * @DateTime    2019-03-20
+ * @param       string       $configName 配置名称
+ * @param       bool|boolean $retJson    数据是否以json直接返回
+ * @return      [type]                   [description]
+ */
+function getConfig(string $configName)
+{
+    $link=Database::getConnection();
+    $sql = $link->query("SELECT name,value FROM configs");
+    $sql or returnInfo('SQL_ERROR');
+    $configs=array();
+    while($row=$sql->fetch_assoc()){
+        $configs[$row['name']]=$row['value'];
+    }
+    array_key_exists($configName,$configs) or returnInfo("No found config");
+    return $configs[$configName];
+}
+
+function oneBlood(int $num=0): int
+{
+    $score = 0;
+    if (!getConfig('one_blood_open') or $num<1) {
+        return $score;
+    }
+    $num-=1;
+    $blood_score=json_decode(getConfig('blood_score'));
+    $oneBloodNum = count($blood_score);
+    # 如果num在一血加成范围之内，加分，否则score为0
+    if ($num < $oneBloodNum) {
+        $score = $blood_score[$num];
+    }
+    return $score;
+}
+function getNums($ques_id, $user_id){
+    global $link;
+    $sql=$link->query("SELECT * from ctf_submits where ques_id='$ques_id' and is_pass='1' order by sub_time");
+    $sql or returnInfo(SQL_ERROR);
+    $i=0;
+    while($row= $sql->fetch_assoc()){
+        $i++ ;
+        if($row['user_id']== $user_id){
+            break;
+        }
+    }
+    return $i;
+}
+
+function getRank()
+{
+    $link=Database::getConnection();
+    $temp = '';
+    $data = array();
+
+    $sql = $link->query(
+        "SELECT 
+            a.id,`extra_score` as `score`,`name`,`nickname`
+        from 
+            `users_info` as a , ctf_submits as b 
+        where 
+            a.is_hide='0' and a.is_delete='0' and b.is_pass='1' and b.is_delete='0' 
+        group by 
+            a.id"
+    );
+
+    $sql or returnInfo('SQL_ERROR');
+
+    while ($row = $sql->fetch_assoc()) {
+        $data[$row['id']] = $row;
+        $data[$row['id']]['score']=intval($row['score']);
+        $data[$row['id']]['solves']=array();
+    }
+
+    if (getConfig('dynamic_score_open')) {
+        $sql = $link->query(
+            "SELECT 
+                a.ques_id,a.user_id,b.num,a.sub_time
+            from 
+                (SELECT `user_id`,`ques_id`,`sub_time` from `ctf_submits` where `is_pass`='1' order by `ques_id`,`sub_time`)a 
+            inner join 
+                (select `ques_id`,count(*) as `num` from `ctf_submits` where `is_pass`='1' group by `ques_id`)b
+            on a.`ques_id`=b.`ques_id`
+            order by a.user_id,a.sub_time"
+        );
+    } else {
+        $sql = $link->query(
+            "SELECT 
+                b.score,a.ques_id,a.user_id,a.sub_time,b.title 
+            FROM 
+                `ctf_submits` as a, `ctf_challenges` as b 
+            WHERE 
+                a.is_pass='1' and b.id=a.ques_id 
+            ORDER BY a.user_id,a.sub_time"
+        );
+    }
+
+    $sql or returnInfo('SQL_ERROR');
+    while ($row = $sql->fetch_assoc()) {
+
+        # 得分=基础分+一血分
+        if (getConfig('dynamic_score_open')) {
+            $data[$row['user_id']]['score'] += scoreModel($row['num']) + oneBlood(getNums($row['ques_id'],$row['user_id']));
+        } else {
+            $data[$row['user_id']]['score'] += $row['score'] + oneBlood(getNums($row['ques_id'],$row['user_id']));
+        }
+        # 计算得分时间
+        $data[$row['user_id']]['solves'][$row['title']] = $row['sub_time'] + 28800;
+        $data[$row['user_id']]['lasttime']=$row['sub_time'] + 28800;
+    }
+
+    foreach ($data as $key => $row) {
+        $score[$key]  = $row['score'];
+        $lasttime[$key] = $row['lasttime'];
+    }
+
+    array_multisort($score, SORT_DESC, $lasttime, SORT_ASC,$data);
+    
+    return $data;
+}
+
+function getScore($formate_time){
+    header("Content-type: text/html; charset=utf-8"); 
+    header('Content-Disposition: attachment; filename="导出.csv"');
+    echo "\xEF\xBB\xBF"; // windows magic head utf-8
+    $link=Database::getConnection();
+    $data=getRank();
+    $sql=$link->query("SELECT title from ctf_challenges");
+    $sql or returnInfo("SQL_ERROR");
+    echo '用户名,总分,';
+    $titles=array();
+    while($row=$sql->fetch_assoc()){
+        $titles[]=$row['title'];
+    }
+    foreach ($titles as $key) {
+        echo $key,",";
+    }
+    echo "\n";
+    foreach ($data as $key => $v1) {
+        echo $v1['name'],',',$v1['score'],',';
+        foreach ($titles as $key => $v2) {
+            if(array_key_exists($v2, $v1['solves'])){
+                echo date($formate_time,$v1['solves'][$v2]),',';
+            }
+            else{
+                echo '未完成,';
+            }
+        }
+        echo "\n";
+    }
+    die();
 }

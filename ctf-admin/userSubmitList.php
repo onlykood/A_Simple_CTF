@@ -28,6 +28,8 @@
         <div class="x-body">
             <xblock>
                 <button class="layui-btn layui-btn-danger" onclick="allClicked(this,'is_delete')" name="批量删除">批量删除</button>
+                <a href="./ajax.php?m=getScore1"><button class="layui-btn" name="成绩导出">成绩导出(只有时间没有日期)</button></a>
+                <a href="./ajax.php?m=getScore2"><button class="layui-btn" name="成绩导出">成绩导出(有时间有日期)</button></a>
             </xblock>
               <table class="layui-table">
                 <thead>

@@ -58,6 +58,10 @@ switch( $_GET['m'] )    {
         updateConfig($_POST['name'],$_POST['value']);
     case 'getConfigs':
         getConfigs();
+    case 'getScore1':
+        getScore("H:i:s");
+    case 'getScore2':
+        getScore("Y-m-d H:i:s");
     default:returnInfo(DATA_ERROR);
 }
 ?>
