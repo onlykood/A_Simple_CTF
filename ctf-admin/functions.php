@@ -538,7 +538,7 @@ function getRank()
     } else {
         $sql = $link->query(
             "SELECT 
-                b.score,a.ques_id,a.user_id,a.sub_time,b.title 
+                b.score,a.ques_id,a.user_id,a.sub_time,b.title,b.id 
             FROM 
                 `ctf_submits` as a, `ctf_challenges` as b 
             WHERE 
@@ -557,7 +557,7 @@ function getRank()
             $data[$row['user_id']]['score'] += $row['score'] + oneBlood(getNums($row['ques_id'],$row['user_id']));
         }
         # 计算得分时间
-        $data[$row['user_id']]['solves'][$row['title']] = $row['sub_time'] + 28800;
+        $data[$row['user_id']]['solves'][$row['id']] = $row['sub_time'] + 28800;
         $data[$row['user_id']]['lasttime']=$row['sub_time'] + 28800;
     }
 
@@ -577,12 +577,14 @@ function getScore($formate_time){
     echo "\xEF\xBB\xBF"; // windows magic head utf-8
     $link=Database::getConnection();
     $data=getRank();
-    $sql=$link->query("SELECT title from ctf_challenges");
+    $sql=$link->query("SELECT id,title from ctf_challenges");
     $sql or returnInfo("SQL_ERROR");
     echo '用户名,总分,';
     $titles=array();
+    $ids=array();
     while($row=$sql->fetch_assoc()){
         $titles[]=$row['title'];
+        $ids[]=$row['id'];
     }
     foreach ($titles as $key) {
         echo $key,",";
@@ -590,7 +592,7 @@ function getScore($formate_time){
     echo "\n";
     foreach ($data as $key => $v1) {
         echo $v1['name'],',',$v1['score'],',';
-        foreach ($titles as $key => $v2) {
+        foreach ($idss as $key => $v2) {
             if(array_key_exists($v2, $v1['solves'])){
                 echo date($formate_time,$v1['solves'][$v2]),',';
             }
