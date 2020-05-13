@@ -592,7 +592,7 @@ function getScore($formate_time){
     echo "\n";
     foreach ($data as $key => $v1) {
         echo $v1['name'],',',$v1['score'],',';
-        foreach ($idss as $key => $v2) {
+        foreach ($ids as $key => $v2) {
             if(array_key_exists($v2, $v1['solves'])){
                 echo date($formate_time,$v1['solves'][$v2]),',';
             }
