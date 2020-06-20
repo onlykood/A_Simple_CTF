@@ -557,8 +557,8 @@ function getRank()
             $data[$row['user_id']]['score'] += $row['score'] + oneBlood(getNums($row['ques_id'],$row['user_id']));
         }
         # 计算得分时间
-        $data[$row['user_id']]['solves'][$row['id']] = $row['sub_time'] + 28800;
-        $data[$row['user_id']]['lasttime']=$row['sub_time'] + 28800;
+        $data[$row['user_id']]['solves'][$row['id']] = $row['sub_time'];
+        $data[$row['user_id']]['lasttime']=$row['sub_time'];
     }
 
     foreach ($data as $key => $row) {
