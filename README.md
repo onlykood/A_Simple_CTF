@@ -56,3 +56,6 @@
 
     A: 参考 https://github.com/onlykood/dynamic_docker 。
 
+    Q: 后台访问出错，登录没反应
+    A: 后台地址 ctf-admin ，需要在前台以管理员用户登录后，才可以正常访问，否则会提示404。
+       注：这里的登录是指ctf平台的登录入口，并非login.php页面
